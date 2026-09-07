@@ -3,227 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Врач-невролог — Портфолио</title>
+<title>Василий Дорогов — врач-невролог</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --paper:#F7F6F2;
-    --ink:#1F2421;
-    --primary:#253645;
-    --muted:#5B6660;
-    --line:#DEDAD0;
-    --accent:#A6672C;
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'IBM Plex Sans', sans-serif;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
-  h1,h2,h3{
-    font-family:'Fraunces', serif;
-    font-weight:500;
-    color:var(--primary);
-    margin:0;
-  }
-  a{color:var(--primary);}
-  .wrap{
-    max-width:900px;
-    margin:0 auto;
-    padding:0 32px;
-  }
-  /* NAV */
-  header{
-    padding:28px 0;
-    border-bottom:1px solid var(--line);
-  }
-  header .wrap{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:12px;
-  }
-  .brand{
-    font-family:'Fraunces', serif;
-    font-size:18px;
-    color:var(--primary);
-  }
-  nav{display:flex; gap:28px;}
-  nav a{
-    text-decoration:none;
-    color:var(--muted);
-    font-size:15px;
-    border-bottom:1px solid transparent;
-    transition:border-color .2s ease, color .2s ease;
-  }
-  nav a:hover{color:var(--primary); border-color:var(--accent);}
-
-  /* HERO */
-  .hero{
-    padding:88px 0 72px;
-    display:grid;
-    grid-template-columns:1.5fr 1fr;
-    gap:48px;
-    border-bottom:1px solid var(--line);
-  }
-  .hero h1{
-    font-size:44px;
-    line-height:1.15;
-    margin-bottom:14px;
-  }
-  .hero .role{
-    font-size:19px;
-    color:var(--accent);
-    margin-bottom:22px;
-    font-family:'Fraunces', serif;
-    font-style:italic;
-  }
-  .hero p{
-    max-width:52ch;
-    color:var(--muted);
-    font-size:16px;
-  }
-  .facts{
-    display:flex;
-    flex-direction:column;
-    gap:22px;
-    padding-top:8px;
-    border-left:1px solid var(--line);
-    padding-left:28px;
-  }
-  .fact .num{
-    font-family:'Fraunces', serif;
-    font-size:28px;
-    color:var(--primary);
-    display:block;
-  }
-  .fact .label{
-    color:var(--muted);
-    font-size:14px;
-  }
-
-  /* SECTIONS */
-  section{
-    padding:64px 0;
-    border-bottom:1px solid var(--line);
-  }
-  section:last-of-type{border-bottom:none;}
-  .section-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    margin-bottom:36px;
-    gap:24px;
-  }
-  .section-head h2{font-size:26px;}
-  .section-head .idx{
-    color:var(--muted);
-    font-size:14px;
-    white-space:nowrap;
-  }
-
-  /* SPECIALIZATION */
-  .spec-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:1px;
-    background:var(--line);
-    border:1px solid var(--line);
-  }
-  .spec-item{
-    background:var(--paper);
-    padding:26px 28px;
-  }
-  .spec-item h3{
-    font-size:17px;
-    margin-bottom:8px;
-  }
-  .spec-item p{
-    margin:0;
-    color:var(--muted);
-    font-size:14.5px;
-  }
-
-  /* EXPERIENCE */
-  .exp-item{
-    display:grid;
-    grid-template-columns:140px 1fr;
-    gap:24px;
-    padding:22px 0;
-    border-top:1px solid var(--line);
-  }
-  .exp-item:first-child{border-top:none;}
-  .exp-period{color:var(--muted); font-size:14.5px; padding-top:2px;}
-  .exp-role h3{font-size:18px; margin-bottom:6px;}
-  .exp-role p{margin:0; color:var(--muted); font-size:15px;}
-
-  /* ABOUT */
-  .about p{
-    max-width:64ch;
-    font-size:16.5px;
-    color:var(--ink);
-    margin-bottom:16px;
-  }
-  .about p:last-child{margin-bottom:0;}
-
-  /* CONTACT */
-  .contact-grid{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:32px;
-  }
-  .contact-item .label{
-    color:var(--muted);
-    font-size:13.5px;
-    margin-bottom:6px;
-  }
-  .contact-item .value{
-    font-size:16px;
-    color:var(--ink);
-  }
-  .contact-item a{text-decoration:none; border-bottom:1px solid var(--line);}
-  .contact-item a:hover{border-color:var(--accent);}
-
-  footer{
-    padding:32px 0 48px;
-    color:var(--muted);
-    font-size:13.5px;
-  }
-
-  @media (max-width:720px){
-    .hero{grid-template-columns:1fr; padding-top:56px;}
-    .facts{border-left:none; border-top:1px solid var(--line); padding-left:0; padding-top:24px; flex-direction:row; flex-wrap:wrap;}
-    .fact{flex:1 1 40%;}
-    .spec-grid{grid-template-columns:1fr;}
-    .contact-grid{grid-template-columns:1fr; gap:20px;}
-    .exp-item{grid-template-columns:1fr; gap:6px;}
-    header .wrap{flex-direction:column; align-items:flex-start;}
-    nav{gap:18px; flex-wrap:wrap;}
-    .hero h1{font-size:34px;}
-  }
-
-  :focus-visible{
-    outline:2px solid var(--accent);
-    outline-offset:3px;
-  }
-  @media (prefers-reduced-motion: reduce){
-    html{scroll-behavior:auto;}
-    *{transition:none !important;}
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
 <header>
   <div class="wrap">
-    <div class="brand">Василий Дорогов</div>
+    <div class="brand">В. Дорогов</div>
     <nav>
       <a href="#about">Обо мне</a>
       <a href="#spec">Специализация</a>
@@ -234,66 +26,77 @@
 </header>
 
 <section class="hero">
-  <div class="wrap" style="display:contents;">
-    <div>
-      <h1>Василий Дорогов</h1>
-      <div class="role">Врач-невролог</div>
-      <p>Диагностика и лечение заболеваний нервной системы — от головной боли и головокружения до последствий инсульта. Веду приём и наблюдение пациентов в ГКБ им. В.В. Вересаева, Москва.</p>
-    </div>
-    <div class="facts">
-      <div class="fact">
-        <span class="num">12 лет</span>
-        <span class="label">клинической практики</span>
+  <div class="wrap hero-grid">
+    <div class="hero-main reveal">
+      <div class="eyebrow">Невролог · Москва</div>
+      <h1>Василий<br>Дорогов</h1>
+      <p class="lede">Диагностика и лечение заболеваний нервной системы — от головной боли и головокружения до последствий инсульта.</p>
+      <div class="hero-cta">
+        <a class="btn-primary" href="#contact">Записаться на приём</a>
       </div>
-      <div class="fact">
-        <span class="num">ГКБ им. В.В. Вересаева</span>
-        <span class="label">место работы, Москва</span>
+    </div>
+    <div class="hero-stats reveal">
+      <div class="stat-card">
+        <span class="stat-num">12</span>
+        <span class="stat-label">лет клинической практики</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num-sm">ГКБ им.<br>В.В. Вересаева</span>
+        <span class="stat-label">место работы, Москва</span>
       </div>
     </div>
   </div>
 </section>
 
-<section id="about" class="about">
+<section id="about">
   <div class="wrap">
-    <div class="section-head">
-      <h2>Обо мне</h2>
-      <span class="idx">01</span>
+    <div class="section-head reveal">
+      <span class="tag">01 — О враче</span>
+      <h2>Подход к лечению</h2>
     </div>
-    <p>Занимаюсь неврологией более 12 лет. За это время накопил опыт ведения пациентов с широким спектром состояний — от острых нарушений мозгового кровообращения до хронических болевых синдромов и нейродегенеративных заболеваний.</p>
-    <p>В работе придерживаюсь доказательного подхода: диагноз опирается на данные осмотра и обследований, а лечение подбирается индивидуально, с учётом сопутствующих заболеваний и образа жизни пациента.</p>
+    <div class="about-grid">
+      <p class="reveal">Занимаюсь неврологией более 12 лет. За это время накопил опыт ведения пациентов с широким спектром состояний — от острых нарушений мозгового кровообращения до хронических болевых синдромов и нейродегенеративных заболеваний.</p>
+      <p class="reveal">В работе придерживаюсь доказательного подхода: диагноз опирается на данные осмотра и обследований, а лечение подбирается индивидуально, с учётом сопутствующих заболеваний и образа жизни пациента.</p>
+    </div>
   </div>
 </section>
 
 <section id="spec">
   <div class="wrap">
-    <div class="section-head">
-      <h2>Специализация</h2>
-      <span class="idx">02</span>
+    <div class="section-head reveal">
+      <span class="tag">02 — Специализация</span>
+      <h2>Направления работы</h2>
     </div>
     <div class="spec-grid">
-      <div class="spec-item">
+      <div class="spec-card reveal">
+        <div class="spec-icon">01</div>
         <h3>Головные боли</h3>
-        <p>Мигрень, головная боль напряжения, кластерная головная боль — диагностика и подбор терапии.</p>
+        <p>Мигрень, головная боль напряжения, кластерная головная боль.</p>
       </div>
-      <div class="spec-item">
+      <div class="spec-card reveal">
+        <div class="spec-icon">02</div>
         <h3>Нарушения мозгового кровообращения</h3>
-        <p>Ведение пациентов после инсульта, профилактика повторных сосудистых событий.</p>
+        <p>Ведение пациентов после инсульта, профилактика повторных событий.</p>
       </div>
-      <div class="spec-item">
-        <h3>Заболевания периферической нервной системы</h3>
+      <div class="spec-card reveal">
+        <div class="spec-icon">03</div>
+        <h3>Периферическая нервная система</h3>
         <p>Невропатии, радикулопатии, туннельные синдромы.</p>
       </div>
-      <div class="spec-item">
-        <h3>Головокружение и нарушения равновесия</h3>
-        <p>Дифференциальная диагностика вестибулярных и неврологических причин.</p>
+      <div class="spec-card reveal">
+        <div class="spec-icon">04</div>
+        <h3>Головокружение</h3>
+        <p>Дифференциальная диагностика вестибулярных причин.</p>
       </div>
-      <div class="spec-item">
+      <div class="spec-card reveal">
+        <div class="spec-icon">05</div>
         <h3>Экстрапирамидные расстройства</h3>
         <p>Болезнь Паркинсона и другие двигательные нарушения.</p>
       </div>
-      <div class="spec-item">
+      <div class="spec-card reveal">
+        <div class="spec-icon">06</div>
         <h3>Эпилепсия</h3>
-        <p>Диагностика пароксизмальных состояний, подбор и коррекция терапии.</p>
+        <p>Диагностика пароксизмальных состояний, подбор терапии.</p>
       </div>
     </div>
   </div>
@@ -301,13 +104,13 @@
 
 <section id="exp">
   <div class="wrap">
-    <div class="section-head">
-      <h2>Опыт работы</h2>
-      <span class="idx">03</span>
+    <div class="section-head reveal">
+      <span class="tag">03 — Опыт</span>
+      <h2>Карьера</h2>
     </div>
-    <div class="exp-item">
-      <div class="exp-period">2014 — наст. время</div>
-      <div class="exp-role">
+    <div class="exp-line reveal">
+      <div class="exp-year">2014 — сейчас</div>
+      <div class="exp-body">
         <h3>Врач-невролог</h3>
         <p>ГКБ им. В.В. Вересаева, Москва. Приём и стационарное наблюдение пациентов неврологического профиля.</p>
       </div>
@@ -317,22 +120,22 @@
 
 <section id="contact">
   <div class="wrap">
-    <div class="section-head">
-      <h2>Контакты</h2>
-      <span class="idx">04</span>
+    <div class="section-head reveal">
+      <span class="tag">04 — Контакты</span>
+      <h2>Связаться</h2>
     </div>
     <div class="contact-grid">
-      <div class="contact-item">
-        <div class="label">Телефон</div>
-        <div class="value"><a href="tel:+79261256598">+7 (926) 125-65-98</a></div>
-      </div>
-      <div class="contact-item">
-        <div class="label">Email</div>
-        <div class="value"><a href="mailto:vdorogov89@gmail.com">vdorogov89@gmail.com</a></div>
-      </div>
-      <div class="contact-item">
-        <div class="label">Место приёма</div>
-        <div class="value">ГКБ им. В.В. Вересаева, Москва</div>
+      <a class="contact-card reveal" href="tel:+79261256598" target="_blank" rel="noopener noreferrer">
+        <span class="c-label">Телефон</span>
+        <span class="c-value">+7 (926) 125-65-98</span>
+      </a>
+      <a class="contact-card reveal" href="mailto:vdorogov89@gmail.com" target="_blank" rel="noopener noreferrer">
+        <span class="c-label">Email</span>
+        <span class="c-value">vdorogov89@gmail.com</span>
+      </a>
+      <div class="contact-card reveal">
+        <span class="c-label">Место приёма</span>
+        <span class="c-value">ГКБ им. В.В. Вересаева, Москва</span>
       </div>
     </div>
   </div>
@@ -344,8 +147,326 @@
   </div>
 </footer>
 
+<style>
+  :root{
+    --bg:#08080D;
+    --bg2:#0F0F17;
+    --ink:#F2F2F5;
+    --muted:#8B8B98;
+    --line:rgba(255,255,255,0.08);
+    --glass:rgba(255,255,255,0.04);
+    --grad1:#4FE0FF;
+    --grad2:#8A5CFF;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
+  }
+  a{color:inherit;}
+  .wrap{
+    max-width:960px;
+    margin:0 auto;
+    padding:0 32px;
+    position:relative;
+  }
+
+  .bg-glow{
+    position:fixed;
+    top:-20%;
+    left:50%;
+    transform:translateX(-50%);
+    width:1200px;
+    height:900px;
+    background:radial-gradient(circle at 30% 30%, rgba(79,224,255,0.14), transparent 60%),
+               radial-gradient(circle at 70% 60%, rgba(138,92,255,0.14), transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+  .bg-grid{
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size:64px 64px;
+    pointer-events:none;
+    z-index:0;
+    mask-image:radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+
+  header{
+    padding:26px 0;
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:0;
+    background:rgba(8,8,13,0.7);
+    backdrop-filter:blur(16px);
+    z-index:10;
+  }
+  header .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .brand{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:17px;
+    letter-spacing:-0.01em;
+  }
+  nav{display:flex; gap:30px;}
+  nav a{
+    text-decoration:none;
+    color:var(--muted);
+    font-size:14.5px;
+    transition:color .2s ease;
+  }
+  nav a:hover{color:var(--ink);}
+
+  .hero{padding:110px 0 90px; position:relative; z-index:1;}
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.5fr 1fr;
+    gap:56px;
+    align-items:end;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-size:13px;
+    color:var(--grad1);
+    letter-spacing:0.02em;
+    margin-bottom:20px;
+    padding:6px 14px;
+    border:1px solid var(--line);
+    border-radius:100px;
+    background:var(--glass);
+  }
+  .hero h1{
+    font-size:76px;
+    line-height:0.98;
+    letter-spacing:-0.03em;
+    background:linear-gradient(120deg, var(--ink) 40%, var(--grad1) 75%, var(--grad2) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    margin-bottom:26px;
+  }
+  .lede{
+    max-width:46ch;
+    color:var(--muted);
+    font-size:17px;
+  }
+  .hero-cta{margin-top:32px;}
+  .btn-primary{
+    display:inline-block;
+    padding:14px 28px;
+    border-radius:100px;
+    background:linear-gradient(120deg, var(--grad1), var(--grad2));
+    color:#08080D;
+    font-weight:600;
+    font-size:15px;
+    text-decoration:none;
+    transition:transform .2s ease, box-shadow .2s ease;
+    box-shadow:0 0 0 rgba(79,224,255,0);
+  }
+  .btn-primary:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 30px rgba(79,224,255,0.25);
+  }
+  .hero-stats{display:flex; flex-direction:column; gap:16px;}
+  .stat-card{
+    background:var(--glass);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:24px;
+    backdrop-filter:blur(10px);
+  }
+  .stat-num{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:44px;
+    font-weight:700;
+    display:block;
+    background:linear-gradient(120deg, var(--grad1), var(--grad2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .stat-num-sm{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:19px;
+    font-weight:600;
+    display:block;
+    line-height:1.3;
+    margin-bottom:6px;
+  }
+  .stat-label{color:var(--muted); font-size:13.5px;}
+
+  section{padding:80px 0; position:relative; z-index:1;}
+  section:not(.hero){border-top:1px solid var(--line);}
+  .section-head{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:44px;
+  }
+  .tag{
+    font-size:13px;
+    color:var(--grad1);
+    letter-spacing:0.02em;
+  }
+  .section-head h2{font-size:32px; letter-spacing:-0.01em;}
+
+  .about-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:32px;
+  }
+  .about-grid p{
+    margin:0;
+    color:var(--muted);
+    font-size:16px;
+  }
+
+  .spec-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:16px;
+  }
+  .spec-card{
+    background:var(--glass);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:26px;
+    transition:transform .25s ease, border-color .25s ease, background .25s ease;
+  }
+  .spec-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(79,224,255,0.3);
+    background:rgba(255,255,255,0.06);
+  }
+  .spec-icon{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:13px;
+    color:var(--grad1);
+    margin-bottom:16px;
+    opacity:0.7;
+  }
+  .spec-card h3{font-size:16.5px; margin-bottom:10px; font-weight:600;}
+  .spec-card p{margin:0; color:var(--muted); font-size:14px;}
+
+  .exp-line{
+    display:grid;
+    grid-template-columns:160px 1fr;
+    gap:28px;
+    padding:28px;
+    background:var(--glass);
+    border:1px solid var(--line);
+    border-radius:18px;
+  }
+  .exp-year{color:var(--grad1); font-size:14px; font-family:'Space Grotesk', sans-serif;}
+  .exp-body h3{font-size:19px; margin-bottom:8px;}
+  .exp-body p{margin:0; color:var(--muted); font-size:15px;}
+
+  .contact-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:16px;
+  }
+  .contact-card{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:24px;
+    background:var(--glass);
+    border:1px solid var(--line);
+    border-radius:18px;
+    text-decoration:none;
+    color:var(--ink);
+    transition:transform .25s ease, border-color .25s ease;
+  }
+  a.contact-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(138,92,255,0.35);
+  }
+  .c-label{color:var(--muted); font-size:13px;}
+  .c-value{font-size:15.5px; font-weight:500;}
+
+  footer{
+    padding:36px 0 48px;
+    color:var(--muted);
+    font-size:13.5px;
+    border-top:1px solid var(--line);
+    position:relative;
+    z-index:1;
+  }
+
+  .reveal{
+    opacity:0;
+    transform:translateY(24px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .reveal.in{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  @media (max-width:760px){
+    .hero{padding:80px 0 60px;}
+    .hero-grid{grid-template-columns:1fr; gap:36px;}
+    .hero h1{font-size:48px;}
+    .hero-stats{flex-direction:row; flex-wrap:wrap;}
+    .stat-card{flex:1 1 45%;}
+    .about-grid{grid-template-columns:1fr;}
+    .spec-grid{grid-template-columns:1fr 1fr;}
+    .contact-grid{grid-template-columns:1fr;}
+    .exp-line{grid-template-columns:1fr; gap:10px;}
+    nav{gap:18px; flex-wrap:wrap;}
+    .section-head h2{font-size:26px;}
+  }
+  @media (max-width:480px){
+    .spec-grid{grid-template-columns:1fr;}
+    .hero h1{font-size:38px;}
+  }
+
+  :focus-visible{
+    outline:2px solid var(--grad1);
+    outline-offset:3px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .reveal{opacity:1; transform:none; transition:none;}
+    *{transition:none !important;}
+  }
+</style>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('in');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
 
 </body>
