@@ -13,8 +13,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=113180618', 'ym');
+
+    ym(113180618, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<!-- /Yandex.Metrika counter -->
 </head>
 <body>
+<noscript><div><img src="https://mc.yandex.ru/watch/113180618" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 
 <div class="bg-glow"></div>
 <div class="bg-grid"></div>
@@ -148,11 +161,11 @@
       <h2>Связаться</h2>
     </div>
     <div class="contact-grid">
-      <a class="contact-card reveal" href="tel:+79261256598">
+      <a class="contact-card reveal" onclick="if(window.ym)ym(113180618,'reachGoal','contact')" href="tel:+79261256598">
         <span class="c-label">Телефон</span>
         <span class="c-value">+7 (926) 125-65-98</span>
       </a>
-      <a class="contact-card reveal" href="mailto:vdorogov89@gmail.com">
+      <a class="contact-card reveal" onclick="if(window.ym)ym(113180618,'reachGoal','contact')" href="mailto:vdorogov89@gmail.com">
         <span class="c-label">Email</span>
         <span class="c-value">vdorogov89@gmail.com</span>
       </a>
