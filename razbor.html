@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Разбор МРТ и тактики лечения — невролог Василий Дорогов</title>
+<meta name="description" content="Письменное заключение невролога по МРТ и выпискам: связаны ли находки с жалобами, нужна ли операция, что делать дальше. Боль в спине, грыжи, головная боль, головокружение.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Разбор МРТ и тактики лечения — невролог Василий Дорогов">
+<meta property="og:description" content="Второе мнение невролога: оперироваться или нет, почему не помогает лечение, что делать дальше.">
+<meta property="og:url" content="https://vdorogov89.github.io/razbor.html">
+<link rel="canonical" href="https://vdorogov89.github.io/razbor.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#08080D;
+    --ink:#F2F2F5;
+    --body:#C9C9D3;
+    --muted:#8B8B98;
+    --line:rgba(255,255,255,0.08);
+    --glass:rgba(255,255,255,0.04);
+    --grad1:#4FE0FF;
+    --grad2:#8A5CFF;
+    --warn:#FF8A7A;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--body);
+    font-family:'Inter', system-ui, sans-serif; line-height:1.7;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Space Grotesk', system-ui, sans-serif; color:var(--ink); font-weight:600; margin:0;}
+  a{color:var(--grad1);}
+  .wrap{max-width:960px; margin:0 auto; padding:0 32px; position:relative;}
+  .bg-glow{
+    position:fixed; top:-30%; left:50%; transform:translateX(-50%);
+    width:1200px; height:800px; pointer-events:none; z-index:0;
+    background:radial-gradient(circle at 30% 30%, rgba(79,224,255,0.10), transparent 60%),
+               radial-gradient(circle at 70% 60%, rgba(138,92,255,0.10), transparent 60%);
+  }
+  header{
+    padding:26px 0; border-bottom:1px solid var(--line);
+    position:sticky; top:0; background:rgba(8,8,13,0.75); backdrop-filter:blur(16px); z-index:10;
+  }
+  header .wrap{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;}
+  .brand{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:17px; color:var(--ink); text-decoration:none;}
+  .back{color:var(--muted); font-size:14.5px; text-decoration:none;}
+  .back:hover{color:var(--ink);}
+
+  article{position:relative; z-index:1; padding:80px 0 60px;}
+  .article-inner{max-width:68ch; margin:0 auto;}
+  .kicker{font-size:13px; color:var(--grad1); margin-bottom:18px;}
+  article h1{
+    font-size:46px; line-height:1.08; letter-spacing:-0.02em; margin-bottom:24px;
+    background:linear-gradient(120deg, var(--ink) 55%, var(--grad1) 85%, var(--grad2) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .lead{font-size:18.5px; color:var(--ink); opacity:.9; margin:0 0 12px;}
+  .byline{font-size:14px; color:var(--muted); padding-bottom:36px; border-bottom:1px solid var(--line); margin-bottom:12px;}
+  article h2{font-size:26px; letter-spacing:-0.01em; margin:48px 0 16px;}
+  article h3{font-size:18px; margin:28px 0 8px;}
+  article p{margin:0 0 18px; font-size:16.5px;}
+  article ul{margin:0 0 18px; padding-left:22px;}
+  article li{margin-bottom:8px; font-size:16.5px;}
+  strong{color:var(--ink); font-weight:600;}
+
+  .callout{
+    margin:28px 0; padding:24px 26px; border-radius:18px;
+    background:var(--glass); border:1px solid var(--line);
+  }
+  .callout p:last-child{margin-bottom:0;}
+  .callout.warn{border-color:rgba(255,138,122,0.35); background:rgba(255,138,122,0.05);}
+  .callout.warn h2{margin-top:0; color:var(--warn); font-size:22px;}
+  .callout.warn ul{margin-bottom:12px;}
+
+  .cta{
+    margin:48px 0 0; padding:30px; border-radius:20px;
+    background:linear-gradient(120deg, rgba(79,224,255,0.08), rgba(138,92,255,0.10));
+    border:1px solid rgba(79,224,255,0.2);
+  }
+  .cta h2{margin:0 0 12px; font-size:22px;}
+  .btn-primary{
+    display:inline-block; margin-top:8px; padding:13px 26px; border-radius:100px;
+    background:linear-gradient(120deg, var(--grad1), var(--grad2));
+    color:#08080D; font-weight:600; font-size:15px; text-decoration:none;
+  }
+  footer{
+    position:relative; z-index:1; padding:36px 0 48px; color:var(--muted);
+    font-size:13.5px; border-top:1px solid var(--line);
+  }
+  :focus-visible{outline:2px solid var(--grad1); outline-offset:3px;}
+  @media (max-width:760px){
+    article{padding:56px 0 40px;}
+    article h1{font-size:34px;}
+    article h2{font-size:22px;}
+    .wrap{padding:0 22px;}
+  }
+
+  .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:8px 0 28px;}
+  .card{padding:22px; border-radius:18px; background:var(--glass); border:1px solid var(--line);}
+  .card h3{margin:0 0 8px; font-size:17px;}
+  .card p{margin:0; font-size:15px; color:var(--body);}
+  ol.steps{counter-reset:s; list-style:none; padding:0; margin:0 0 18px;}
+  ol.steps li{counter-increment:s; position:relative; padding:0 0 18px 52px; font-size:16.5px;}
+  ol.steps li::before{
+    content:counter(s); position:absolute; left:0; top:-2px; width:36px; height:36px; border-radius:50%;
+    display:grid; place-items:center; font-family:'Space Grotesk',sans-serif; font-weight:600; color:#08080D;
+    background:linear-gradient(120deg, var(--grad1), var(--grad2));
+  }
+  .small{font-size:13.5px; color:var(--muted); margin-top:14px;}
+  @media (max-width:760px){ .cards{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">В. Дорогов</a>
+    <a class="back" href="index.html">На главную</a>
+  </div>
+</header>
+
+<article>
+  <div class="wrap">
+    <div class="article-inner">
+      <div class="kicker">Второе мнение невролога</div>
+      <h1>Разбор МРТ и тактики лечения</h1>
+      <p class="lead">Письменное заключение невролога по вашим снимкам и выпискам: что на самом деле показывает обследование, связано ли это с жалобами и что делать дальше.</p>
+      <div class="byline">Василий Дорогов, врач-невролог, 12 лет клинической практики</div>
+
+      <h2>С какими вопросами обращаются</h2>
+      <div class="cards">
+        <div class="card"><h3>Грыжа и боль в спине</h3><p>Предлагают операцию, и хочется понять, нужна ли она. Или на МРТ грыжа, а что с ней делать — непонятно.</p></div>
+        <div class="card"><h3>Головная боль</h3><p>Лечение не помогает, таблетки работают всё хуже, а причину так никто и не объяснил.</p></div>
+        <div class="card"><h3>Головокружение</h3><p>Годами лечат «сосуды» и остеохондроз без результата. Хочется понять вероятную причину и нужное обследование.</p></div>
+      </div>
+
+      <h2>Что вы получаете</h2>
+      <p>Это не пересказ заключения МРТ простыми словами, а клиническое мнение врача о вашей ситуации. В письменном заключении:</p>
+      <ul>
+        <li>как находки на снимках соотносятся с вашими жалобами;</li>
+        <li>вероятная причина симптомов и что ещё стоит исключить;</li>
+        <li>нужны ли дополнительные обследования и какие;</li>
+        <li>направления лечения и оценка предложенной тактики, в том числе операции;</li>
+        <li>тревожные признаки, при которых нельзя ждать;</li>
+        <li>нужен ли очный осмотр невролога или консультация хирурга.</li>
+      </ul>
+
+      <h2>Как это работает</h2>
+      <ol class="steps">
+        <li>Вы оставляете заявку и кратко описываете ситуацию.</li>
+        <li>Я отвечаю, подходит ли ваш случай для разбора, и уточняю, какие документы понадобятся.</li>
+        <li>Вы присылаете снимки, заключения и выписки удобным способом, который мы согласуем.</li>
+        <li>В течение 3–5 рабочих дней вы получаете письменное заключение.</li>
+      </ol>
+
+      <div class="callout">
+        <p><strong>Важно понимать.</strong> Разбор документов не заменяет очный осмотр: окончательный диагноз и назначение лечения требуют личной консультации врача. Если по итогам разбора очный осмотр нужен, я прямо об этом напишу.</p>
+      </div>
+
+      <div class="callout warn">
+        <h2>Не ждите разбора, если</h2>
+        <p>появилось онемение в промежности, нарушение мочеиспускания или стула, быстро нарастает слабость в ногах, внезапно возникли сильнейшая головная боль, двоение, нарушение речи или слабость в руке или ноге. Это повод немедленно вызвать скорую: 103 или 112.</p>
+      </div>
+
+      <div class="cta">
+        <h2>Оставить заявку</h2>
+        <p>Сейчас разборы проводятся в пилотном режиме, условия и стоимость я сообщаю в ответ на заявку. В первом письме достаточно коротко описать ситуацию — снимки и выписки присылать пока не нужно.</p>
+        <a class="btn-primary" href="mailto:vdorogov89@gmail.com?subject=%D0%97%D0%B0%D1%8F%D0%B2%D0%BA%D0%B0%20%D0%BD%D0%B0%20%D1%80%D0%B0%D0%B7%D0%B1%D0%BE%D1%80%20%D0%9C%D0%A0%D0%A2&body=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D0%92%D0%B0%D1%81%D0%B8%D0%BB%D0%B8%D0%B9%21%0A%0A%D0%98%D0%BC%D1%8F%3A%0A%D0%92%D0%BE%D0%B7%D1%80%D0%B0%D1%81%D1%82%3A%0A%D0%93%D0%BE%D1%80%D0%BE%D0%B4%20/%20%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B0%3A%0A%D0%A7%D1%82%D0%BE%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BE%D0%BA%D0%BE%D0%B8%D1%82%20%D0%B8%20%D0%BA%D0%B0%D0%BA%20%D0%B4%D0%B0%D0%B2%D0%BD%D0%BE%3A%0A%D0%9A%D0%B0%D0%BA%D0%BE%D0%B9%20%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%20%D1%85%D0%BE%D1%82%D0%B8%D1%82%D0%B5%20%D1%80%D0%B5%D1%88%D0%B8%D1%82%D1%8C%20%28%D0%BD%D0%B0%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%2C%20%D0%BD%D1%83%D0%B6%D0%BD%D0%B0%20%D0%BB%D0%B8%20%D0%BE%D0%BF%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D1%8F%29%3A%0A%D0%9A%D0%B0%D0%BA%D0%B8%D0%B5%20%D0%BE%D0%B1%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F%20%D1%83%D0%B6%D0%B5%20%D1%81%D0%B4%D0%B5%D0%BB%D0%B0%D0%BD%D1%8B%20%28%D0%9C%D0%A0%D0%A2%2C%20%D0%9A%D0%A2%2C%20%D0%B2%D1%8B%D0%BF%D0%B8%D1%81%D0%BA%D0%B8%29%3A%0A%0A">Написать заявку</a>
+        <p class="small">Или напишите на vdorogov89@gmail.com. Отправляя заявку, вы соглашаетесь на обработку указанных в ней данных для ответа на ваше обращение.</p>
+      </div>
+
+      <p style="margin-top:40px">Полезно прочитать перед обращением: <a href="hernia.html">о грыжах и МРТ</a>, <a href="migraine.html">о мигрени</a>, <a href="vertigo.html">о головокружении</a>.</p>
+    </div>
+  </div>
+</article>
+
+<footer>
+  <div class="wrap">
+    © <span id="year"></span> Василий Дорогов. Врач-невролог. Материалы сайта носят информационный характер и не заменяют консультацию врача.
+  </div>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
