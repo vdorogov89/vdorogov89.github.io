@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дневник головной боли онлайн — бесплатно, с подсчётом дней и сводкой для врача</title>
+<meta name="description" content="Бесплатный онлайн-дневник головной боли от врача-невролога: запись приступов с телефона, подсчёт дней с головной болью и обезболивающими, график по месяцам, сводка для врача в PDF. Данные хранятся только на вашем устройстве.">
+<meta name="theme-color" content="#08080D">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Дневник головной боли онлайн">
+<meta property="og:description" content="Запись приступов, подсчёт дней с болью и таблетками, сводка для врача. Бесплатно, без регистрации.">
+<meta property="og:url" content="https://vdorogov89.github.io/diary.html">
+<link rel="canonical" href="https://vdorogov89.github.io/diary.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080D; --ink:#F2F2F5; --body:#C9C9D3; --muted:#8B8B98;
+  --line:rgba(255,255,255,0.08); --glass:rgba(255,255,255,0.04);
+  --grad1:#4FE0FF; --grad2:#8A5CFF; --warn:#FF8A7A; --amber:#FFC56B; --ok:#6BE3A4;
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--bg); color:var(--body); font-family:'Inter',system-ui,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden;}
+h1,h2,h3{font-family:'Space Grotesk',system-ui,sans-serif; color:var(--ink); font-weight:600; margin:0;}
+a{color:var(--grad1);}
+.wrap{max-width:820px; margin:0 auto; padding:0 22px; position:relative;}
+.bg-glow{position:fixed; top:-30%; left:50%; transform:translateX(-50%); width:1200px; height:800px; pointer-events:none; z-index:0;
+  background:radial-gradient(circle at 30% 30%, rgba(79,224,255,0.10), transparent 60%), radial-gradient(circle at 70% 60%, rgba(138,92,255,0.10), transparent 60%);}
+.site-header{padding:22px 0; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(8,8,13,0.8); backdrop-filter:blur(16px); z-index:10;}
+.site-header .wrap{display:flex; justify-content:space-between; align-items:center;}
+.brand{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:17px; color:var(--ink); text-decoration:none;}
+.back{color:var(--muted); font-size:14.5px; text-decoration:none;}
+.app{position:relative; z-index:1; padding-top:48px; padding-bottom:40px;}
+.kicker{font-size:13px; color:var(--grad1); margin-bottom:12px;}
+.intro h1{font-size:40px; line-height:1.1; letter-spacing:-0.02em; margin-bottom:16px;
+  background:linear-gradient(120deg, var(--ink) 55%, var(--grad1) 85%, var(--grad2) 100%); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.lead{font-size:17.5px; color:var(--ink); opacity:.9; margin:0 0 14px;}
+.privacy{font-size:14px; color:var(--muted); margin:0 0 24px;}
+.muted{color:var(--muted); font-weight:400;}
+.small{font-size:13.5px; color:var(--muted);}
+
+.tabs{display:flex; gap:6px; overflow-x:auto; padding:4px; background:var(--glass); border:1px solid var(--line); border-radius:14px; margin-bottom:20px; position:sticky; top:74px; z-index:5; backdrop-filter:blur(16px);}
+.tab{flex:1; white-space:nowrap; padding:10px 14px; border:0; border-radius:10px; background:transparent; color:var(--muted); font:500 14.5px 'Inter',sans-serif; cursor:pointer;}
+.tab.active{background:linear-gradient(120deg, rgba(79,224,255,0.18), rgba(138,92,255,0.22)); color:var(--ink);}
+
+.panel{background:var(--glass); border:1px solid var(--line); border-radius:20px; padding:24px;}
+.panel h2{font-size:20px; margin:8px 0 10px;}
+.field{margin-bottom:22px;}
+.field label, .flabel{display:block; font-weight:500; color:var(--ink); margin-bottom:10px; font-size:15.5px;}
+input[type=date], input[type=number], input[type=text], textarea{
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.05);
+  color:var(--ink); font:16px 'Inter',sans-serif; color-scheme:dark;}
+input:focus, textarea:focus{outline:2px solid var(--grad1); outline-offset:1px;}
+#fMedName{margin-top:10px;}
+input[type=range]{width:100%; accent-color:var(--grad1); height:28px;}
+#intVal{font-size:22px; color:var(--grad1); margin:0 4px;}
+.scale{display:flex; justify-content:space-between; font-size:12.5px; color:var(--muted);}
+.quick{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.quick button, .periods button{padding:7px 12px; border-radius:100px; border:1px solid var(--line); background:transparent; color:var(--body); font:14px 'Inter',sans-serif; cursor:pointer;}
+.periods{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
+.periods button.active{border-color:var(--grad1); color:var(--ink); background:rgba(79,224,255,0.1);}
+.chips{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{display:inline-flex; align-items:center; padding:9px 14px; border-radius:100px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body); font-size:14.5px; cursor:pointer; user-select:none;}
+.chip input{position:absolute; opacity:0; pointer-events:none;}
+.chip.on{border-color:var(--grad1); background:rgba(79,224,255,0.12); color:var(--ink);}
+.actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;}
+.btn-primary{padding:13px 24px; border-radius:100px; border:0; background:linear-gradient(120deg, var(--grad1), var(--grad2)); color:#08080D; font:600 15px 'Inter',sans-serif; cursor:pointer;}
+.btn-ghost{padding:12px 22px; border-radius:100px; border:1px solid var(--line); background:transparent; color:var(--ink); font:500 15px 'Inter',sans-serif; cursor:pointer;}
+.btn-danger{padding:12px 22px; border-radius:100px; border:1px solid rgba(255,138,122,0.5); background:transparent; color:var(--warn); font:500 15px 'Inter',sans-serif; cursor:pointer;}
+.filebtn{display:inline-block;}
+
+.cards{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:18px;}
+.card{padding:16px; border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid var(--line);}
+.card .num{font-family:'Space Grotesk',sans-serif; font-size:30px; color:var(--ink); line-height:1.1;}
+.card .lbl{font-size:13px; color:var(--muted);}
+.card.red{border-color:rgba(255,138,122,0.5);} .card.red .num{color:var(--warn);}
+.card.amber{border-color:rgba(255,197,107,0.45);} .card.amber .num{color:var(--amber);}
+.callout{margin:16px 0; padding:16px 18px; border-radius:16px; background:var(--glass); border:1px solid var(--line); font-size:15px;}
+.callout p{margin:0;}
+.callout.warn{border-color:rgba(255,138,122,0.35); background:rgba(255,138,122,0.05);}
+.callout.amber{border-color:rgba(255,197,107,0.35); background:rgba(255,197,107,0.05);}
+.emergency{margin-top:28px;}
+.chartbox{overflow-x:auto; margin:6px 0 18px;}
+.legend{display:flex; gap:16px; font-size:13px; color:var(--muted); margin-bottom:8px; flex-wrap:wrap;}
+.legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:6px; vertical-align:-1px;}
+.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin:6px 0 18px;}
+.cal .dow{font-size:12px; color:var(--muted); text-align:center;}
+.cal .d{aspect-ratio:1; border-radius:8px; background:rgba(255,255,255,0.04); display:flex; align-items:flex-start; justify-content:flex-end; padding:4px 6px; font-size:12px; color:var(--muted); position:relative;}
+.cal .d.med::after{content:""; position:absolute; left:6px; bottom:6px; width:6px; height:6px; border-radius:50%; background:var(--ink);}
+.bars .row{display:grid; grid-template-columns:130px 1fr 28px; gap:10px; align-items:center; font-size:14px; margin-bottom:8px;}
+.bars .track{height:8px; border-radius:8px; background:rgba(255,255,255,0.06); overflow:hidden;}
+.bars .fill{height:100%; background:linear-gradient(90deg, var(--grad1), var(--grad2));}
+.entry{padding:14px 0; border-bottom:1px solid var(--line); display:grid; grid-template-columns:1fr auto; gap:8px;}
+.entry:last-child{border-bottom:0;}
+.entry .top{color:var(--ink); font-weight:500;}
+.entry .meta{font-size:13.5px; color:var(--muted);}
+.entry .btns{display:flex; gap:6px; align-items:flex-start;}
+.entry .btns button{padding:6px 10px; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--body); font-size:13px; cursor:pointer;}
+.pill{display:inline-block; min-width:26px; text-align:center; padding:1px 8px; border-radius:100px; font-size:13px; font-weight:600; color:#08080D; margin-right:6px;}
+.toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#1b1b26; border:1px solid var(--line); color:var(--ink); padding:12px 20px; border-radius:100px; z-index:50; font-size:14.5px;}
+footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:30px;}
+#printArea{display:none;}
+:focus-visible{outline:2px solid var(--grad1); outline-offset:3px;}
+@media (max-width:600px){
+  .intro h1{font-size:32px;}
+  .panel{padding:18px;}
+  .bars .row{grid-template-columns:100px 1fr 24px;}
+  .tabs{top:66px;}
+}
+@media print{
+  body{background:#fff; color:#000;}
+  body > *:not(#printArea){display:none !important;}
+  #printArea{display:block !important; font:11pt/1.4 Arial, sans-serif; color:#000;}
+  #printArea h1{font:bold 16pt Arial; color:#000; margin:0 0 4pt;}
+  #printArea h2{font:bold 12pt Arial; color:#000; margin:14pt 0 6pt;}
+  #printArea table{width:100%; border-collapse:collapse; font-size:9.5pt;}
+  #printArea th, #printArea td{border:1px solid #999; padding:3pt 5pt; text-align:left; vertical-align:top;}
+  #printArea th{background:#eee;}
+  #printArea .pnote{font-size:9pt; color:#444;}
+  @page{margin:14mm;}
+}
+</style>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=113180618', 'ym');
+
+    ym(113180618, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<!-- /Yandex.Metrika counter -->
+</head>
+<body>
+<noscript><div><img src="https://mc.yandex.ru/watch/113180618" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<div class="bg-glow"></div>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">В. Дорогов</a>
+    <a class="back" href="migraine.html">О мигрени</a>
+  </div>
+</header>
+
+<main class="wrap app">
+  <div class="intro">
+    <div class="kicker">Инструмент для пациентов</div>
+    <h1>Дневник головной боли</h1>
+    <p class="lead">Записывайте приступы за полминуты с телефона или компьютера. Дневник сам посчитает дни с головной болью и с обезболивающими и подготовит сводку для врача.</p>
+    <p class="privacy">🔒 Записи хранятся только на этом устройстве, в вашем браузере. Никуда не отправляются, врач и сайт их не видят. Чтобы не потерять данные, иногда сохраняйте резервную копию во вкладке «Данные».</p>
+    <div id="storageWarn" class="callout warn" hidden><p>Браузер не даёт сохранять данные (например, в режиме инкогнито). Записи пропадут после закрытия страницы.</p></div>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="entry" role="tab">Запись</button>
+    <button class="tab" data-tab="summary" role="tab">Сводка</button>
+    <button class="tab" data-tab="history" role="tab">Все записи</button>
+    <button class="tab" data-tab="data" role="tab">Данные</button>
+  </nav>
+
+  <!-- ENTRY -->
+  <section class="panel" id="tab-entry">
+    <form id="entryForm" onsubmit="return false">
+      <div class="field">
+        <label for="fDate">Дата приступа</label>
+        <input type="date" id="fDate" required>
+      </div>
+
+      <div class="field">
+        <label for="fInt">Сила боли: <b id="intVal">5</b> <span id="intLbl" class="muted">умеренная</span></label>
+        <input type="range" id="fInt" min="1" max="10" value="5">
+        <div class="scale"><span>1 — едва заметная</span><span>10 — невыносимая</span></div>
+      </div>
+
+      <div class="field">
+        <label for="fHours">Длительность, часов</label>
+        <input type="number" id="fHours" min="0.5" max="240" step="0.5" inputmode="decimal" placeholder="например, 6">
+        <div class="quick" id="hoursQuick">
+          <button type="button" data-h="1">1 ч</button><button type="button" data-h="4">4 ч</button><button type="button" data-h="8">8 ч</button><button type="button" data-h="24">сутки</button><button type="button" data-h="48">2 суток</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="flabel">Что принимали</span>
+        <div class="chips" id="medChips"></div>
+        <input type="text" id="fMedName" placeholder="Название препарата (необязательно)">
+      </div>
+
+      <div class="field" id="effectField">
+        <span class="flabel">Помогло?</span>
+        <div class="chips" id="effectChips"></div>
+      </div>
+
+      <div class="field">
+        <span class="flabel">Что было вместе с болью</span>
+        <div class="chips" id="symChips"></div>
+      </div>
+
+      <div class="field">
+        <span class="flabel">Возможные провокаторы</span>
+        <div class="chips" id="trigChips"></div>
+      </div>
+
+      <div class="field">
+        <label for="fNote">Заметка</label>
+        <textarea id="fNote" rows="2" placeholder="Необязательно"></textarea>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" id="saveBtn">Сохранить запись</button>
+        <button type="button" class="btn-ghost" id="cancelEdit" hidden>Отменить</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="panel" id="tab-summary" hidden>
+    <div class="periods" id="periods">
+      <button data-p="cur" class="active">Этот месяц</button>
+      <button data-p="prev">Прошлый месяц</button>
+      <button data-p="3">3 месяца</button>
+      <button data-p="6">6 месяцев</button>
+      <button data-p="12">Год</button>
+    </div>
+    <div id="summaryOut"></div>
+    <div class="actions">
+      <button type="button" class="btn-primary" id="printBtn">Сводка для врача (PDF / печать)</button>
+    </div>
+    <p class="small">В окне печати выберите «Сохранить как PDF», чтобы получить файл. Его можно взять на приём или приложить к <a href="razbor.html">заявке на разбор</a>.</p>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="panel" id="tab-history" hidden>
+    <div id="historyOut"></div>
+  </section>
+
+  <!-- DATA -->
+  <section class="panel" id="tab-data" hidden>
+    <h2>Резервная копия</h2>
+    <p>Записи хранятся только в этом браузере. Сохраните копию в файл, чтобы не потерять их при очистке браузера или перенести на другое устройство.</p>
+    <div class="actions">
+      <button type="button" class="btn-primary" id="exportBtn">Сохранить копию в файл</button>
+      <label class="btn-ghost filebtn">Восстановить из файла<input type="file" id="importFile" accept=".json,application/json" hidden></label>
+    </div>
+    <p class="small" id="dataInfo"></p>
+    <h2>Удаление</h2>
+    <p>Удалит все записи с этого устройства без возможности восстановления.</p>
+    <button type="button" class="btn-danger" id="clearBtn">Удалить все записи</button>
+  </section>
+
+  <div class="callout warn emergency">
+    <p><strong>Срочно к врачу или 103 / 112</strong>, если головная боль возникла внезапно «как удар», сопровождается слабостью в руке или ноге, нарушением речи, двоением, температурой с напряжением шеи или появилась после травмы. Подробнее — в <a href="migraine.html">статье о мигрени</a>.</p>
+  </div>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+<div id="printArea"></div>
+
+<footer>
+  <div class="wrap">
+    © <span id="year"></span> Василий Дорогов. Врач-невролог. Дневник помогает наблюдать за головной болью и не заменяет консультацию врача.
+  </div>
+</footer>
+
+<script>
+(function(){
+const KEY='hd_diary_v1';
+const MEDS=[['none','Не принимал(а)'],['simple','Простое обезболивающее'],['combo','Комбинированное обезболивающее'],['triptan','Триптан'],['other','Другое']];
+const EFFECTS=[['yes','Помогло'],['partly','Частично'],['no','Не помогло']];
+const SYMS=[['nausea','Тошнота'],['light','Раздражает свет'],['sound','Раздражают звуки'],['aura','Аура'],['vomit','Рвота']];
+const TRIGS=[['sleepless','Недосып'],['oversleep','Долгий сон'],['stress','Стресс'],['relax','Расслабление после стресса'],['meal','Пропуск еды'],['alcohol','Алкоголь'],['weather','Погода'],['cycle','Дни цикла'],['screen','Долгая работа за экраном'],['other','Другое']];
+const LBL=o=>Object.fromEntries(o);
+const MEDL=LBL(MEDS), EFFL=LBL(EFFECTS), SYML=LBL(SYMS), TRIGL=LBL(TRIGS);
+const MONTHS=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+const MSHORT=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const $=id=>document.getElementById(id);
+let entries=[], storageOK=true, editId=null, period='cur';
+
+function goal(g){try{if(window.ym)ym(113180618,'reachGoal',g);}catch(e){}}
+function load(){try{entries=JSON.parse(localStorage.getItem(KEY))||[];}catch(e){storageOK=false; entries=[];}}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(entries)); return true;}catch(e){storageOK=false; $('storageWarn').hidden=false; return false;}}
+function pad(n){return String(n).padStart(2,'0');}
+function today(){const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function mkey(date){return date.slice(0,7);}
+function fmtDate(s){const [y,m,d]=s.split('-'); return +d+' '+['янв.','февр.','мар.','апр.','мая','июня','июля','авг.','сент.','окт.','нояб.','дек.'][+m-1]+' '+y;}
+function fmtNum(x){return (Math.round(x*10)/10).toString().replace('.',',');}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function intColor(i){return i>=7?'#FF8A7A':i>=4?'#FFC56B':'#6BE3A4';}
+function toast(t){const el=$('toast'); el.textContent=t; el.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>el.hidden=true,2200);}
+
+// chips
+function buildChips(box,opts,name,type){
+  $(box).innerHTML=opts.map(([v,l])=>`<label class="chip"><input type="${type}" name="${name}" value="${v}">${l}</label>`).join('');
+  $(box).addEventListener('change',e=>{
+    if(name==='med'){
+      const t=e.target;
+      if(t.value==='none'&&t.checked) $(box).querySelectorAll('input').forEach(i=>{if(i!==t)i.checked=false;});
+      else if(t.checked) $(box).querySelector('input[value=none]').checked=false;
+      updateEffect();
+    }
+    syncChips(box);
+  });
+}
+function syncChips(box){$(box).querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.querySelector('input').checked));}
+function vals(box){return [...$(box).querySelectorAll('input:checked')].map(i=>i.value);}
+function setVals(box,arr){$(box).querySelectorAll('input').forEach(i=>i.checked=arr.includes(i.value)); syncChips(box);}
+function updateEffect(){const m=vals('medChips'); $('effectField').hidden=!(m.length&&!m.includes('none'));}
+
+function intLabel(v){return v<=3?'лёгкая':v<=6?'умеренная':'сильная';}
+function updInt(){const v=+$('fInt').value; $('intVal').textContent=v; $('intLbl').textContent=intLabel(v);}
+
+function resetForm(){
+  editId=null; $('fDate').value=today(); $('fInt').value=5; updInt(); $('fHours').value=''; $('fMedName').value=''; $('fNote').value='';
+  ['medChips','effectChips','symChips','trigChips'].forEach(b=>setVals(b,[])); updateEffect();
+  $('saveBtn').textContent='Сохранить запись'; $('cancelEdit').hidden=true;
+}
+function saveEntry(){
+  const date=$('fDate').value;
+  if(!date){toast('Укажите дату'); return;}
+  if(date>today()){toast('Дата не может быть в будущем'); return;}
+  const meds=vals('medChips');
+  const e={id:editId||Date.now().toString(36)+Math.random().toString(36).slice(2,6), date, intensity:+$('fInt').value,
+    hours:parseFloat(String($('fHours').value).replace(',','.'))||null, meds, medName:$('fMedName').value.trim(),
+    effect:(meds.length&&!meds.includes('none'))?(vals('effectChips')[0]||null):null,
+    symptoms:vals('symChips'), triggers:vals('trigChips'), note:$('fNote').value.trim()};
+  if(editId){entries=entries.map(x=>x.id===editId?e:x);} else entries.push(e);
+  entries.sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
+  const ok=persist(); goal('diary_save');
+  toast(editId?'Изменения сохранены':(ok?'Запись сохранена':'Сохранено до закрытия страницы'));
+  resetForm(); renderAll();
+}
+function startEdit(id){
+  const e=entries.find(x=>x.id===id); if(!e) return;
+  showTab('entry'); editId=id;
+  $('fDate').value=e.date; $('fInt').value=e.intensity; updInt(); $('fHours').value=e.hours||''; $('fMedName').value=e.medName||''; $('fNote').value=e.note||'';
+  setVals('medChips',e.meds||[]); setVals('effectChips',e.effect?[e.effect]:[]); setVals('symChips',e.symptoms||[]); setVals('trigChips',e.triggers||[]); updateEffect();
+  $('saveBtn').textContent='Сохранить изменения'; $('cancelEdit').hidden=false; window.scrollTo({top:0,behavior:'smooth'});
+}
+function delEntry(id){if(!confirm('Удалить эту запись?'))return; entries=entries.filter(x=>x.id!==id); persist(); renderAll(); toast('Запись удалена');}
+
+// periods
+function monthList(p){
+  const now=new Date(); let y=now.getFullYear(), m=now.getMonth();
+  if(p==='prev'){m--; if(m<0){m=11;y--;} return [y+'-'+pad(m+1)];}
+  const n=p==='cur'?1:+p, out=[];
+  for(let i=0;i<n;i++){out.unshift(y+'-'+pad(m+1)); m--; if(m<0){m=11;y--;}}
+  return out;
+}
+function monthStats(list){
+  const hd=new Set(), md=new Set(), sd=new Set(), td=new Set();
+  let intSum=0, hSum=0, hN=0, medE=0, helped=0;
+  list.forEach(e=>{
+    hd.add(e.date); intSum+=e.intensity; if(e.hours){hSum+=e.hours; hN++;}
+    const m=(e.meds||[]).filter(x=>x!=='none');
+    if(m.length){md.add(e.date); medE++; if(e.effect==='yes')helped++;}
+    if(m.includes('simple')) sd.add(e.date);
+    if(m.includes('combo')||m.includes('triptan')) td.add(e.date);
+  });
+  return {attacks:list.length, hDays:hd.size, mDays:md.size, sDays:sd.size, tDays:td.size,
+    avgInt:list.length?intSum/list.length:0, avgH:hN?hSum/hN:null, medE, helped};
+}
+function medLevel(s){ // per month
+  if(s.tDays>=10||s.sDays>=15||s.mDays>=10) return 'red';
+  if(s.mDays>=8) return 'amber';
+  return '';
+}
+function mName(k){const [y,m]=k.split('-'); return MONTHS[+m-1]+' '+y;}
+
+function renderSummary(){
+  const months=monthList(period), set=new Set(months);
+  const list=entries.filter(e=>set.has(mkey(e.date)));
+  const out=$('summaryOut');
+  const title=months.length===1?mName(months[0]):(mName(months[0])+' — '+mName(months[months.length-1]));
+  if(!list.length){out.innerHTML=`<p class="muted">${esc(title)}: записей нет.</p>`; return;}
+  const per=months.map(k=>({k, s:monthStats(entries.filter(e=>mkey(e.date)===k))}));
+  const tot=monthStats(list), n=months.length, multi=n>1;
+  const avgHD=per.reduce((a,x)=>a+x.s.hDays,0)/n, avgMD=per.reduce((a,x)=>a+x.s.mDays,0)/n;
+  const worst=per.map(x=>medLevel(x.s)).includes('red')?'red':per.map(x=>medLevel(x.s)).includes('amber')?'amber':'';
+  const hdLevel=(multi?avgHD:tot.hDays)>=15?'red':'';
+  let h=`<h2>${esc(title)}</h2><div class="cards">
+    <div class="card ${hdLevel}"><div class="num">${multi?fmtNum(avgHD):tot.hDays}</div><div class="lbl">${multi?'дней с головной болью в месяц, в среднем':'дней с головной болью'}</div></div>
+    <div class="card ${worst}"><div class="num">${multi?fmtNum(avgMD):tot.mDays}</div><div class="lbl">${multi?'дней с препаратами в месяц, в среднем':'дней с приёмом препаратов'}</div></div>
+    <div class="card"><div class="num">${fmtNum(tot.avgInt)}</div><div class="lbl">средняя сила боли из 10</div></div>
+    <div class="card"><div class="num">${tot.avgH!=null?fmtNum(tot.avgH)+' ч':'—'}</div><div class="lbl">средняя длительность приступа</div></div>
+  </div>`;
+  if(tot.medE) h+=`<p class="small">Приступов: ${tot.attacks}. Препараты принимали в ${tot.medE} из них, помогли полностью в ${Math.round(tot.helped/tot.medE*100)}% случаев.</p>`;
+  else h+=`<p class="small">Приступов: ${tot.attacks}.</p>`;
+  if(worst==='red'){
+    const bad=per.filter(x=>medLevel(x.s)==='red').map(x=>mName(x.k));
+    h+=`<div class="callout warn"><p><strong>Много дней с обезболивающими${multi?' ('+esc(bad.join(', '))+')':''}.</strong> Частый приём препаратов может сам поддерживать головную боль (лекарственно-индуцированная головная боль). Ориентиры: простые обезболивающие 15 и более дней в месяц, триптаны или комбинированные препараты 10 и более дней. Обсудите это с врачом, не отменяйте лечение самостоятельно. <a href="migraine.html">Подробнее в статье о мигрени</a>.</p></div>`;
+  } else if(worst==='amber'){
+    h+=`<div class="callout amber"><p>Число дней с препаратами приближается к порогу, при котором может развиться лекарственно-индуцированная головная боль. Стоит следить за этим показателем.</p></div>`;
+  }
+  const refHD=multi?avgHD:tot.hDays;
+  if(refHD>=15) h+=`<div class="callout warn"><p>Головная боль 15 и более дней в месяц — повод обязательно обратиться к неврологу для подбора лечения.</p></div>`;
+  else if(refHD>=4) h+=`<div class="callout"><p>При 4 и более днях с головной болью в месяц стоит обсудить с врачом профилактическое лечение, которое уменьшает число приступов.</p></div>`;
+
+  if(multi){
+    h+=`<h2>По месяцам</h2><div class="legend"><span><i style="background:linear-gradient(120deg,#4FE0FF,#8A5CFF)"></i>дни с головной болью</span><span><i style="background:#FFC56B"></i>дни с препаратами</span></div><div class="chartbox">${barChart(per)}</div>`;
+  } else {
+    h+=`<h2>Календарь</h2><div class="legend"><span><i style="background:#6BE3A4"></i>лёгкая</span><span><i style="background:#FFC56B"></i>умеренная</span><span><i style="background:#FF8A7A"></i>сильная</span><span>● приём препаратов</span></div>${calendar(months[0])}`;
+  }
+  const tc={}; list.forEach(e=>(e.triggers||[]).forEach(t=>tc[t]=(tc[t]||0)+1));
+  const tops=Object.entries(tc).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(tops.length){const mx=tops[0][1]; h+=`<h2>Частые провокаторы</h2><div class="bars">`+tops.map(([t,c])=>`<div class="row"><span>${esc(TRIGL[t]||t)}</span><div class="track"><div class="fill" style="width:${c/mx*100}%"></div></div><span>${c}</span></div>`).join('')+`</div>`;}
+  out.innerHTML=h;
+}
+function barChart(per){
+  const W=Math.max(per.length*46,280), H=190, pb=28, pt=14, max=Math.max(5,...per.map(x=>Math.max(x.s.hDays,x.s.mDays)));
+  const bw=14, step=W/per.length, sc=v=>(H-pb-pt)*v/max;
+  let g=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Дни с головной болью по месяцам"><defs><linearGradient id="bg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#8A5CFF"/><stop offset="1" stop-color="#4FE0FF"/></linearGradient></defs>`;
+  per.forEach((x,i)=>{
+    const cx=step*i+step/2, h1=sc(x.s.hDays), h2=sc(x.s.mDays), m=+x.k.slice(5)-1;
+    g+=`<rect x="${cx-bw-2}" y="${H-pb-h1}" width="${bw}" height="${h1}" rx="4" fill="url(#bg)"/><rect x="${cx+2}" y="${H-pb-h2}" width="${bw}" height="${h2}" rx="4" fill="#FFC56B"/>`;
+    if(x.s.hDays) g+=`<text x="${cx-bw/2-2}" y="${H-pb-h1-4}" fill="#F2F2F5" font-size="11" text-anchor="middle">${x.s.hDays}</text>`;
+    if(x.s.mDays) g+=`<text x="${cx+bw/2+2}" y="${H-pb-h2-4}" fill="#FFC56B" font-size="11" text-anchor="middle">${x.s.mDays}</text>`;
+    g+=`<text x="${cx}" y="${H-8}" fill="#8B8B98" font-size="12" text-anchor="middle">${MSHORT[m]}</text>`;
+  });
+  return g+`<line x1="0" y1="${H-pb}" x2="${W}" y2="${H-pb}" stroke="rgba(255,255,255,0.12)"/></svg>`;
+}
+function calendar(k){
+  const [y,m]=k.split('-').map(Number), first=new Date(y,m-1,1), days=new Date(y,m,0).getDate(), off=(first.getDay()+6)%7;
+  const byDay={}; entries.filter(e=>mkey(e.date)===k).forEach(e=>{const d=+e.date.slice(8); const o=byDay[d]||{i:0,med:false}; o.i=Math.max(o.i,e.intensity); if((e.meds||[]).some(x=>x!=='none'))o.med=true; byDay[d]=o;});
+  let h='<div class="cal">'+['пн','вт','ср','чт','пт','сб','вс'].map(d=>`<div class="dow">${d}</div>`).join('');
+  for(let i=0;i<off;i++) h+='<div></div>';
+  for(let d=1;d<=days;d++){const o=byDay[d]; h+=`<div class="d${o&&o.med?' med':''}" style="${o?'background:'+intColor(o.i)+';color:#08080D':''}">${d}</div>`;}
+  return h+'</div>';
+}
+function renderHistory(){
+  const out=$('historyOut');
+  if(!entries.length){out.innerHTML='<p class="muted">Записей пока нет. Добавьте первую во вкладке «Запись».</p>'; return;}
+  out.innerHTML=`<p class="small">Всего записей: ${entries.length}</p>`+entries.map(e=>{
+    const meds=(e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':'');
+    const bits=[e.hours?fmtNum(e.hours)+' ч':null, meds||null, e.effect?EFFL[e.effect].toLowerCase():null,
+      (e.symptoms||[]).map(x=>SYML[x]).join(', ')||null, (e.triggers||[]).length?'провокаторы: '+e.triggers.map(x=>TRIGL[x]).join(', '):null, e.note||null].filter(Boolean);
+    return `<div class="entry"><div><div class="top"><span class="pill" style="background:${intColor(e.intensity)}">${e.intensity}</span>${fmtDate(e.date)}</div><div class="meta">${esc(bits.join(' · '))}</div></div>
+      <div class="btns"><button data-edit="${e.id}">Изменить</button><button data-del="${e.id}">✕</button></div></div>`;
+  }).join('');
+}
+function renderData(){$('dataInfo').textContent=entries.length?`Сейчас в дневнике ${entries.length} ${plural(entries.length,'запись','записи','записей')}.`:'Дневник пока пуст.';}
+function plural(n,a,b,c){const m10=n%10,m100=n%100; return m10===1&&m100!==11?a:m10>=2&&m10<=4&&(m100<10||m100>=20)?b:c;}
+function renderAll(){renderSummary(); renderHistory(); renderData();}
+
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  ['entry','summary','history','data'].forEach(x=>$('tab-'+x).hidden=x!==t);
+}
+
+function printSummary(){
+  const months=monthList(period), set=new Set(months), list=entries.filter(e=>set.has(mkey(e.date))).slice().sort((a,b)=>a.date<b.date?-1:1);
+  if(!list.length){toast('За выбранный период нет записей'); return;}
+  const per=months.map(k=>({k,s:monthStats(entries.filter(e=>mkey(e.date)===k))}));
+  let h=`<h1>Дневник головной боли — сводка для врача</h1>
+  <p>Период: ${esc(months.length===1?mName(months[0]):mName(months[0])+' — '+mName(months[months.length-1]))}. Сформировано: ${fmtDate(today())}.</p>
+  <p>Пациент: ______________________________ &nbsp; Возраст: ______</p>
+  <h2>По месяцам</h2><table><tr><th>Месяц</th><th>Дни с ГБ</th><th>Приступов</th><th>Дни с препаратами</th><th>из них простые анальгетики</th><th>из них триптаны / комбинированные</th><th>Ср. сила (1–10)</th><th>Ср. длит., ч</th></tr>`+
+  per.map(x=>`<tr><td>${mName(x.k)}</td><td>${x.s.hDays}</td><td>${x.s.attacks}</td><td>${x.s.mDays}</td><td>${x.s.sDays}</td><td>${x.s.tDays}</td><td>${x.s.attacks?fmtNum(x.s.avgInt):'—'}</td><td>${x.s.avgH!=null?fmtNum(x.s.avgH):'—'}</td></tr>`).join('')+`</table>
+  <h2>Записи</h2><table><tr><th>Дата</th><th>Сила</th><th>Длит., ч</th><th>Препараты</th><th>Эффект</th><th>Сопутствующее</th><th>Провокаторы</th><th>Заметка</th></tr>`+
+  list.map(e=>`<tr><td>${fmtDate(e.date)}</td><td>${e.intensity}</td><td>${e.hours?fmtNum(e.hours):''}</td><td>${esc((e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':''))}</td><td>${e.effect?EFFL[e.effect]:''}</td><td>${esc((e.symptoms||[]).map(x=>SYML[x]).join(', '))}</td><td>${esc((e.triggers||[]).map(x=>TRIGL[x]).join(', '))}</td><td>${esc(e.note)}</td></tr>`).join('')+`</table>
+  <p class="pnote">Сводка составлена пациентом в дневнике головной боли на сайте vdorogov89.github.io. Показатели не являются диагнозом.</p>`;
+  $('printArea').innerHTML=h; goal('diary_print'); window.print();
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify({app:'headache-diary',version:1,exported:new Date().toISOString(),entries},null,1)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='dnevnik-golovnoy-boli-'+today()+'.json';
+  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); toast('Копия сохранена');
+}
+function importData(file){
+  const r=new FileReader();
+  r.onload=()=>{try{
+    const d=JSON.parse(r.result), arr=Array.isArray(d)?d:d.entries;
+    if(!Array.isArray(arr)) throw 0;
+    const valid=arr.filter(e=>e&&typeof e.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&e.intensity);
+    const ids=new Set(entries.map(e=>e.id)); let added=0;
+    valid.forEach(e=>{if(!e.id)e.id=Date.now().toString(36)+Math.random().toString(36).slice(2,6); if(!ids.has(e.id)){entries.push(e); added++;}});
+    entries.sort((a,b)=>a.date<b.date?1:-1); persist(); renderAll(); toast('Добавлено записей: '+added);
+  }catch(e){toast('Не удалось прочитать файл');}};
+  r.readAsText(file);
+}
+
+// init
+load(); if(!storageOK) $('storageWarn').hidden=false;
+try{localStorage.setItem('__t','1'); localStorage.removeItem('__t');}catch(e){$('storageWarn').hidden=false;}
+buildChips('medChips',MEDS,'med','checkbox'); buildChips('effectChips',EFFECTS,'eff','radio'); buildChips('symChips',SYMS,'sym','checkbox'); buildChips('trigChips',TRIGS,'trig','checkbox');
+$('fDate').max=today(); resetForm();
+$('fInt').addEventListener('input',updInt);
+$('hoursQuick').addEventListener('click',e=>{if(e.target.dataset.h)$('fHours').value=e.target.dataset.h;});
+$('saveBtn').addEventListener('click',saveEntry);
+$('cancelEdit').addEventListener('click',resetForm);
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+$('periods').addEventListener('click',e=>{if(!e.target.dataset.p)return; period=e.target.dataset.p; document.querySelectorAll('#periods button').forEach(b=>b.classList.toggle('active',b===e.target)); renderSummary();});
+$('historyOut').addEventListener('click',e=>{if(e.target.dataset.edit)startEdit(e.target.dataset.edit); if(e.target.dataset.del)delEntry(e.target.dataset.del);});
+$('printBtn').addEventListener('click',printSummary);
+$('exportBtn').addEventListener('click',exportData);
+$('importFile').addEventListener('change',e=>{if(e.target.files[0])importData(e.target.files[0]); e.target.value='';});
+$('clearBtn').addEventListener('click',()=>{if(!entries.length)return; if(confirm('Удалить все записи с этого устройства? Восстановить их будет невозможно, если нет резервной копии.')){entries=[]; persist(); renderAll(); toast('Все записи удалены');}});
+$('year').textContent=new Date().getFullYear();
+renderAll();
+})();
+</script>
+</body>
+</html>
