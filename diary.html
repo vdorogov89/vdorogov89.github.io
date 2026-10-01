@@ -98,9 +98,20 @@ input[type=range]{width:100%; accent-color:var(--grad1); height:28px;}
 .entry .btns{display:flex; gap:6px; align-items:flex-start;}
 .entry .btns button{padding:6px 10px; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--body); font-size:13px; cursor:pointer;}
 .pill{display:inline-block; min-width:26px; text-align:center; padding:1px 8px; border-radius:100px; font-size:13px; font-weight:600; color:#08080D; margin-right:6px;}
-.toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#1b1b26; border:1px solid var(--line); color:var(--ink); padding:12px 20px; border-radius:100px; z-index:50; font-size:14.5px;}
+.toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#1b1b26; border:1px solid var(--line); color:var(--ink); padding:12px 20px; border-radius:100px; z-index:50; font-size:14.5px; white-space:nowrap;}
 footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:30px;}
 #printArea{display:none;}
+.btn-primary.done{background:#6BE3A4;}
+.btn-primary:disabled{cursor:default;}
+.entry{transition:background .4s ease; border-radius:10px;}
+.entry.flash{background:rgba(79,224,255,0.14);}
+.mtable{overflow-x:auto; margin-bottom:18px;}
+.mtable table{width:100%; border-collapse:collapse; font-size:14.5px;}
+.mtable th{font-weight:500; color:var(--muted); text-align:left; padding:8px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
+.mtable td{padding:9px 8px; border-bottom:1px solid var(--line); color:var(--ink);}
+.mtable td.red{color:var(--warn); font-weight:600;}
+.mtable td.amber{color:var(--amber); font-weight:600;}
+#editBanner{margin-top:0;}
 :focus-visible{outline:2px solid var(--grad1); outline-offset:3px;}
 @media (max-width:600px){
   .intro h1{font-size:32px;}
@@ -164,6 +175,7 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
   <!-- ENTRY -->
   <section class="panel" id="tab-entry">
     <form id="entryForm" onsubmit="return false">
+      <div id="editBanner" class="callout amber" hidden></div>
       <div class="field">
         <label for="fDate">Дата приступа</label>
         <input type="date" id="fDate" required>
@@ -315,29 +327,42 @@ function updInt(){const v=+$('fInt').value; $('intVal').textContent=v; $('intLbl
 function resetForm(){
   editId=null; $('fDate').value=today(); $('fInt').value=5; updInt(); $('fHours').value=''; $('fMedName').value=''; $('fNote').value='';
   ['medChips','effectChips','symChips','trigChips'].forEach(b=>setVals(b,[])); updateEffect();
-  $('saveBtn').textContent='Сохранить запись'; $('cancelEdit').hidden=true;
+  $('saveBtn').textContent='Сохранить запись'; $('cancelEdit').hidden=true; $('editBanner').hidden=true;
 }
+let saving=false;
 function saveEntry(){
+  if(saving) return;
   const date=$('fDate').value;
   if(!date){toast('Укажите дату'); return;}
   if(date>today()){toast('Дата не может быть в будущем'); return;}
-  const meds=vals('medChips');
+  const meds=vals('medChips'), wasEdit=!!editId;
   const e={id:editId||Date.now().toString(36)+Math.random().toString(36).slice(2,6), date, intensity:+$('fInt').value,
     hours:parseFloat(String($('fHours').value).replace(',','.'))||null, meds, medName:$('fMedName').value.trim(),
     effect:(meds.length&&!meds.includes('none'))?(vals('effectChips')[0]||null):null,
     symptoms:vals('symChips'), triggers:vals('trigChips'), note:$('fNote').value.trim()};
-  if(editId){entries=entries.map(x=>x.id===editId?e:x);} else entries.push(e);
+  if(wasEdit){entries=entries.map(x=>x.id===e.id?e:x);} else entries.push(e);
   entries.sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
   const ok=persist(); goal('diary_save');
-  toast(editId?'Изменения сохранены':(ok?'Запись сохранена':'Сохранено до закрытия страницы'));
-  resetForm(); renderAll();
+  saving=true;
+  const btn=$('saveBtn'); btn.disabled=true; btn.classList.add('done');
+  btn.textContent=wasEdit?'✓ Изменения сохранены':'✓ Запись сохранена';
+  toast(ok?(wasEdit?'Изменения сохранены':'Запись сохранена'):'Сохранено до закрытия страницы');
+  renderAll();
+  setTimeout(()=>{
+    saving=false; btn.disabled=false; btn.classList.remove('done'); resetForm();
+    if(wasEdit){ showTab('history'); flash(e.id); }
+  }, wasEdit?900:1400);
+}
+function flash(id){
+  const el=document.querySelector('[data-entry="'+id+'"]'); if(!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),2000);
 }
 function startEdit(id){
   const e=entries.find(x=>x.id===id); if(!e) return;
   showTab('entry'); editId=id;
   $('fDate').value=e.date; $('fInt').value=e.intensity; updInt(); $('fHours').value=e.hours||''; $('fMedName').value=e.medName||''; $('fNote').value=e.note||'';
   setVals('medChips',e.meds||[]); setVals('effectChips',e.effect?[e.effect]:[]); setVals('symChips',e.symptoms||[]); setVals('trigChips',e.triggers||[]); updateEffect();
-  $('saveBtn').textContent='Сохранить изменения'; $('cancelEdit').hidden=false; window.scrollTo({top:0,behavior:'smooth'});
+  $('saveBtn').textContent='Сохранить изменения'; $('cancelEdit').hidden=false; $('editBanner').innerHTML='<p><strong>Редактирование записи от '+fmtDate(e.date)+'.</strong> Внесите изменения и нажмите «Сохранить изменения».</p>'; $('editBanner').hidden=false; window.scrollTo({top:0,behavior:'smooth'});
 }
 function delEntry(id){if(!confirm('Удалить эту запись?'))return; entries=entries.filter(x=>x.id!==id); persist(); renderAll(); toast('Запись удалена');}
 
@@ -369,57 +394,94 @@ function medLevel(s){ // per month
 }
 function mName(k){const [y,m]=k.split('-'); return MONTHS[+m-1]+' '+y;}
 
+function warnBlocks(per,multi,refHD){
+  let h='';
+  const lv=per.map(x=>medLevel(x.s));
+  if(lv.includes('red')){
+    const bad=per.filter(x=>medLevel(x.s)==='red').map(x=>mName(x.k));
+    h+=`<div class="callout warn"><p><strong>Много дней с обезболивающими${multi?' ('+esc(bad.join(', '))+')':''}.</strong> Частый приём препаратов может сам поддерживать головную боль (лекарственно-индуцированная головная боль). Ориентиры: простые обезболивающие 15 и более дней в месяц, триптаны или комбинированные препараты 10 и более дней. Обсудите это с врачом, не отменяйте лечение самостоятельно. <a href="migraine.html">Подробнее в статье о мигрени</a>.</p></div>`;
+  } else if(lv.includes('amber')){
+    h+=`<div class="callout amber"><p>Число дней с препаратами приближается к порогу, при котором может развиться лекарственно-индуцированная головная боль. Стоит следить за этим показателем.</p></div>`;
+  }
+  if(refHD>=15) h+=`<div class="callout warn"><p>Головная боль 15 и более дней в месяц — повод обязательно обратиться к неврологу для подбора лечения.</p></div>`;
+  else if(refHD>=4) h+=`<div class="callout"><p>При 4 и более днях с головной болью в месяц стоит обсудить с врачом профилактическое лечение, которое уменьшает число приступов.</p></div>`;
+  return h;
+}
+function triggersBlock(list){
+  const tc={}; list.forEach(e=>(e.triggers||[]).forEach(t=>tc[t]=(tc[t]||0)+1));
+  const tops=Object.entries(tc).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(!tops.length) return '';
+  const mx=tops[0][1];
+  return `<h2>Частые провокаторы</h2><div class="bars">`+tops.map(([t,c])=>`<div class="row"><span>${esc(TRIGL[t]||t)}</span><div class="track"><div class="fill" style="width:${c/mx*100}%"></div></div><span>${c}</span></div>`).join('')+`</div>`;
+}
 function renderSummary(){
-  const months=monthList(period), set=new Set(months);
-  const list=entries.filter(e=>set.has(mkey(e.date)));
+  let months=monthList(period);
   const out=$('summaryOut');
+  // для многомесячных периодов не учитываем месяцы до первой записи, чтобы не занижать средние
+  if(months.length>1 && entries.length){
+    const first=entries.reduce((m,e)=>mkey(e.date)<m?mkey(e.date):m,'9999-99');
+    const trimmed=months.filter(k=>k>=first);
+    if(trimmed.length) months=trimmed;
+  }
+  const set=new Set(months), list=entries.filter(e=>set.has(mkey(e.date)));
   const title=months.length===1?mName(months[0]):(mName(months[0])+' — '+mName(months[months.length-1]));
   if(!list.length){out.innerHTML=`<p class="muted">${esc(title)}: записей нет.</p>`; return;}
   const per=months.map(k=>({k, s:monthStats(entries.filter(e=>mkey(e.date)===k))}));
   const tot=monthStats(list), n=months.length, multi=n>1;
-  const avgHD=per.reduce((a,x)=>a+x.s.hDays,0)/n, avgMD=per.reduce((a,x)=>a+x.s.mDays,0)/n;
-  const worst=per.map(x=>medLevel(x.s)).includes('red')?'red':per.map(x=>medLevel(x.s)).includes('amber')?'amber':'';
-  const hdLevel=(multi?avgHD:tot.hDays)>=15?'red':'';
-  let h=`<h2>${esc(title)}</h2><div class="cards">
-    <div class="card ${hdLevel}"><div class="num">${multi?fmtNum(avgHD):tot.hDays}</div><div class="lbl">${multi?'дней с головной болью в месяц, в среднем':'дней с головной болью'}</div></div>
-    <div class="card ${worst}"><div class="num">${multi?fmtNum(avgMD):tot.mDays}</div><div class="lbl">${multi?'дней с препаратами в месяц, в среднем':'дней с приёмом препаратов'}</div></div>
-    <div class="card"><div class="num">${fmtNum(tot.avgInt)}</div><div class="lbl">средняя сила боли из 10</div></div>
-    <div class="card"><div class="num">${tot.avgH!=null?fmtNum(tot.avgH)+' ч':'—'}</div><div class="lbl">средняя длительность приступа</div></div>
-  </div>`;
-  if(tot.medE) h+=`<p class="small">Приступов: ${tot.attacks}. Препараты принимали в ${tot.medE} из них, помогли полностью в ${Math.round(tot.helped/tot.medE*100)}% случаев.</p>`;
-  else h+=`<p class="small">Приступов: ${tot.attacks}.</p>`;
-  if(worst==='red'){
-    const bad=per.filter(x=>medLevel(x.s)==='red').map(x=>mName(x.k));
-    h+=`<div class="callout warn"><p><strong>Много дней с обезболивающими${multi?' ('+esc(bad.join(', '))+')':''}.</strong> Частый приём препаратов может сам поддерживать головную боль (лекарственно-индуцированная головная боль). Ориентиры: простые обезболивающие 15 и более дней в месяц, триптаны или комбинированные препараты 10 и более дней. Обсудите это с врачом, не отменяйте лечение самостоятельно. <a href="migraine.html">Подробнее в статье о мигрени</a>.</p></div>`;
-  } else if(worst==='amber'){
-    h+=`<div class="callout amber"><p>Число дней с препаратами приближается к порогу, при котором может развиться лекарственно-индуцированная головная боль. Стоит следить за этим показателем.</p></div>`;
-  }
-  const refHD=multi?avgHD:tot.hDays;
-  if(refHD>=15) h+=`<div class="callout warn"><p>Головная боль 15 и более дней в месяц — повод обязательно обратиться к неврологу для подбора лечения.</p></div>`;
-  else if(refHD>=4) h+=`<div class="callout"><p>При 4 и более днях с головной болью в месяц стоит обсудить с врачом профилактическое лечение, которое уменьшает число приступов.</p></div>`;
+  const effect=tot.medE?` Препараты принимали в ${tot.medE} из них, помогли полностью в ${Math.round(tot.helped/tot.medE*100)}% случаев.`:'';
+  let h=`<h2>${esc(title)}</h2>`;
 
   if(multi){
-    h+=`<h2>По месяцам</h2><div class="legend"><span><i style="background:linear-gradient(120deg,#4FE0FF,#8A5CFF)"></i>дни с головной болью</span><span><i style="background:#FFC56B"></i>дни с препаратами</span></div><div class="chartbox">${barChart(per)}</div>`;
+    const curK=today().slice(0,7);
+    const full=per.filter(x=>x.k!==curK); const base=full.length?full:per, nb=base.length;
+    const partial=full.length<per.length;
+    const avgA=base.reduce((a,x)=>a+x.s.attacks,0)/nb, avgHD=base.reduce((a,x)=>a+x.s.hDays,0)/nb, avgMD=base.reduce((a,x)=>a+x.s.mDays,0)/nb;
+    const worst=per.map(x=>medLevel(x.s)).includes('red')?'red':per.map(x=>medLevel(x.s)).includes('amber')?'amber':'';
+    h+=`<div class="legend"><span><i style="background:linear-gradient(120deg,#4FE0FF,#8A5CFF)"></i>приступов в месяц</span><span><i style="background:none;border-top:2px dashed #FFC56B;height:0;border-radius:0"></i>среднее за период: ${fmtNum(avgA)}</span></div>
+      <div class="chartbox">${attacksChart(per,avgA)}</div>
+      <div class="cards">
+        <div class="card"><div class="num">${fmtNum(avgA)}</div><div class="lbl">приступов в месяц, в среднем</div></div>
+        <div class="card ${avgHD>=15?'red':''}"><div class="num">${fmtNum(avgHD)}</div><div class="lbl">дней с головной болью в месяц, в среднем</div></div>
+        <div class="card ${worst}"><div class="num">${fmtNum(avgMD)}</div><div class="lbl">дней с препаратами в месяц, в среднем</div></div>
+        <div class="card"><div class="num">${fmtNum(tot.avgInt)}</div><div class="lbl">средняя сила боли из 10</div></div>
+      </div>
+      <p class="small">Всего приступов за период: ${tot.attacks}.${effect}${partial&&full.length?' Текущий месяц ещё не закончился, поэтому в средние значения не входит.':''}</p>`;
+    h+=warnBlocks(per,true,avgHD);
+    h+=`<h2>По месяцам</h2><div class="mtable"><table><tr><th>Месяц</th><th>Приступов</th><th>Дни с болью</th><th>Дни с препаратами</th><th>Ср. сила</th></tr>`+
+      per.slice().reverse().map(x=>{const lv=medLevel(x.s); return `<tr><td style="white-space:nowrap">${MSHORT[+x.k.slice(5)-1]} ${x.k.slice(0,4)}${x.k===today().slice(0,7)?'*':''}</td><td>${x.s.attacks}</td><td>${x.s.hDays}</td><td class="${lv}">${x.s.mDays}</td><td>${x.s.attacks?fmtNum(x.s.avgInt):'—'}</td></tr>`;}).join('')+`</table></div>`;
   } else {
+    const worst=medLevel(tot);
+    h+=`<div class="cards">
+      <div class="card"><div class="num">${tot.attacks}</div><div class="lbl">приступов</div></div>
+      <div class="card ${tot.hDays>=15?'red':''}"><div class="num">${tot.hDays}</div><div class="lbl">дней с головной болью</div></div>
+      <div class="card ${worst}"><div class="num">${tot.mDays}</div><div class="lbl">дней с приёмом препаратов</div></div>
+      <div class="card"><div class="num">${fmtNum(tot.avgInt)}</div><div class="lbl">средняя сила боли из 10${tot.avgH!=null?' · длительность '+fmtNum(tot.avgH)+' ч':''}</div></div>
+    </div>`;
+    if(effect) h+=`<p class="small">${effect.trim()}</p>`;
+    h+=warnBlocks(per,false,tot.hDays);
     h+=`<h2>Календарь</h2><div class="legend"><span><i style="background:#6BE3A4"></i>лёгкая</span><span><i style="background:#FFC56B"></i>умеренная</span><span><i style="background:#FF8A7A"></i>сильная</span><span>● приём препаратов</span></div>${calendar(months[0])}`;
   }
-  const tc={}; list.forEach(e=>(e.triggers||[]).forEach(t=>tc[t]=(tc[t]||0)+1));
-  const tops=Object.entries(tc).sort((a,b)=>b[1]-a[1]).slice(0,6);
-  if(tops.length){const mx=tops[0][1]; h+=`<h2>Частые провокаторы</h2><div class="bars">`+tops.map(([t,c])=>`<div class="row"><span>${esc(TRIGL[t]||t)}</span><div class="track"><div class="fill" style="width:${c/mx*100}%"></div></div><span>${c}</span></div>`).join('')+`</div>`;}
+  h+=triggersBlock(list);
   out.innerHTML=h;
 }
-function barChart(per){
-  const W=Math.max(per.length*46,280), H=190, pb=28, pt=14, max=Math.max(5,...per.map(x=>Math.max(x.s.hDays,x.s.mDays)));
-  const bw=14, step=W/per.length, sc=v=>(H-pb-pt)*v/max;
-  let g=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Дни с головной болью по месяцам"><defs><linearGradient id="bg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#8A5CFF"/><stop offset="1" stop-color="#4FE0FF"/></linearGradient></defs>`;
+function attacksChart(per,avg){
+  const n=per.length, W=Math.max(320,n*48), H=220, pl=26, pr=8, pb=28, pt=18;
+  const max=Math.max(4,...per.map(x=>x.s.attacks)), top=Math.ceil(max*1.15);
+  const cw=W-pl-pr, step=cw/n, bw=Math.min(28,step*0.6), sc=v=>(H-pb-pt)*v/top;
+  let g=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:${Math.min(W,n*30)}px;height:auto" role="img" aria-label="Число приступов по месяцам"><defs><linearGradient id="bg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#8A5CFF"/><stop offset="1" stop-color="#4FE0FF"/></linearGradient></defs>`;
+  const ticks=[0,Math.round(top/2),top];
+  ticks.forEach(t=>{const y=H-pb-sc(t); g+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="rgba(255,255,255,0.07)"/><text x="${pl-6}" y="${y+4}" fill="#8B8B98" font-size="11" text-anchor="end">${t}</text>`;});
   per.forEach((x,i)=>{
-    const cx=step*i+step/2, h1=sc(x.s.hDays), h2=sc(x.s.mDays), m=+x.k.slice(5)-1;
-    g+=`<rect x="${cx-bw-2}" y="${H-pb-h1}" width="${bw}" height="${h1}" rx="4" fill="url(#bg)"/><rect x="${cx+2}" y="${H-pb-h2}" width="${bw}" height="${h2}" rx="4" fill="#FFC56B"/>`;
-    if(x.s.hDays) g+=`<text x="${cx-bw/2-2}" y="${H-pb-h1-4}" fill="#F2F2F5" font-size="11" text-anchor="middle">${x.s.hDays}</text>`;
-    if(x.s.mDays) g+=`<text x="${cx+bw/2+2}" y="${H-pb-h2-4}" fill="#FFC56B" font-size="11" text-anchor="middle">${x.s.mDays}</text>`;
-    g+=`<text x="${cx}" y="${H-8}" fill="#8B8B98" font-size="12" text-anchor="middle">${MSHORT[m]}</text>`;
+    const cx=pl+step*i+step/2, h1=sc(x.s.attacks), m=+x.k.slice(5)-1;
+    if(x.s.attacks){
+      g+=`<rect x="${cx-bw/2}" y="${H-pb-h1}" width="${bw}" height="${h1}" rx="5" fill="url(#bg)"/>`;
+      g+=`<text x="${cx}" y="${H-pb-h1-5}" fill="#F2F2F5" font-size="12" text-anchor="middle">${x.s.attacks}</text>`;
+    }
+    g+=`<text x="${cx}" y="${H-9}" fill="#8B8B98" font-size="12" text-anchor="middle">${MSHORT[m]}${x.k===today().slice(0,7)?'*':''}</text>`;
   });
-  return g+`<line x1="0" y1="${H-pb}" x2="${W}" y2="${H-pb}" stroke="rgba(255,255,255,0.12)"/></svg>`;
+  const ya=H-pb-sc(avg);
+  g+=`<line x1="${pl}" y1="${ya}" x2="${W-pr}" y2="${ya}" stroke="#FFC56B" stroke-width="2" stroke-dasharray="6 5"/>`;
+  return g+`<line x1="${pl}" y1="${H-pb}" x2="${W-pr}" y2="${H-pb}" stroke="rgba(255,255,255,0.15)"/></svg>`;
 }
 function calendar(k){
   const [y,m]=k.split('-').map(Number), first=new Date(y,m-1,1), days=new Date(y,m,0).getDate(), off=(first.getDay()+6)%7;
@@ -436,7 +498,7 @@ function renderHistory(){
     const meds=(e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':'');
     const bits=[e.hours?fmtNum(e.hours)+' ч':null, meds||null, e.effect?EFFL[e.effect].toLowerCase():null,
       (e.symptoms||[]).map(x=>SYML[x]).join(', ')||null, (e.triggers||[]).length?'провокаторы: '+e.triggers.map(x=>TRIGL[x]).join(', '):null, e.note||null].filter(Boolean);
-    return `<div class="entry"><div><div class="top"><span class="pill" style="background:${intColor(e.intensity)}">${e.intensity}</span>${fmtDate(e.date)}</div><div class="meta">${esc(bits.join(' · '))}</div></div>
+    return `<div class="entry" data-entry="${e.id}"><div><div class="top"><span class="pill" style="background:${intColor(e.intensity)}">${e.intensity}</span>${fmtDate(e.date)}</div><div class="meta">${esc(bits.join(' · '))}</div></div>
       <div class="btns"><button data-edit="${e.id}">Изменить</button><button data-del="${e.id}">✕</button></div></div>`;
   }).join('');
 }

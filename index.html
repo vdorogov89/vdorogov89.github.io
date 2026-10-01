@@ -39,6 +39,7 @@
       <a href="#about">Обо мне</a>
       <a href="#spec">Направления</a>
       <a href="razbor.html">Разбор МРТ</a>
+      <a href="diary.html">Дневник</a>
       <a href="#articles">Статьи</a>
       <a href="#contact">Контакты</a>
     </nav>
@@ -53,6 +54,7 @@
       <p class="lede">Головная боль, головокружение и боль в спине. Разбираюсь в причине и подбираю лечение, которое работает, а не просто снимает симптом на пару часов.</p>
       <div class="hero-cta">
         <a class="btn-primary" href="razbor.html">Разбор МРТ и выписок</a>
+        <a class="btn-link" href="diary.html">Дневник головной боли онлайн →</a>
       </div>
     </div>
     <div class="hero-stats reveal">
@@ -124,10 +126,26 @@
   </div>
 </section>
 
+<section id="diary">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="tag">04 — Инструмент</span>
+      <h2>Дневник головной боли</h2>
+    </div>
+    <a class="article-card diary-card reveal" href="diary.html">
+      <div>
+        <h3>Бесплатный онлайн-дневник для телефона и компьютера</h3>
+        <p>Записывайте приступы за полминуты. Дневник сам посчитает приступы, дни с головной болью и обезболивающими, покажет динамику по месяцам и подготовит сводку для врача. Без регистрации, записи хранятся только на вашем устройстве.</p>
+      </div>
+      <span class="read">Открыть дневник</span>
+    </a>
+  </div>
+</section>
+
 <section id="articles">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="tag">04 — Статьи</span>
+      <span class="tag">05 — Статьи</span>
       <h2>Для пациентов</h2>
     </div>
     <a class="article-card reveal" href="migraine.html">
@@ -151,20 +169,13 @@
       </div>
       <span class="read">Читать статью</span>
     </a>
-    <a class="article-card reveal" href="diary.html">
-      <div>
-        <h3>Дневник головной боли онлайн</h3>
-        <p>Бесплатный инструмент: запись приступов с телефона, подсчёт дней с головной болью и обезболивающими, график по месяцам и сводка для врача.</p>
-      </div>
-      <span class="read">Открыть дневник</span>
-    </a>
   </div>
 </section>
 
 <section id="contact">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="tag">05 — Контакты</span>
+      <span class="tag">06 — Контакты</span>
       <h2>Связаться</h2>
     </div>
     <div class="contact-grid">
@@ -520,6 +531,11 @@
   @media (max-width:760px){
     .article-card{grid-template-columns:1fr; gap:14px;}
   }
+  .hero-cta{display:flex; align-items:center; gap:24px; flex-wrap:wrap;}
+  .btn-link{display:inline-block; color:var(--ink); opacity:.85; font-size:15px; text-decoration:none; border-bottom:1px solid rgba(79,224,255,0.5); padding-bottom:2px;}
+  .btn-link:hover{opacity:1;}
+  .diary-card{border-color:rgba(79,224,255,0.25); background:linear-gradient(120deg, rgba(79,224,255,0.07), rgba(138,92,255,0.08));}
+  
 </style>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
