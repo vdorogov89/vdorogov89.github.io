@@ -437,8 +437,7 @@ function renderSummary(){
     const partial=full.length<per.length;
     const avgA=base.reduce((a,x)=>a+x.s.attacks,0)/nb, avgHD=base.reduce((a,x)=>a+x.s.hDays,0)/nb, avgMD=base.reduce((a,x)=>a+x.s.mDays,0)/nb;
     const worst=per.map(x=>medLevel(x.s)).includes('red')?'red':per.map(x=>medLevel(x.s)).includes('amber')?'amber':'';
-    h+=`<div class="legend"><span><i style="background:linear-gradient(120deg,#4FE0FF,#8A5CFF)"></i>приступов в месяц</span><span><i style="background:none;border-top:2px dashed #FFC56B;height:0;border-radius:0"></i>среднее за период: ${fmtNum(avgA)}</span></div>
-      <div class="chartbox">${attacksChart(per,avgA)}</div>
+    h+=`<h2>Дни с головной болью по месяцам</h2>${chartLegend(avgHD)}<div class="chartbox">${daysChart(per,avgHD)}</div>
       <div class="cards">
         <div class="card"><div class="num">${fmtNum(avgA)}</div><div class="lbl">приступов в месяц, в среднем</div></div>
         <div class="card ${avgHD>=15?'red':''}"><div class="num">${fmtNum(avgHD)}</div><div class="lbl">дней с головной болью в месяц, в среднем</div></div>
@@ -458,30 +457,45 @@ function renderSummary(){
       <div class="card"><div class="num">${fmtNum(tot.avgInt)}</div><div class="lbl">средняя сила боли из 10${tot.avgH!=null?' · длительность '+fmtNum(tot.avgH)+' ч':''}</div></div>
     </div>`;
     if(effect) h+=`<p class="small">${effect.trim()}</p>`;
+    { // контекст: выбранный месяц и до 5 предыдущих, начиная с месяца первой записи
+      const first=entries.reduce((m,e)=>mkey(e.date)<m?mkey(e.date):m,'9999-99');
+      let [y,m]=months[0].split('-').map(Number); const ctx=[];
+      for(let i=0;i<6;i++){const k=y+'-'+pad(m); if(i===0||k>=first) ctx.unshift(k); m--; if(m<1){m=12;y--;}}
+      const pc=ctx.map(k=>({k,s:monthStats(entries.filter(e=>mkey(e.date)===k))}));
+      h+=`<h2>Дни с головной болью по месяцам</h2>${chartLegend(null)}<div class="chartbox">${daysChart(pc,null,months[0])}</div>${ctx.length>1?'<p class="small">Выбранный месяц выделен, для сравнения показаны предыдущие.</p>':''}`;
+    }
     h+=warnBlocks(per,false,tot.hDays);
     h+=`<h2>Календарь</h2><div class="legend"><span><i style="background:#6BE3A4"></i>лёгкая</span><span><i style="background:#FFC56B"></i>умеренная</span><span><i style="background:#FF8A7A"></i>сильная</span><span>● приём препаратов</span></div>${calendar(months[0])}`;
   }
   h+=triggersBlock(list);
   out.innerHTML=h;
 }
-function attacksChart(per,avg){
-  const n=per.length, W=Math.max(320,n*48), H=220, pl=26, pr=8, pb=28, pt=18;
-  const max=Math.max(4,...per.map(x=>x.s.attacks)), top=Math.ceil(max*1.15);
-  const cw=W-pl-pr, step=cw/n, bw=Math.min(28,step*0.6), sc=v=>(H-pb-pt)*v/top;
-  let g=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:${Math.min(W,n*30)}px;height:auto" role="img" aria-label="Число приступов по месяцам"><defs><linearGradient id="bg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#8A5CFF"/><stop offset="1" stop-color="#4FE0FF"/></linearGradient></defs>`;
-  const ticks=[0,Math.round(top/2),top];
-  ticks.forEach(t=>{const y=H-pb-sc(t); g+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="rgba(255,255,255,0.07)"/><text x="${pl-6}" y="${y+4}" fill="#8B8B98" font-size="11" text-anchor="end">${t}</text>`;});
+function daysChart(per,avg,hl){
+  // дни с головной болью по месяцам; столбец окрашен по зонам: 0–3 зелёная, 4–14 оранжевая, 15+ красная
+  const n=per.length, W=Math.max(340,n*64), H=230, pl=28, pr=10, pb=28, pt=20;
+  const max=Math.max(...per.map(x=>x.s.hDays)), top=Math.max(6,Math.ceil(max*1.15));
+  const cw=W-pl-pr, step=cw/n, bw=Math.min(72,step*0.7), base=H-pb, sc=v=>(H-pb-pt)*Math.min(v,top)/top;
+  const zones=[[0,3,'#6BE3A4'],[3,14,'#FFC56B'],[14,1e9,'#FF8A7A']];
+  let g=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:${Math.min(W,n*40)}px;height:auto" role="img" aria-label="Дни с головной болью по месяцам"><defs>`;
+  per.forEach((x,i)=>{const v=x.s.hDays; if(!v)return; const cx=pl+step*i+step/2, h1=sc(v);
+    g+=`<clipPath id="cb${i}"><rect x="${cx-bw/2}" y="${base-h1}" width="${bw}" height="${h1+6}" rx="6"/></clipPath>`;});
+  g+='</defs>';
+  const ticks=[...new Set([0,4,15,top].filter(t=>t<=top))];
+  ticks.forEach(t=>{const y=base-sc(t), thr=t===4||t===15; g+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="${thr?'rgba(255,255,255,0.13)':'rgba(255,255,255,0.07)'}"${thr?' stroke-dasharray="2 4"':''}/><text x="${pl-6}" y="${y+4}" fill="#8B8B98" font-size="11" text-anchor="end">${t}</text>`;});
   per.forEach((x,i)=>{
-    const cx=pl+step*i+step/2, h1=sc(x.s.attacks), m=+x.k.slice(5)-1;
-    if(x.s.attacks){
-      g+=`<rect x="${cx-bw/2}" y="${H-pb-h1}" width="${bw}" height="${h1}" rx="5" fill="url(#bg)"/>`;
-      g+=`<text x="${cx}" y="${H-pb-h1-5}" fill="#F2F2F5" font-size="12" text-anchor="middle">${x.s.attacks}</text>`;
-    }
-    g+=`<text x="${cx}" y="${H-9}" fill="#8B8B98" font-size="12" text-anchor="middle">${MSHORT[m]}${x.k===today().slice(0,7)?'*':''}</text>`;
+    const v=x.s.hDays, cx=pl+step*i+step/2, m=+x.k.slice(5)-1, dim=hl&&x.k!==hl;
+    if(v){
+      g+=`<g clip-path="url(#cb${i})" opacity="${dim?0.35:1}">`;
+      zones.forEach(([a,b,c])=>{if(v<=a)return; const y1=base-sc(Math.min(v,b)), y0=base-sc(a); g+=`<rect x="${cx-bw/2}" y="${y1}" width="${bw}" height="${y0-y1+1}" fill="${c}"/>`;});
+      g+=`</g><text x="${cx}" y="${base-sc(v)-6}" fill="${dim?'#8B8B98':'#F2F2F5'}" font-size="13" font-weight="600" text-anchor="middle">${v}</text>`;
+    } else g+=`<text x="${cx}" y="${base-6}" fill="#8B8B98" font-size="12" text-anchor="middle">0</text>`;
+    g+=`<text x="${cx}" y="${H-9}" fill="${dim?'#6B6B78':'#B8B8C4'}" font-size="12" text-anchor="middle"${x.k===hl?' font-weight="700"':''}>${MSHORT[m]}${x.k===today().slice(0,7)?'*':''}</text>`;
   });
-  const ya=H-pb-sc(avg);
-  g+=`<line x1="${pl}" y1="${ya}" x2="${W-pr}" y2="${ya}" stroke="#FFC56B" stroke-width="2" stroke-dasharray="6 5"/>`;
-  return g+`<line x1="${pl}" y1="${H-pb}" x2="${W-pr}" y2="${H-pb}" stroke="rgba(255,255,255,0.15)"/></svg>`;
+  if(avg!=null){const ya=base-sc(avg); g+=`<line x1="${pl}" y1="${ya}" x2="${W-pr}" y2="${ya}" stroke="#C9C9FF" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.8"/>`;}
+  return g+`<line x1="${pl}" y1="${base}" x2="${W-pr}" y2="${base}" stroke="rgba(255,255,255,0.15)"/></svg>`;
+}
+function chartLegend(avg){
+  return `<div class="legend"><span><i style="background:#6BE3A4"></i>до 3 дней</span><span><i style="background:#FFC56B"></i>4–14 дней</span><span><i style="background:#FF8A7A"></i>15 и более</span>${avg!=null?`<span><i style="background:none;border-top:2px dashed #C9C9FF;height:0;border-radius:0"></i>в среднем: ${fmtNum(avg)}</span>`:''}</div>`;
 }
 function calendar(k){
   const [y,m]=k.split('-').map(Number), first=new Date(y,m-1,1), days=new Date(y,m,0).getDate(), off=(first.getDay()+6)%7;
