@@ -94,9 +94,9 @@ input[type=range]{width:100%; accent-color:var(--grad1); height:28px;}
 .head figure{margin:0; flex:1; max-width:200px; text-align:center;}
 .head figcaption{font-size:13px; color:var(--muted); margin-top:2px;}
 .head svg{width:100%; height:auto; display:block; -webkit-tap-highlight-color:transparent;}
-.head .z{cursor:pointer; fill:rgba(255,255,255,0.05); stroke:rgba(255,255,255,0.22); stroke-width:1;}
+.head .z{cursor:pointer; fill:transparent; stroke-width:1; stroke-dasharray:3 3;}
 .head .z:hover{fill:rgba(255,138,122,0.22);}
-.head .z.on{fill:rgba(255,138,122,0.8);}
+.head .z.on{fill:rgba(255,138,122,0.72);}
 .head .z:focus{outline:none; stroke:#4FE0FF; stroke-width:2;}
 .head.heat .z{cursor:default;}
 .head.heat .z:hover{fill:inherit;}
@@ -373,30 +373,47 @@ function updateEffect(){const m=vals('medChips'); $('effectField').hidden=!(m.le
 // локализация боли
 const ZONES=[['fr_r','лоб справа'],['fr_l','лоб слева'],['tp_r','висок справа'],['tp_l','висок слева'],['ey_r','глаз справа'],['ey_l','глаз слева'],['fc_r','лицо справа'],['fc_l','лицо слева'],['vx','темя'],['oc_r','затылок справа'],['oc_l','затылок слева'],['nk_r','шея справа'],['nk_l','шея слева']];
 const ZL=LBL(ZONES);
-// на обоих видах правая сторона головы — справа на рисунке
-const ZG={front:[['fr_l',55,18,45,62],['fr_r',100,18,45,62],['tp_l',18,30,37,92],['tp_r',145,30,37,92],['ey_l',55,80,45,42],['ey_r',100,80,45,42],['fc_l',18,122,82,90],['fc_r',100,122,82,90]],
-  back:[['vx',18,18,164,44],['oc_l',18,62,82,137],['oc_r',100,62,82,137],['nk_l',58,199,42,55],['nk_r',100,199,42,55]]};
+// спереди лицо смотрит на нас: правая сторона пациента — слева на рисунке; сзади — справа
+const ZG={front:[['fr_r',60,10,40,74],['fr_l',100,10,40,74],['tp_r',18,36,42,86],['tp_l',140,36,42,86],['ey_r',60,84,40,38],['ey_l',100,84,40,38],['fc_r',18,122,82,92],['fc_l',100,122,82,92]],
+  back:[['vx',18,8,164,52],['oc_l',18,60,82,136],['oc_r',100,60,82,136],['nk_l',66,188,34,54],['nk_r',100,188,34,54]]};
+const HEAD={
+  front:'M100 14 C141 14 166 44 166 93 C166 121 162 141 156 158 C147 183 127 205 100 207 C73 205 53 183 44 158 C38 141 34 121 34 93 C34 44 59 14 100 14 Z',
+  back:'M100 10 C145 10 169 45 169 96 C169 141 155 172 137 188 C127 196 115 201 100 201 C85 201 73 196 63 188 C45 172 31 141 31 96 C31 45 55 10 100 10 Z',
+  neckF:'M79 196 L77 234 M121 196 L123 234 M77 234 C60 242 36 246 14 256 M123 234 C140 242 164 246 186 256',
+  neckB:'M68 186 L66 238 L134 238 L132 186 Z',
+  shouldersB:'M66 234 C50 242 32 247 14 256 M134 234 C150 242 168 247 186 256'
+};
 let svgN=0;
 function headView(view,mode,data,max){
   const id='hc'+(++svgN), back=view==='back', print=mode==='print';
-  const line=print?'#999':'rgba(255,255,255,0.35)', soft=print?'#bbb':'rgba(255,255,255,0.18)', txt=print?'#555':'#8B8B98';
-  let g=`<svg viewBox="0 0 200 262" role="group" aria-label="${back?'Голова сзади':'Голова спереди'}"><defs><clipPath id="${id}"><ellipse cx="100" cy="110" rx="70" ry="90"/>${back?'<rect x="72" y="150" width="56" height="102" rx="8"/>':''}</clipPath></defs>`;
-  g+=`<ellipse cx="29" cy="118" rx="9" ry="20" fill="none" stroke="${soft}"/><ellipse cx="171" cy="118" rx="9" ry="20" fill="none" stroke="${soft}"/>`;
-  if(!back) g+=`<path d="M78 196 L78 252 M122 196 L122 252" stroke="${soft}" fill="none"/>`;
+  const line=print?'#888':'rgba(255,255,255,0.42)', soft=print?'#aaa':'rgba(255,255,255,0.26)', grid=print?'#ccc':'rgba(255,255,255,0.13)', txt=print?'#444':'#8B8B98';
+  const skin=print?'#fff':`url(#${id}g)`;
+  let g=`<svg viewBox="0 0 200 262" role="group" aria-label="${back?'Голова сзади':'Голова спереди'}"><defs>`+
+    `<radialGradient id="${id}g" cx="0.45" cy="0.38" r="0.7"><stop offset="0" stop-color="rgba(255,255,255,0.10)"/><stop offset="1" stop-color="rgba(255,255,255,0.03)"/></radialGradient>`+
+    `<clipPath id="${id}"><path d="${back?HEAD.back:HEAD.front}"/>${back?`<path d="${HEAD.neckB}"/>`:''}</clipPath></defs>`;
+  // уши
+  if(back) g+=`<path d="M33 98 C22 94 18 108 21 122 C24 134 30 140 36 138 Z M167 98 C178 94 182 108 179 122 C176 134 170 140 164 138 Z" fill="${skin}" stroke="${soft}" stroke-width="1.3"/>`;
+  else g+=`<path d="M36 96 C24 92 20 108 23 122 C26 136 33 141 40 138 Z M164 96 C176 92 180 108 177 122 C174 136 167 141 160 138 Z" fill="${skin}" stroke="${soft}" stroke-width="1.3"/><path d="M33 104 C27 106 27 120 32 128 M167 104 C173 106 173 120 168 128" stroke="${soft}" fill="none"/>`;
+  // шея и плечи
+  if(back) g+=`<path d="${HEAD.neckB}" fill="${print?'#fff':'rgba(255,255,255,0.05)'}" stroke="none"/><path d="M68 186 L66 236 M132 186 L134 236 ${HEAD.shouldersB}" stroke="${line}" stroke-width="1.5" fill="none"/>`;
+  else g+=`<path d="M79 196 L77 236 L123 236 L121 196 Z" fill="${print?'#fff':'rgba(255,255,255,0.05)'}"/><path d="${HEAD.neckF}" stroke="${line}" stroke-width="1.5" fill="none"/>`;
+  g+=`<path d="${back?HEAD.back:HEAD.front}" fill="${skin}"/>`;
   g+=`<g clip-path="url(#${id})">`;
   ZG[view].forEach(([z,x,y,w,h])=>{
-    let attr='', fill='';
-    if(mode==='pick') attr=` class="z${data.has(z)?' on':''}" data-z="${z}" tabindex="0" role="button" aria-pressed="${data.has(z)}" aria-label="${ZL[z]}"`;
-    else{const c=data[z]||0, r=max?c/max:0; fill=c?(print?`rgba(220,60,40,${0.15+0.7*r})`:`rgba(255,138,122,${0.18+0.72*r})`):(print?'#fff':'rgba(255,255,255,0.04)'); attr=` class="z" style="fill:${fill};stroke:${soft}"`;}
+    let attr='';
+    if(mode==='pick') attr=` class="z${data.has(z)?' on':''}" data-z="${z}" tabindex="0" role="button" aria-pressed="${data.has(z)}" aria-label="${ZL[z]}" style="stroke:${grid}"`;
+    else{const c=data[z]||0, r=max?c/max:0; const fill=c?(print?`rgba(220,60,40,${0.15+0.7*r})`:`rgba(255,138,122,${0.2+0.7*r})`):'transparent'; attr=` class="z" style="fill:${fill};stroke:${grid}"`;}
     g+=`<rect x="${x}" y="${y}" width="${w}" height="${h}"${attr}><title>${ZL[z]}</title></rect>`;
   });
   g+='</g>';
-  g+=`<ellipse cx="100" cy="110" rx="70" ry="90" fill="none" stroke="${line}" stroke-width="1.5" pointer-events="none"/>`;
-  if(back) g+=`<path d="M72 196 L72 252 M128 196 L128 252" stroke="${line}" stroke-width="1.5" fill="none" pointer-events="none"/>`;
-  else g+=`<g stroke="${soft}" fill="none" stroke-width="1.5" pointer-events="none"><path d="M66 100 q12 -8 24 0"/><path d="M110 100 q12 -8 24 0"/><path d="M100 108 L95 140 L104 142"/><path d="M84 162 q16 8 32 0"/></g>`;
-  if(mode!=='pick') ZG[view].forEach(([z,x,y,w,h])=>{const c=data[z]||0; if(!c)return; let cx=x+w/2, cy=y+h/2; if(x<40)cx=x+w-12; if(x>140)cx=x+12; if(z.startsWith('nk'))cy=y+28; g+=`<text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="15" font-weight="600" fill="${print?'#000':'#F2F2F5'}" pointer-events="none">${c}</text>`;});
-  g+=`<text x="4" y="14" font-size="12" fill="${txt}">левая</text><text x="196" y="14" font-size="12" fill="${txt}" text-anchor="end">правая</text></svg>`;
-  return `<figure>${g}<figcaption>${back?'Сзади':'Спереди'}</figcaption></figure>`;
+  g+=`<path d="${back?HEAD.back:HEAD.front}" fill="none" stroke="${line}" stroke-width="1.6" pointer-events="none"/>`;
+  g+=`<g stroke="${soft}" fill="none" stroke-width="1.4" stroke-linecap="round" pointer-events="none">`;
+  if(back) g+=`<path d="M58 30 C80 18 120 18 142 30"/><path d="M100 12 C98 30 101 44 100 58"/><path d="M48 56 C60 44 72 40 84 40"/><path d="M152 56 C140 44 128 40 116 40"/><path d="M66 184 C84 194 116 194 134 184"/><path d="M84 192 L84 200 M100 194 L100 202 M116 192 L116 200"/>`;
+  else g+=`<path d="M50 72 C62 40 138 40 150 72"/><path d="M62 94 C70 88 82 87 92 91"/><path d="M108 91 C118 87 130 88 138 94"/><path d="M65 106 C72 100 84 100 90 106 C84 111 72 111 65 106 Z"/><path d="M110 106 C116 100 128 100 135 106 C128 111 116 111 110 106 Z"/><path d="M100 106 C99 118 95 128 93 136 C96 141 104 141 107 136"/><path d="M85 160 C92 156 97 157 100 158 C103 157 108 156 115 160 C108 167 92 167 85 160 Z"/>`;
+  g+='</g>';
+  if(mode!=='pick') ZG[view].forEach(([z,x,y,w,h])=>{const c=data[z]||0; if(!c)return; let cx=x+w/2, cy=y+h/2; if(x<30)cx=x+w-14; if(x>130&&w<50)cx=x+14; if(z==='fr_r'||z==='fr_l')cy=y+46; if(z==='fc_r'||z==='fc_l'){cx=x<100?66:134; cy=176;} g+=`<text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="16" font-weight="700" fill="${print?'#000':'#FFFFFF'}" pointer-events="none" style="paint-order:stroke" stroke="${print?'#fff':'rgba(8,8,13,0.55)'}" stroke-width="3">${c}</text>`;});
+  g+=`<text x="4" y="12" font-size="12" fill="${txt}">${back?'левая':'правая'}</text><text x="196" y="12" font-size="12" fill="${txt}" text-anchor="end">${back?'правая':'левая'}</text></svg>`;
+  return `<figure>${g}<figcaption>${back?'Вид сзади':'Вид спереди'}</figcaption></figure>`;
 }
 function headHTML(mode,data){
   let max=0; if(mode!=='pick') max=Math.max(0,...Object.values(data));
