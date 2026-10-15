@@ -13,6 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ДППГ">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="author" content="Василий Дорогов">
+<meta name="copyright" content="© 2026 Василий Дорогов">
 <style>
 :root{--bg:#08080D; --ink:#F2F2F5; --body:#C9C9D3; --muted:#8B8B98; --line:rgba(255,255,255,0.09); --glass:rgba(255,255,255,0.045); --acc:#4FE0FF; --acc2:#8A5CFF; --warn:#FF8A7A; --amber:#FFC56B; --ok:#6BE3A4;}
 *{box-sizing:border-box;}
@@ -81,12 +83,13 @@ ul{margin:6px 0; padding-left:20px;} li{margin:3px 0;}
 .list button b{display:block; color:var(--ink);} .list button span{font-size:13px; color:var(--muted);}
 .list button.on{border-color:rgba(79,224,255,0.5);}
 details summary{cursor:pointer; color:var(--ink); font-weight:600;}
+.copy{font-size:11.5px; color:var(--muted); line-height:1.45; margin:22px 0 6px; padding-top:12px; border-top:1px solid var(--line);}
 .foot{font-size:12px; color:var(--muted); margin:18px 0;}
 </style>
 </head>
 <body>
 <div class="app">
-  <header><h1>ДППГ: манёвры</h1><span>памятка для врача</span></header>
+  <header><h1>ДППГ: манёвры</h1><span>автор — В.&nbsp;Дорогов</span></header>
 
   <section id="s-wiz">
     <div class="crumbs" id="crumbs"></div>
@@ -124,6 +127,7 @@ details summary{cursor:pointer; color:var(--ink); font-weight:600;}
       <li><b>Передний канал:</b> манёвр Яковино не требует определения стороны.</li></ul></div>
     <p class="foot">Источники: AAO-HNS Clinical Practice Guideline: BPPV (2017); Bárány Society, критерии ДППГ (2015); Kim J.S. et al., Neurology 2012 (апогеотропная форма); Yacovino D.A. et al., J Neurol 2009. Анимации схематичны: углы и время — по тексту шага.</p>
   </section>
+  <p class="copy">© 2026 Василий Дорогов, врач-невролог. Все права защищены. Текст, схемы и анимации — авторские материалы. Копирование, переработка и распространение без письменного разрешения автора запрещены.</p>
 </div>
 <nav class="tabs"><button data-tab="wiz" class="on">Подбор манёвра</button><button data-tab="man">Все манёвры</button><button data-tab="ref">Справка</button></nav>
 <script>
