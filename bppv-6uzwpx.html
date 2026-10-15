@@ -543,7 +543,7 @@ function result(dx,note,mans,side,extra=''){
 }
 $('wiz').addEventListener('click',e=>{
   const b=e.target.closest('[data-go],[data-man]'); if(!b) return;
-  if(b.dataset.man){ wizPlayer.load(b.dataset.man,b.dataset.side||'R'); wp.scrollIntoView({behavior:'smooth'}); return; }
+  if(b.dataset.man){ b.closest('.mbtns').querySelectorAll('button').forEach(x=>x.classList.toggle('alt',x!==b)); wizState.key=b.dataset.man; wizPlayer.load(b.dataset.man,b.dataset.side||'R'); wp.scrollIntoView({behavior:'smooth'}); return; }
   const g=b.dataset.go;
   if(g==='dh'||g==='roll'){ wizState={step:g}; renderWiz(); }
   else if(g==='post'){ const sd=b.dataset.side; result(`ДППГ заднего канала, ${EAR[sd]} ухо`,'Выберите манёвр. Эффективность Эпли и Семонта сопоставима; Семонт удобнее при ограничении разгибания шеи.',['epley','semont'],sd); }
