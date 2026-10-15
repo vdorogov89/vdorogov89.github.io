@@ -457,9 +457,18 @@ function eyeSVG(type,t,compact){
   let tx=0,ty=0,rot=0, frame=0, label='', arrow='';
   const A=9, AR=26;
   if(type==='postR'||type==='postL'){ const sgn=type==='postR'?-1:1; ty=-d*A*0.6; rot=sgn*d*AR;
-    arrow=`<path d="M${cx-18} ${cy-30} A24 24 0 0 ${type==='postR'?0:1} ${cx+18} ${cy-30}" fill="none" stroke="${COL.acc}" stroke-width="2"/>`+
-      (type==='postR'?`<path d="M${cx-18} ${cy-30} l7 -4 M${cx-18} ${cy-30} l1 8" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`:`<path d="M${cx+18} ${cy-30} l-7 -4 M${cx+18} ${cy-30} l-1 8" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`)+
-      `<path d="M${cx+44} ${cy+8} v-18 m-5 6 l5 -6 l5 6" fill="none" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`;
+    { // дуга над радужкой и наконечник по касательной; спереди правое ухо пациента — слева
+      const r=24, a1=-50*D2R, a2=50*D2R, P=a=>[cx+r*Math.sin(a), cy-r*Math.cos(a)];
+      const p1=P(a1), p2=P(a2);
+      const right=type==='postR', ta=right?a1:a2, tip=right?p1:p2;
+      const dir=right?[-Math.cos(ta),-Math.sin(ta)]:[Math.cos(ta),Math.sin(ta)];
+      const nrm=[-dir[1],dir[0]];
+      const w1=[tip[0]-dir[0]*7+nrm[0]*4, tip[1]-dir[1]*7+nrm[1]*4], w2=[tip[0]-dir[0]*7-nrm[0]*4, tip[1]-dir[1]*7-nrm[1]*4];
+      arrow=`<path d="M${R(p1[0])} ${R(p1[1])} A${r} ${r} 0 0 1 ${R(p2[0])} ${R(p2[1])}" fill="none" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`+
+        `<path d="M${R(w1[0])} ${R(w1[1])} L${R(tip[0])} ${R(tip[1])} L${R(w2[0])} ${R(w2[1])}" fill="none" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`+
+        `<path d="M${cx+44} ${cy+8} v-18 m-5 6 l5 -6 l5 6" fill="none" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`+
+        `<text x="8" y="${H-8}" font-size="9" fill="#8B8B98" font-family="sans-serif">← правое ухо</text><text x="${W-8}" y="${H-8}" font-size="9" fill="#8B8B98" text-anchor="end" font-family="sans-serif">левое ухо →</text>`;
+    }
     label=type==='postR'?'вверх + торсия к правому уху':'вверх + торсия к левому уху'; }
   else if(type==='down'){ ty=d*A; arrow=`<path d="M${cx+44} ${cy-8} v18 m-5 -6 l5 6 l5 -6" fill="none" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`; label='вниз (downbeat)'; }
   else if(type==='geo'||type==='apo'){ frame=90; const dir=type==='geo'?1:-1; tx=dir*d*A; // в повёрнутой системе
