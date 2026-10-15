@@ -1,0 +1,31 @@
+{
+ "id": "/bppv-6uzwpx.html",
+ "name": "ДППГ: манёвры",
+ "short_name": "ДППГ",
+ "lang": "ru",
+ "start_url": "/bppv-6uzwpx.html",
+ "scope": "/bppv-6uzwpx",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/bppv-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/bppv-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/bppv-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

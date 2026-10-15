@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ДППГ: манёвры</title>
+<meta name="theme-color" content="#08080D">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="bppv-6uzwpx.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="bppv-icon-192.png">
+<link rel="apple-touch-icon" href="bppv-apple-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ДППГ">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style>
+:root{--bg:#08080D; --ink:#F2F2F5; --body:#C9C9D3; --muted:#8B8B98; --line:rgba(255,255,255,0.09); --glass:rgba(255,255,255,0.045); --acc:#4FE0FF; --acc2:#8A5CFF; --warn:#FF8A7A; --amber:#FFC56B; --ok:#6BE3A4;}
+*{box-sizing:border-box;}
+html,body{margin:0; background:var(--bg); color:var(--body); font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif; -webkit-font-smoothing:antialiased;}
+button{font:inherit; color:inherit; cursor:pointer;}
+.app{max-width:560px; margin:0 auto; padding:0 16px calc(84px + env(safe-area-inset-bottom));}
+header{padding:16px 0 10px; display:flex; align-items:baseline; justify-content:space-between;}
+header h1{margin:0; font-size:20px; color:var(--ink); letter-spacing:-0.01em;}
+header span{font-size:12.5px; color:var(--muted);}
+nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center; gap:6px; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:rgba(10,10,16,0.92); backdrop-filter:blur(14px); border-top:1px solid var(--line);}
+nav.tabs button{flex:1; max-width:180px; padding:9px 6px; border-radius:12px; border:0; background:transparent; color:var(--muted); font-size:13.5px;}
+nav.tabs button.on{background:rgba(79,224,255,0.12); color:var(--ink);}
+section[hidden]{display:none;}
+.card{background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:16px; margin:12px 0;}
+h2{font-size:17px; color:var(--ink); margin:4px 0 8px;}
+h3{font-size:15px; color:var(--ink); margin:14px 0 6px;}
+p{margin:6px 0;}
+.muted{color:var(--muted);} .small{font-size:13px; color:var(--muted);}
+.crumbs{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 2px;}
+.crumbs span{font-size:12px; padding:3px 9px; border-radius:20px; background:rgba(255,255,255,0.06); color:var(--muted);}
+.crumbs span.on{background:rgba(79,224,255,0.14); color:var(--ink);}
+.opts{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;}
+.opt{text-align:left; padding:10px; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,0.03);}
+.opt:active{transform:scale(0.98);}
+.opt b{display:block; color:var(--ink); font-size:14px; line-height:1.3; margin-top:4px;}
+.opt .eyebox, .opt .eye, .opt b{pointer-events:none;}
+.opt .eye{width:100%; height:auto; display:block; background:rgba(255,255,255,0.03); border-radius:10px;}
+.opt .elab{font-size:11.5px; color:var(--acc); text-align:center; margin-top:3px;}
+.opt.wide{grid-column:1/-1;}
+.back{background:none; border:0; color:var(--acc); padding:4px 0; font-size:14px;}
+.player .ph{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+.ptitle{color:var(--ink); font-weight:600; font-size:16px;}
+.psub{font-size:12.5px; color:var(--muted);}
+.seg{display:flex; background:rgba(255,255,255,0.06); border-radius:10px; padding:3px; flex:none;}
+.seg button{border:0; background:transparent; padding:6px 10px; border-radius:8px; font-size:13px; color:var(--muted);}
+.seg button.on{background:rgba(79,224,255,0.18); color:var(--ink);}
+.stage{position:relative; margin:10px -6px 4px; background:radial-gradient(120% 90% at 50% 30%, #1A1C2C, #0E0F18); border-radius:16px; overflow:hidden;}
+.stage svg{display:block; width:100%; height:auto;}
+.cam{position:absolute; right:8px; bottom:8px; border:0; background:rgba(8,8,13,0.7); color:var(--muted); font-size:11.5px; padding:4px 9px; border-radius:20px;}
+.obs{position:absolute; right:6px; top:6px; width:112px; padding:4px 6px 6px; border-radius:12px; background:rgba(8,8,13,0.82); border:1px solid rgba(79,224,255,0.35); text-align:center;}
+.obs .eyebox{display:block; line-height:0;} .obs .eye{width:100%; height:auto; display:block;} .obs .elab{display:none;}
+.obs b{display:block; color:var(--acc); font-size:11.5px; line-height:1.2;} .obs small{display:block; color:var(--muted); font-size:9.5px; line-height:1.2; margin-top:1px;}
+.timer{position:absolute; left:10px; top:10px; padding:6px 12px; border-radius:12px; background:rgba(8,8,13,0.8); color:var(--ink); font-size:26px; font-weight:600; font-variant-numeric:tabular-nums;}
+.timer.done{color:#08080D; background:var(--ok); font-size:17px;}
+.steps{display:flex; gap:6px; margin:8px 0 2px; flex-wrap:wrap;}
+.steps button{width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:transparent; color:var(--muted); font-size:14px;}
+.steps button.on{background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; border-color:transparent; font-weight:600;}
+.stext{min-height:66px; font-size:15px; color:var(--ink);}
+.stext b{color:var(--acc); font-weight:600;}
+.hold{display:inline-block; margin-top:4px; font-size:13px; color:var(--amber);}
+.ctrl{display:flex; gap:8px;}
+.ctrl button{flex:1; padding:11px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.04);}
+.ctrl button.main{flex:2; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.procbtn{width:100%; margin-top:8px; padding:10px; border-radius:12px; border:1px dashed rgba(255,197,107,0.5); background:transparent; color:var(--amber); font-size:14px;}
+.procbtn.on{background:rgba(255,197,107,0.12); border-style:solid;}
+.result{border-color:rgba(107,227,164,0.35); background:rgba(107,227,164,0.06);}
+.result .dx{font-size:17px; color:var(--ink); font-weight:600;}
+.warnbox{border-color:rgba(255,138,122,0.4); background:rgba(255,138,122,0.06);}
+.warnbox h3{color:var(--warn); margin-top:0;}
+.amberbox{border-color:rgba(255,197,107,0.4); background:rgba(255,197,107,0.06);}
+ul{margin:6px 0; padding-left:20px;} li{margin:3px 0;}
+.mbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.mbtns button{padding:10px 14px; border-radius:12px; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns button.alt{background:rgba(255,255,255,0.08); color:var(--ink); font-weight:500;}
+.list button{display:block; width:100%; text-align:left; padding:12px 14px; margin:8px 0; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,0.03);}
+.list button b{display:block; color:var(--ink);} .list button span{font-size:13px; color:var(--muted);}
+.list button.on{border-color:rgba(79,224,255,0.5);}
+details summary{cursor:pointer; color:var(--ink); font-weight:600;}
+.foot{font-size:12px; color:var(--muted); margin:18px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header><h1>ДППГ: манёвры</h1><span>памятка для врача</span></header>
+
+  <section id="s-wiz">
+    <div class="crumbs" id="crumbs"></div>
+    <div id="wiz"></div>
+    <div class="card" id="wizPlayer" hidden></div>
+  </section>
+
+  <section id="s-man" hidden>
+    <div class="card" id="manPlayer"></div>
+    <div class="list" id="manList"></div>
+  </section>
+
+  <section id="s-ref" hidden>
+    <div class="card warnbox"><h3>Признаки центрального позиционного нистагма → МРТ</h3><ul>
+      <li>чистый вертикальный нистагм без торсии, особенно вниз;</li>
+      <li>нет латентного периода, нистагм не угасает, длится больше минуты;</li>
+      <li>направление не соответствует стимулированному каналу;</li>
+      <li>сильная рвота при слабом нистагме, нистагм в покое;</li>
+      <li>другие неврологические симптомы;</li>
+      <li>нет эффекта после 3–4 правильно выполненных манёвров.</li></ul></div>
+    <div class="card"><h3 style="margin-top:0">Когда думать о ДППГ</h3><p>Короткие (меньше минуты) приступы вращательного головокружения при укладывании, повороте в постели, наклоне или запрокидывании головы; типичный позиционный нистагм с латентным периодом; нет других неврологических симптомов (критерии Bárány Society, 2015).</p></div>
+    <div class="card amberbox"><h3 style="margin-top:0">Осторожно</h3><p>Выраженная патология шейного отдела (нестабильность, недавняя травма или операция, ревматоидный артрит с поражением атлантоаксиального сочленения), резкое ограничение подвижности шеи, выраженный кифоз, тяжёлое ожирение. Вместо пробы Дикса–Холлпайка — проба лёжа на боку; из манёвров — Семонт; выполнять с помощником.</p></div>
+    <div class="card"><h3 style="margin-top:0">После манёвра</h3><ul>
+      <li>Повторить диагностическую пробу в конце сеанса.</li>
+      <li>Ограничения положения головы и сна не нужны.</li>
+      <li>Неустойчивость несколько дней — частое явление.</li>
+      <li>Контроль через 1–4 недели или при рецидиве.</li>
+      <li>Нистагм сменил плоскость — возможен переход частиц в другой канал: roll-тест и манёвр по нему.</li>
+      <li>Препараты, подавляющие головокружение, рутинно не нужны.</li>
+      <li>Частые рецидивы — проверить 25(OH)D.</li></ul></div>
+    <div class="card"><h3 style="margin-top:0">Определение стороны</h3><ul>
+      <li><b>Задний канал:</b> больное ухо — то, что внизу при положительной пробе Дикса–Холлпайка.</li>
+      <li><b>Горизонтальный, геотропный:</b> больная сторона — где нистагм <u>сильнее</u>.</li>
+      <li><b>Горизонтальный, апогеотропный:</b> больная сторона — где нистагм <u>слабее</u>.</li>
+      <li><b>Передний канал:</b> манёвр Яковино не требует определения стороны.</li></ul></div>
+    <p class="foot">Источники: AAO-HNS Clinical Practice Guideline: BPPV (2017); Bárány Society, критерии ДППГ (2015); Kim J.S. et al., Neurology 2012 (апогеотропная форма); Yacovino D.A. et al., J Neurol 2009. Анимации схематичны: углы и время — по тексту шага.</p>
+  </section>
+</div>
+<nav class="tabs"><button data-tab="wiz" class="on">Подбор манёвра</button><button data-tab="man">Все манёвры</button><button data-tab="ref">Справка</button></nav>
+<script>
+// ===== 3D-сцена: кушетка и пациент, ортографическая камера =====
+const COL={skin:'#F0DCCB',skinD:'#D9C1AE',hair:'#3A3346',shirt:'#6C7BFF',shirtD:'#4B56B8',shirtS:'#5966D6',pants:'#2F3A66',pantsD:'#222A4C',shoe:'#1B1B26',chair:'#5C5C72',chairD:'#44445A',acc:'#4FE0FF',card:'#F7F7FA',floor:'rgba(255,255,255,0.18)',couchTop:'#8A8FA8',couchSide:'#5E6278',couchFront:'#4C5066',couchLeg:'#3B3E50'};
+const D2R=Math.PI/180;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const R=n=>Math.round(n*10)/10;
+function line(a,b,w,c){return `<line x1="${R(a[0])}" y1="${R(a[1])}" x2="${R(b[0])}" y2="${R(b[1])}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;}
+function circ(p,r,c,extra=''){return `<circle cx="${R(p[0])}" cy="${R(p[1])}" r="${r}" fill="${c}" ${extra}/>`;}
+// векторы
+const V={add:(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]], sub:(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]], mul:(a,k)=>[a[0]*k,a[1]*k,a[2]*k],
+  cross:(a,b)=>[a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]], dot:(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],
+  norm:a=>{const l=Math.hypot(a[0],a[1],a[2])||1; return [a[0]/l,a[1]/l,a[2]/l];}};
+const comb=(...pairs)=>pairs.reduce((s,[v,k])=>V.add(s,V.mul(v,k)),[0,0,0]);
+
+function makeCam(az,el,cx,cy,sc){
+  const ca=Math.cos(az*D2R), sa=Math.sin(az*D2R), ce=Math.cos(el*D2R), se=Math.sin(el*D2R);
+  const dir=v=>{ // мир -> камера (без переноса)
+    const x1=v[0]*ca+v[2]*sa, z1=-v[0]*sa+v[2]*ca, y1=v[1];
+    return [x1, y1*ce-z1*se, y1*se+z1*ce];
+  };
+  return {dir, p:v=>{const d=dir(v); return [cx+d[0]*sc, cy-d[1]*sc, d[2]];}, sc};
+}
+
+// pose: {mode:'long'|'edge', A (наклон позвоночника, 0 — вертикально, 90 — голова к краю -x), roll (на правый бок +), yaw (поворот головы вправо +), pitch (разгибание +), px,pz, legs, arms}
+function bodyFrame(p){
+  const A=p.A*D2R;
+  const u=[-Math.sin(A),Math.cos(A),0], f0=[Math.cos(A),Math.sin(A),0];
+  const r0=V.cross(f0,u), ro=p.roll*D2R;
+  const f=V.add(V.mul(f0,Math.cos(ro)),V.mul(r0,Math.sin(ro)));
+  const r=V.sub(V.mul(r0,Math.cos(ro)),V.mul(f0,Math.sin(ro)));
+  return {u,f,r};
+}
+function headFrame(b,yaw,pitch){
+  const y=yaw*D2R, t=pitch*D2R;
+  const f1=V.add(V.mul(b.f,Math.cos(y)),V.mul(b.r,Math.sin(y)));
+  const r1=V.sub(V.mul(b.r,Math.cos(y)),V.mul(b.f,Math.sin(y)));
+  const f2=V.add(V.mul(f1,Math.cos(t)),V.mul(b.u,Math.sin(t)));
+  const u2=V.sub(V.mul(b.u,Math.cos(t)),V.mul(f1,Math.sin(t)));
+  return {u:u2,f:f2,r:r1};
+}
+
+const COUCH={x0:-66,x1:84,z0:-24,z1:24,top:0,th:9,h:46};
+function couch(cam){
+  const {x0,x1,z0,z1,top,th,h}=COUCH; const P=(x,y,z)=>cam.p([x,y,z]);
+  const items=[];
+  const poly=(pts,c,depth)=>items.push({d:depth,s:`<path d="M${pts.map(q=>R(q[0])+' '+R(q[1])).join(' L')}Z" fill="${c}"/>`});
+  // ножки
+  [[x0+6,z0+5],[x1-6,z0+5],[x0+6,z1-5],[x1-6,z1-5]].forEach(([x,z])=>{const a=P(x,top-th,z), b=P(x,top-h,z); items.push({d:-999+(cam.dir([x,0,z])[2]),s:line(a,b,5,COL.couchLeg)});});
+  const faces=[
+    {n:[0,1,0],pts:[[x0,top,z0],[x1,top,z0],[x1,top,z1],[x0,top,z1]],c:COL.couchTop},
+    {n:[0,0,1],pts:[[x0,top,z1],[x1,top,z1],[x1,top-th,z1],[x0,top-th,z1]],c:COL.couchFront},
+    {n:[0,0,-1],pts:[[x0,top,z0],[x1,top,z0],[x1,top-th,z0],[x0,top-th,z0]],c:COL.couchFront},
+    {n:[-1,0,0],pts:[[x0,top,z0],[x0,top,z1],[x0,top-th,z1],[x0,top-th,z0]],c:COL.couchSide},
+    {n:[1,0,0],pts:[[x1,top,z0],[x1,top,z1],[x1,top-th,z1],[x1,top-th,z0]],c:COL.couchSide}];
+  faces.forEach(F=>{ if(cam.dir(F.n)[2]>0) poly(F.pts.map(q=>P(...q)),F.c,-998); });
+  // подушка-валик у головного конца не рисуем: голова может свешиваться
+  return items.map(i=>i.s).join('');
+}
+
+function patient(cam,p){
+  const b=bodyFrame(p), items=[];
+  const add=(d,s)=>items.push({d,s});
+  const Pv=v=>cam.p(v);
+  const pelvis=[p.px,COUCH.top+7,p.pz];
+  const L=46, S=V.add(pelvis,V.mul(b.u,L));
+  // туловище — коробка
+  const hw=13, dp=7, hw2=11;
+  const corner=(base,w,sr,sf)=>V.add(base,V.add(V.mul(b.r,w*sr),V.mul(b.f,dp*sf)));
+  const C={tfr:corner(S,hw,1,1),tfl:corner(S,hw,-1,1),tbr:corner(S,hw,1,-1),tbl:corner(S,hw,-1,-1),
+           bfr:corner(pelvis,hw2,1,1),bfl:corner(pelvis,hw2,-1,1),bbr:corner(pelvis,hw2,1,-1),bbl:corner(pelvis,hw2,-1,-1)};
+  const faces=[
+    {n:b.f,k:['tfr','tfl','bfl','bfr'],c:COL.shirt},{n:V.mul(b.f,-1),k:['tbr','tbl','bbl','bbr'],c:COL.shirtD},
+    {n:b.r,k:['tfr','tbr','bbr','bfr'],c:COL.shirtS},{n:V.mul(b.r,-1),k:['tfl','tbl','bbl','bfl'],c:COL.shirtS},
+    {n:b.u,k:['tfr','tfl','tbl','tbr'],c:COL.shirtD},{n:V.mul(b.u,-1),k:['bfr','bfl','bbl','bbr'],c:COL.pants}];
+  const torsoDepth=cam.dir(V.add(pelvis,V.mul(b.u,L/2)))[2];
+  faces.forEach(F=>{ if(cam.dir(F.n)[2]>0.01){ const pts=F.k.map(k=>Pv(C[k])); add(torsoDepth, `<path d="M${pts.map(q=>R(q[0])+' '+R(q[1])).join(' L')}Z" fill="${F.c}" stroke="rgba(0,0,0,0.12)" stroke-width="0.6"/>`);} });
+  // ноги
+  const hips=[1,-1].map(s=>V.add(pelvis,V.mul(b.r,7*s)));
+  hips.forEach((h,i)=>{
+    let knee,ank;
+    if(p.mode==='edge'){ knee=V.add(h,[0,0,30]); knee[1]=COUCH.top+6; ank=V.add(knee,[2,-32,4]); }
+    else if(p.mode==='prone'){ knee=V.add(h,[30,0,0]); knee[1]=COUCH.top+5; ank=V.add(knee,[30,0,0]); ank[1]=COUCH.top+5; }
+    else { knee=V.add(h,[30,0,0]); knee[1]=COUCH.top+6; ank=V.add(knee,[30,0,0]); ank[1]=COUCH.top+5; }
+    const c=i===0?COL.pants:COL.pantsD;
+    const dK=cam.dir(V.mul(V.add(h,knee),0.5))[2], dA=cam.dir(V.mul(V.add(knee,ank),0.5))[2];
+    add(dK,line(Pv(h),Pv(knee),12,c)); add(dA,line(Pv(knee),Pv(ank),10.5,c));
+    const foot=V.add(ank,p.mode==='edge'?[0,-2,7]:[4,8,0]);
+    add(dA+0.5,line(Pv(ank),Pv(foot),7,COL.shoe));
+  });
+  // руки
+  [1,-1].forEach(s=>{
+    const sh=V.add(S,V.add(V.mul(b.r,(hw+3)*s),V.mul(b.u,-3)));
+    let el,ha;
+    if(p.arms==='lap'){ el=comb([sh,1],[b.u,-22],[b.f,6],[b.r,2*s]); ha=comb([el,1],[b.u,-4],[b.f,20],[b.r,-3*s]); }
+    else if(p.arms==='elbows'){ el=comb([sh,1],[b.f,-2],[b.u,-4]); el[1]=COUCH.top+4; ha=comb([el,1],[b.u,22]); ha[1]=COUCH.top+4; }
+    else { el=comb([sh,1],[b.u,-23],[b.r,2*s],[b.f,2]); ha=comb([el,1],[b.u,-21],[b.f,3]); }
+    const d1=cam.dir(V.mul(V.add(sh,el),0.5))[2], d2=cam.dir(V.mul(V.add(el,ha),0.5))[2];
+    const c=s===1?COL.shirt:COL.shirtD;
+    add(d1,line(Pv(sh),Pv(el),9,c)); add(d2,line(Pv(el),Pv(ha),7.5,s===1?COL.skin:COL.skinD)+circ(Pv(ha),4,s===1?COL.skin:COL.skinD));
+  });
+  // шея и голова
+  const hf=headFrame(b,p.yaw,p.pitch);
+  const neckBase=V.add(S,V.mul(b.u,2)), neckTop=V.add(neckBase,V.mul(V.norm(V.add(b.u,hf.u)),7));
+  const hc=V.add(neckTop,V.mul(hf.u,12));
+  add(cam.dir(neckTop)[2],line(Pv(neckBase),Pv(neckTop),9,COL.skinD));
+  // головной рендер: локальные x = левое ухо пациента (−r), y = верх, z = лицо
+  const M=q=>cam.dir(comb([hf.r,-q[0]],[hf.u,q[1]],[hf.f,q[2]]));
+  const hp=Pv(hc);
+  add(cam.dir(hc)[2]+3,`<g transform="translate(${R(hp[0])} ${R(hp[1])}) scale(${cam.sc})">${head([0,0],15,0,0,{M})}</g>`);
+  // стрелка «нос»: куда смотрит лицо
+  items.sort((a,b)=>a.d-b.d);
+  return {svg:items.map(i=>i.s).join(''), headScreen:hp, face:cam.dir(hf.f), headC:hc, hf};
+}
+
+// ---- 3D-projected head. yaw: 0 = facing viewer, +90 = profile facing right; pitch: + = looking down
+function head(c,r,yaw,pitch,opt={}){
+  const Y=yaw*D2R, P=pitch*D2R, cY=Math.cos(Y), sY=Math.sin(Y), cP=Math.cos(P), sP=Math.sin(P);
+  const rot=opt.M?opt.M:((p)=>{const x=p[0], y=p[1]*cP-p[2]*sP, z=p[1]*sP+p[2]*cP; return [x*cY+z*sY, y, -x*sY+z*cY];});
+  const pj=(v,k=1)=>[c[0]+v[0]*r*k, c[1]-v[1]*r*k];
+  const norm=v=>{const l=Math.hypot(v[0],v[1],v[2]); return [v[0]/l,v[1]/l,v[2]/l];};
+  const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+  let s='';
+  // ears (local ±x)
+  const ears=[[-1,-0.02,-0.06],[1,-0.02,-0.06]].map(rot);
+  ears.forEach(e=>{ const q=pj(e); s+=`<ellipse cx="${R(q[0])}" cy="${R(q[1])}" rx="3.4" ry="4.6" fill="${COL.skinD}"/>`; });
+  s+=circ(c,r,COL.skin);
+  // hair = spherical cap n·p > d (local coords), rendered as projected region
+  const n=rot(norm([0,0.74,-0.67])), d=-0.09, rho=Math.sqrt(1-d*d);
+  const nl=norm([0,0.74,-0.67]);
+  let u=norm([1,0,0]); let v=[nl[1]*u[2]-nl[2]*u[1], nl[2]*u[0]-nl[0]*u[2], nl[0]*u[1]-nl[1]*u[0]];
+  const N=96, pts=[];
+  for(let i=0;i<N;i++){const t=i/N*2*Math.PI; const pl=[d*nl[0]+rho*(u[0]*Math.cos(t)+v[0]*Math.sin(t)), d*nl[1]+rho*(u[1]*Math.cos(t)+v[1]*Math.sin(t)), d*nl[2]+rho*(u[2]*Math.cos(t)+v[2]*Math.sin(t))]; pts.push(rot(pl));}
+  const centerHair=dot(n,[0,0,1])>d;
+  const vis=pts.map(p=>p[2]>0);
+  const toD=a=>a.map(p=>{const q=pj(p); return R(q[0])+' '+R(q[1]);}).join(' L');
+  let hairPath='';
+  if(vis.every(x=>x)){
+    const ell='M'+toD(pts)+'Z';
+    hairPath=centerHair?`M${R(c[0]-r)} ${R(c[1])} A${r} ${r} 0 1 0 ${R(c[0]+r)} ${R(c[1])} A${r} ${r} 0 1 0 ${R(c[0]-r)} ${R(c[1])}Z `+ell:ell;
+  } else if(vis.every(x=>!x)){
+    if(centerHair) hairPath=`M${R(c[0]-r)} ${R(c[1])} A${r} ${r} 0 1 0 ${R(c[0]+r)} ${R(c[1])} A${r} ${r} 0 1 0 ${R(c[0]-r)} ${R(c[1])}Z`;
+  } else {
+    let st=vis.findIndex((x,i)=>x && !vis[(i-1+N)%N]);
+    const run=[]; let i=st; while(vis[i%N]){run.push(i%N); i++; if(run.length>N) break;}
+    const a0=(st-1+N)%N, a1=run[run.length-1], b1=(a1+1)%N;
+    const cross=(p,q)=>{const t=p[2]/(p[2]-q[2]); return [p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t, 0];};
+    const s0=cross(pts[a0],pts[st]), s1=cross(pts[a1],pts[b1]);
+    const arc=[s0,...run.map(k=>pts[k]),s1];
+    const ang=p=>Math.atan2(p[1],p[0]);
+    const t0=ang(s1), t1=ang(s0);
+    // two silhouette arcs from s1 to s0: ccw or cw; pick the one whose midpoint is hair
+    let dt=t1-t0; while(dt<=0) dt+=2*Math.PI; // ccw sweep
+    const mid=[Math.cos(t0+dt/2),Math.sin(t0+dt/2),0];
+    const ccwHair=dot(n,mid)>d;
+    const sweep=ccwHair?dt:dt-2*Math.PI;
+    const sil=[]; const M=Math.max(4,Math.ceil(Math.abs(sweep)/0.15));
+    for(let k=1;k<M;k++){const t=t0+sweep*k/M; sil.push([Math.cos(t),Math.sin(t),0]);}
+    hairPath='M'+toD([...arc,...sil])+'Z';
+  }
+  if(hairPath) s+=`<path d="${hairPath}" fill="${COL.hair}" fill-rule="evenodd"/>`;
+  // visible ears on the face side
+  ears.forEach(e=>{ const op=Math.max(0,Math.min(1,(e[2]-0.05)/0.25)); if(op>0){ const q=pj(e); s+=`<g opacity="${R(op)}"><ellipse cx="${R(q[0])}" cy="${R(q[1])}" rx="${R(1.6+1.8*e[2])}" ry="4.4" fill="${COL.skinD}"/><ellipse cx="${R(q[0])}" cy="${R(q[1])}" rx="${R(0.6+0.9*e[2])}" ry="2.4" fill="#C9A894"/></g>`; } });
+  // features
+  const px=opt.px||0, py=opt.py||0;
+  const brows=[[-0.37,0.4,0.84],[0.37,0.4,0.84]].map(rot);
+  const eyes=[[-0.35,0.13,0.93],[0.35,0.13,0.93]].map(rot);
+  // брови: строим по 3D-точкам, чтобы они поворачивались вместе с лицом
+  [-1,1].forEach(sd=>{ const mid=rot([0.37*sd,0.4,0.84]); if(mid[2]<=0.18) return;
+    const a=pj(rot([0.37*sd-0.17,0.37,0.83])), b=pj(rot([0.37*sd+0.17,0.37,0.83])), m=pj(rot([0.37*sd,0.47,0.82]));
+    const cx2=2*m[0]-(a[0]+b[0])/2, cy2=2*m[1]-(a[1]+b[1])/2;
+    s+=`<path d="M${R(a[0])} ${R(a[1])} Q${R(cx2)} ${R(cy2)} ${R(b[0])} ${R(b[1])}" stroke="${COL.hair}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`; });
+  const es=opt.eyeScale||1;
+  const ax=rot([1,0,0]); const eAng=Math.atan2(-ax[1],ax[0])*180/Math.PI;
+  eyes.forEach(e=>{
+    if(e[2]<=0.15) return; const q=pj(e); const sq=0.65+0.35*Math.min(1,e[2]*1.6);
+    const erx=2.8*sq*es, ery=2.8*es, pr=1.6*es;
+    if(opt.closed){ s+=`<path d="M${R(q[0]-2.7*sq)} ${R(q[1])} q${R(2.7*sq)} 2 ${R(5.4*sq)} 0" stroke="#3A3346" stroke-width="1.6" fill="none" stroke-linecap="round"/>`; return; }
+    let ox, oy;
+    if(opt.fixGaze){ // pupils counter-rotate: stay aimed at the target in front
+      ox=Math.max(-1,Math.min(1,-sY/Math.sin(34*D2R)))*(erx-pr-0.2);
+      oy=-Math.max(-1,Math.min(1,sP/Math.sin(26*D2R)))*(ery-pr-0.2);
+    } else { ox=px*sq+0.9*sY*sq; oy=py; }
+    const pp=[q[0]+ox,q[1]+oy];
+    s+=`<ellipse cx="${R(q[0])}" cy="${R(q[1])}" rx="${R(erx)}" ry="${R(ery)}" transform="rotate(${R(eAng)} ${R(q[0])} ${R(q[1])})" fill="#fff" stroke="rgba(0,0,0,0.15)" stroke-width="0.5"/>`+circ(pp,pr,'#22202c')+circ([pp[0]-pr*0.35,pp[1]-pr*0.35],pr*0.3,'#fff');
+    if(opt.out) opt.out.push(pp);
+  });
+  const nb=rot([0,0.02,0.99]), nt=rot([0,-0.12,1.16]);
+  if(nb[2]>-0.1){ const a=pj(nb), b=pj(nt); const bb=pj(rot([0,-0.16,0.97])); s+=`<path d="M${R(a[0])} ${R(a[1])} L${R(b[0])} ${R(b[1])} L${R(bb[0])} ${R(bb[1])}" stroke="${COL.skinD}" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`; }
+  const ml=rot([-0.2,-0.42,0.88]), mr=rot([0.2,-0.42,0.88]), mc=rot([0,-0.5,0.87]);
+  if(mc[2]>0.15){ const a=pj(ml), b=pj(mr), m=pj(mc); const cx2=2*m[0]-(a[0]+b[0])/2, cy2=2*m[1]-(a[1]+b[1])/2;
+    const A=ml[2]>0?a:pj(rot([0,-0.44,0.9])), B=mr[2]>0?b:pj(rot([0,-0.44,0.9]));
+    s+=`<path d="M${R(A[0])} ${R(A[1])} Q${R(cx2)} ${R(cy2)} ${R(B[0])} ${R(B[1])}" stroke="#B4826E" stroke-width="1.7" fill="none" stroke-linecap="round"/>`; }
+  return s;
+}
+
+// ===== Манёвры: шаги для правой стороны =====
+const LONG={mode:'long',A:0,roll:0,yaw:0,pitch:0,px:-14,pz:0,arms:'lap'};
+const EDGE={mode:'edge',A:0,roll:90,yaw:0,pitch:0,px:6,pz:12,arms:'lap'};
+const pose=(base,o)=>Object.assign({},base,o);
+const MAN={
+  dh:{title:'Проба Дикса–Холлпайка',sub:'Диагностика: задний и передний каналы',kind:'long',side:true,diag:true,steps:[
+    {t:'Сидя на кушетке, голова повёрнута на 45° в сторону проверяемого уха.',p:pose(LONG,{yaw:45})},
+    {t:'Быстро уложить на спину: голова свешивается на 20–30° ниже края кушетки, поворот сохраняется. Наблюдать нистагм.',p:pose(LONG,{A:90,yaw:45,pitch:25,arms:'side'}),h:30,hl:'30–60 с',obs:'post'},
+    {t:'Медленно посадить. Наблюдать обратный нистагм. Затем — проба с другой стороны.',p:pose(LONG,{yaw:45}),h:30,hl:'30 с',obs:'rev'}]},
+  roll:{title:'Roll-тест',sub:'Диагностика: горизонтальный канал',kind:'long',side:false,diag:true,steps:[
+    {t:'Лёжа на спине, голова приподнята на 30°.',p:pose(LONG,{A:90,pitch:-30,px:6,arms:'side'})},
+    {t:'Быстро повернуть голову на 90° вправо. Наблюдать нистагм.',p:pose(LONG,{A:90,pitch:-30,px:6,yaw:90,arms:'side'}),h:30,hl:'30–60 с',obs:'hc'},
+    {t:'Вернуть голову в центр, дождаться окончания нистагма.',p:pose(LONG,{A:90,pitch:-30,px:6,arms:'side'}),h:20,hl:'до окончания нистагма'},
+    {t:'Быстро повернуть голову на 90° влево. Наблюдать нистагм и сравнить с правой стороной.',p:pose(LONG,{A:90,pitch:-30,px:6,yaw:-90,arms:'side'}),h:30,hl:'30–60 с',obs:'hc'}]},
+  epley:{title:'Манёвр Эпли',sub:'Задний канал',kind:'long',side:true,steps:[
+    {t:'Сидя на кушетке, голова повёрнута на 45° в сторону больного уха.',p:pose(LONG,{yaw:45})},
+    {t:'Быстро уложить на спину, голова свешивается на 20–30°, поворот сохраняется (положение пробы Дикса–Холлпайка).',p:pose(LONG,{A:90,yaw:45,pitch:25,arms:'side'}),h:30,hl:'30–60 с'},
+    {t:'Не поднимая головы, повернуть её на 90° в здоровую сторону.',p:pose(LONG,{A:90,yaw:-45,pitch:25,arms:'side'}),h:30,hl:'30–60 с'},
+    {t:'Повернуть пациента на здоровый бок, голову ещё на 90°: нос смотрит вниз, к полу, под 45°.',p:pose(LONG,{A:90,roll:-90,yaw:-45,pitch:8,arms:'side'}),h:30,hl:'30–60 с'},
+    {t:'Медленно сесть, подбородок слегка опущен.',p:pose(LONG,{yaw:0,pitch:-15})}]},
+  semont:{title:'Манёвр Семонта',sub:'Задний канал',kind:'edge',side:true,steps:[
+    {t:'Сидя на краю кушетки, ноги свешены. Голова повёрнута на 45° в здоровую сторону.',p:pose(EDGE,{yaw:-45})},
+    {t:'Быстро уложить на больной бок, поворот головы сохраняется — лицо смотрит вверх.',p:pose(EDGE,{A:90,yaw:-45,arms:'side'}),h:60,hl:'1–2 мин'},
+    {t:'Одним быстрым движением через положение сидя — на здоровый бок, не меняя положения головы: лицо смотрит вниз.',p:pose(EDGE,{A:-90,yaw:-45,arms:'side'}),h:60,hl:'1–2 мин',fast:true},
+    {t:'Медленно сесть.',p:pose(EDGE,{yaw:0})}]},
+  lempert:{title:'Манёвр Лемперта («барбекю»)',sub:'Горизонтальный канал, геотропная форма',kind:'long',side:true,steps:[
+    {t:'Лёжа на спине, голова приподнята на 30° и повёрнута на 90° в больную сторону.',p:pose(LONG,{A:90,pitch:-30,px:6,yaw:90,arms:'side'}),h:30,hl:'30–60 с'},
+    {t:'Голова в среднем положении, лицом вверх.',p:pose(LONG,{A:90,pitch:-30,px:6,yaw:0,arms:'side'}),h:30,hl:'30–60 с'},
+    {t:'Голова повёрнута на 90° в здоровую сторону.',p:pose(LONG,{A:90,pitch:-30,px:6,yaw:-90,arms:'side'}),h:30,hl:'30–60 с'},
+    {t:'Продолжая вращение, перевернуть на живот, опора на локти, лицом вниз.',p:pose(LONG,{mode:'prone',A:90,roll:-180,pitch:-10,px:6,yaw:0,arms:'elbows'}),h:30,hl:'30–60 с'},
+    {t:'Сесть через бок, подбородок слегка опущен.',p:pose(LONG,{A:0,roll:-360,pitch:-15,px:6,yaw:0})}]},
+  gufoniGeo:{title:'Манёвр Гуфони (геотропный)',sub:'Горизонтальный канал, геотропная форма',kind:'edge',side:true,steps:[
+    {t:'Сидя на краю кушетки, голова прямо.',p:pose(EDGE,{})},
+    {t:'Быстро уложить на здоровый бок, голова прямо.',p:pose(EDGE,{A:-90,arms:'side'}),h:60,hl:'1–2 мин, до окончания нистагма',fast:true},
+    {t:'Быстро повернуть голову на 45° вниз — носом к полу.',p:pose(EDGE,{A:-90,yaw:-45,arms:'side'}),h:120,hl:'2 мин'},
+    {t:'Медленно сесть.',p:pose(EDGE,{})}]},
+  gufoniApo:{title:'Манёвр Гуфони (апогеотропный)',sub:'Горизонтальный канал, апогеотропная форма',kind:'edge',side:true,steps:[
+    {t:'Сидя на краю кушетки, голова прямо.',p:pose(EDGE,{})},
+    {t:'Быстро уложить на больной бок, голова прямо.',p:pose(EDGE,{A:90,arms:'side'}),h:120,hl:'2 мин',fast:true},
+    {t:'Быстро повернуть голову на 45° вверх — носом к потолку.',p:pose(EDGE,{A:90,yaw:-45,arms:'side'}),h:120,hl:'2 мин'},
+    {t:'Медленно сесть. Повторить roll-тест: если форма стала геотропной — лечить как геотропную.',p:pose(EDGE,{})}]},
+  yacovino:{title:'Манёвр Яковино',sub:'Передний канал, сторону определять не нужно',kind:'long',side:false,steps:[
+    {t:'Сидя на кушетке, голова прямо.',p:pose(LONG,{})},
+    {t:'Быстро уложить на спину, голова свешивается прямо не менее чем на 30° ниже края кушетки.',p:pose(LONG,{A:90,pitch:38,arms:'side'}),h:30,hl:'30 с'},
+    {t:'Не поднимая туловища, прижать подбородок к груди.',p:pose(LONG,{A:90,pitch:-45,arms:'side'}),h:30,hl:'30 с'},
+    {t:'Сесть, сохраняя подбородок прижатым.',p:pose(LONG,{pitch:-35}),h:30,hl:'30 с'}]}
+};
+function mirrorPose(p,kind){const q=Object.assign({},p); q.yaw=-q.yaw; if(kind==='edge') q.A=-q.A; else q.roll=-q.roll; return q;}
+const sideText=(t,side)=>side==='L'?t:t; // тексты сформулированы через «больной/здоровый»
+
+// ===== Плеер =====
+function lerpPose(a,b,u){
+  const o={}; for(const k in b){ if(typeof b[k]==='number') o[k]=lerp(a[k],b[k],u); else o[k]=u<0.5?a[k]:b[k]; } return o;
+}
+class Player{
+  constructor(root,opts={}){
+    this.root=root; this.svg=root.querySelector('svg.scene'); this.az=25; this.opts=opts;
+    this.key=null; this.side='R'; this.i=0; this.from=null; this.cur=null; this.t0=0; this.dur=1300;
+    this.playing=false; this.proc=false; this.holdEnd=0; this.raf=null;
+    root.addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if(!b)return; this.act(b.dataset.act,b);});
+  }
+  load(key,side){
+    this.key=key; this.side=side||this.side; const m=MAN[key];
+    this.steps=m.steps.map(s=>Object.assign({},s,{p:(m.side&&this.side==='L')?mirrorPose(s.p,m.kind):s.p}));
+    this.i=0; this.cur=this.steps[0].p; this.from=this.cur; this.t0=0; this.stopAll(); this.render(); this.ui();
+    if(this.opts.autoplay) this.play();
+  }
+  obs(on){ const o=this.root.querySelector('.obs'); if(!o) return; const s=this.steps[this.i];
+    if(!on||!s.obs){ o.hidden=true; return; }
+    const typ=s.obs==='post'?(this.side==='L'?'postL':'postR'):s.obs==='rev'?'down':'geo';
+    o.querySelector('.eyebox').dataset.type=typ;
+    o.querySelector('b').textContent=s.obs==='rev'?'Оцениваем обратный нистагм':'Оцениваем нистагм';
+    o.querySelector('small').textContent=s.obs==='post'?'латентность, направление, длительность':s.obs==='rev'?'нистагм меняет направление':'к полу или к потолку, сила';
+    o.hidden=false; }
+  go(i,instant){ this.obs(false); i=Math.max(0,Math.min(this.steps.length-1,i)); this.from=this.cur; this.i=i; this.t0=performance.now(); this.dur=instant?1:(this.steps[i].fast?1100:2200); this.holdEnd=0; this.loop(); this.ui(); }
+  loop(){ if(this.raf) return; const f=()=>{this.raf=null; const now=performance.now(); const u=Math.min(1,(now-this.t0)/this.dur);
+      this.cur=lerpPose(this.from,this.steps[this.i].p,ease(u)); this.render();
+      if(u<1){this.raf=requestAnimationFrame(f); return;}
+      this.cur=this.steps[this.i].p; this.obs(true);
+      if(this.playing){ // демо: короткая пауза и следующий шаг
+        if(!this.holdEnd) this.holdEnd=now+(this.steps[this.i].obs?6500:(this.steps[this.i].h?4500:2500));
+        if(now>=this.holdEnd){ this.go(this.i+1<this.steps.length?this.i+1:0, false); return; }
+        this.raf=requestAnimationFrame(f); return; }
+      if(this.proc && this.steps[this.i].h){ this.tick(); }
+    }; this.raf=requestAnimationFrame(f); }
+  tick(){ const s=this.steps[this.i]; if(!this.procEnd) this.procEnd=performance.now()+s.h*1000;
+    const left=Math.max(0,Math.ceil((this.procEnd-performance.now())/1000)); const el=this.root.querySelector('.timer');
+    if(el){ el.hidden=false; el.textContent=left>0?`${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`:'Время вышло'; el.classList.toggle('done',left===0); }
+    if(left>0){ this.tm=setTimeout(()=>this.tick(),250); } else { this.signal(); } }
+  signal(){ try{navigator.vibrate&&navigator.vibrate([200,100,200]);}catch(e){} try{const a=new (window.AudioContext||window.webkitAudioContext)(); const o=a.createOscillator(), g=a.createGain(); o.frequency.value=880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(0.15,a.currentTime); o.start(); o.stop(a.currentTime+0.35);}catch(e){} }
+  clearTimer(){ clearTimeout(this.tm); this.procEnd=0; const el=this.root.querySelector('.timer'); if(el){el.hidden=true; el.classList.remove('done');} }
+  play(){ this.playing=true; this.proc=false; this.clearTimer(); this.go(this.i,false); this.ui(); }
+  stopAll(){ this.playing=false; this.clearTimer(); }
+  act(a,b){
+    if(a==='prev'){this.stopAll(); this.clearTimer(); this.go(this.i-1);}
+    else if(a==='next'){this.stopAll(); this.clearTimer(); this.go(this.i+1<this.steps.length?this.i+1:0);}
+    else if(a==='play'){ if(this.playing){this.stopAll(); this.ui();} else this.play(); }
+    else if(a==='cam'){ this.az=this.az===25?205:25; this.render(); }
+    else if(a==='proc'){ this.playing=false; this.proc=!this.proc; this.clearTimer(); if(this.proc){ this.go(0,false);} this.ui(); }
+    else if(a==='step'){ this.stopAll(); this.clearTimer(); this.go(+b.dataset.i); }
+    else if(a==='side'){ this.load(this.key,b.dataset.s); }
+  }
+  render(){ const cam=makeCam(this.az,24,196,146,1.6); const r=patient(cam,this.cur);
+    const fd=r.face;
+    this.svg.innerHTML=couch(cam)+r.svg+(fd[2]<-0.35?`<text x="12" y="22" font-size="11.5" fill="#FFC56B" font-family="sans-serif">Лицо отвёрнуто — нажмите «другой ракурс»</text>`:''); }
+  ui(){ const m=MAN[this.key], s=this.steps[this.i];
+    const q=sel=>this.root.querySelector(sel);
+    q('.ptitle').textContent=m.title+(m.side?(this.side==='R'?' · справа':' · слева'):'');
+    q('.psub').textContent=m.sub;
+    q('.steps').innerHTML=this.steps.map((x,i)=>`<button data-act="step" data-i="${i}" class="${i===this.i?'on':''}">${i+1}</button>`).join('');
+    q('.stext').innerHTML=`<b>Шаг ${this.i+1} из ${this.steps.length}.</b> ${s.t}${s.hl?` <span class="hold">⏱ ${s.hl}</span>`:''}`;
+    q('[data-act=play]').textContent=this.playing?'❚❚ Пауза':'▶ Демо';
+    const pb=q('[data-act=proc]'); pb.classList.toggle('on',this.proc); pb.textContent=this.proc?'Таймер включён':'Таймер для процедуры';
+    const sd=q('.sides'); if(sd){ sd.hidden=!m.side; sd.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.s===this.side)); }
+    if(!this.proc) this.clearTimer();
+  }
+}
+function playerHTML(withSides=true){
+  return `<div class="player"><div class="ph"><div><div class="ptitle"></div><div class="psub"></div></div>
+  ${withSides?`<div class="sides seg"><button data-act="side" data-s="R">Справа</button><button data-act="side" data-s="L">Слева</button></div>`:''}</div>
+  <div class="stage"><svg class="scene" viewBox="0 0 380 230"></svg><div class="timer" hidden></div><div class="obs" hidden><span class="eyebox" data-type="postR" data-compact="1"></span><div><b></b><small></small></div></div>
+  <button class="cam" data-act="cam" aria-label="Другая сторона">⟲ другой ракурс</button></div>
+  <div class="steps"></div><p class="stext"></p>
+  <div class="ctrl"><button data-act="prev" aria-label="Назад">◀</button><button data-act="play" class="main">▶ Демо</button><button data-act="next" aria-label="Вперёд">▶</button></div>
+  <button data-act="proc" class="procbtn">Таймер для процедуры</button></div>`;
+}
+
+// ===== Глаз с нистагмом =====
+function eyeSVG(type,t,compact){
+  const W=150,H=96,cx=75,cy=46;
+  const per=0.9, ph=(t/per)%1, slow=0.82;
+  const d=ph<slow?0.5-ph/slow:-0.5+(ph-slow)/(1-slow); // от +0.5 к -0.5 медленно, затем быстро назад
+  let tx=0,ty=0,rot=0, frame=0, label='', arrow='';
+  const A=9, AR=26;
+  if(type==='postR'||type==='postL'){ const sgn=type==='postR'?-1:1; ty=-d*A*0.6; rot=sgn*d*AR;
+    arrow=`<path d="M${cx-18} ${cy-30} A24 24 0 0 ${type==='postR'?0:1} ${cx+18} ${cy-30}" fill="none" stroke="${COL.acc}" stroke-width="2"/>`+
+      (type==='postR'?`<path d="M${cx-18} ${cy-30} l7 -4 M${cx-18} ${cy-30} l1 8" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`:`<path d="M${cx+18} ${cy-30} l-7 -4 M${cx+18} ${cy-30} l-1 8" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`)+
+      `<path d="M${cx+44} ${cy+8} v-18 m-5 6 l5 -6 l5 6" fill="none" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`;
+    label=type==='postR'?'вверх + торсия к правому уху':'вверх + торсия к левому уху'; }
+  else if(type==='down'){ ty=d*A; arrow=`<path d="M${cx+44} ${cy-8} v18 m-5 -6 l5 6 l5 -6" fill="none" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`; label='вниз (downbeat)'; }
+  else if(type==='geo'||type==='apo'){ frame=90; const dir=type==='geo'?1:-1; tx=dir*d*A; // в повёрнутой системе
+    arrow=`<line x1="10" y1="${H-14}" x2="${W-10}" y2="${H-14}" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><text x="${W-12}" y="${H-3}" text-anchor="end" font-size="9" fill="#8B8B98">пол</text>`+
+      (type==='geo'?`<path d="M${cx+44} ${cy-8} v18 m-5 -6 l5 6 l5 -6" fill="none" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`:`<path d="M${cx+44} ${cy+8} v-18 m-5 6 l5 -6 l5 6" fill="none" stroke="${COL.acc}" stroke-width="2" stroke-linecap="round"/>`);
+    label=type==='geo'?'к полу (геотропный)':'к потолку (апогеотропный)'; }
+  else if(type==='none'){ label='нистагма нет'; }
+  // в системе глаза: x — горизонталь глаза
+  let ix=0,iy=0; if(frame===90){ ix=tx; } else { iy=ty; }
+  const sp=[0,90,180,270].map(a=>{const r1=6.5,r2=11.5, aa=(a+rot)*D2R; return `<line x1="${R(Math.sin(aa)*r1)}" y1="${R(-Math.cos(aa)*r1)}" x2="${R(Math.sin(aa)*r2)}" y2="${R(-Math.cos(aa)*r2)}" stroke="#C8D4F0" stroke-width="1.4" stroke-linecap="round"/>`;}).join('');
+  const eye=`<g transform="translate(${cx} ${cy}) rotate(${frame})">
+    <path d="M-34 0 Q0 -26 34 0 Q0 26 -34 0Z" fill="#F7F4F1"/>
+    <clipPath id="ec${type}"><path d="M-34 0 Q0 -26 34 0 Q0 26 -34 0Z"/></clipPath>
+    <g clip-path="url(#ec${type})"><g transform="translate(${R(ix)} ${R(iy)})"><circle r="13" fill="#5A6E9C"/>${sp}<circle r="5.5" fill="#15151E"/></g></g>
+    <path d="M-34 0 Q0 -26 34 0" fill="none" stroke="#3A3346" stroke-width="2.2"/></g>`;
+  return `<svg viewBox="${compact?'0 6 150 66':'0 0 '+W+' '+H}" class="eye">${eye}${arrow}</svg><div class="elab">${label}</div>`;
+}
+
+// ===== Интерфейс =====
+const $=id=>document.getElementById(id);
+const SIDE={R:'справа',L:'слева'}, EAR={R:'правое',L:'левое'};
+let wizState={step:'dh'};
+const wp=$('wizPlayer'); wp.innerHTML=playerHTML(true); const wizPlayer=new Player(wp,{autoplay:true});
+const mp=$('manPlayer'); mp.innerHTML=playerHTML(true); const manPlayer=new Player(mp);
+
+function opt(type,title,data,wide){return `<button class="opt${wide?' wide':''}" ${data}>${type?`<span class="eyebox" data-type="${type}"></span>`:''}<b>${title}</b></button>`;}
+const CENTRAL=`<div class="card warnbox"><h3>Сначала исключить центральную причину</h3><p class="small" style="color:var(--body)">Нет латентного периода, нистагм не угасает и длится больше минуты, чистый вертикальный нистагм, другие неврологические симптомы, нет эффекта от 3–4 манёвров — показана МРТ головного мозга.</p></div>`;
+
+function crumbs(active){
+  const items=[['dh','Дикс–Холлпайк'],['roll','Roll-тест'],['side','Сторона'],['res','Манёвр']];
+  $('crumbs').innerHTML=items.map(([k,l])=>`<span class="${k===active?'on':''}">${l}</span>`).join('');
+}
+function renderWiz(){
+  const w=$('wiz'), s=wizState; $('s-wiz').appendChild(wp);
+  if(s.step==='dh'){
+    crumbs('dh');
+    w.innerHTML=`<div class="card"><h2>1. Проба Дикса–Холлпайка</h2><p class="small">Проведите пробу с обеих сторон. Анимация показывает технику, ниже — что вы видите.</p></div>`;
+    w.appendChild(wp); wp.hidden=false; wizPlayer.load('dh','R');
+    w.insertAdjacentHTML('beforeend',`<div class="card"><h2>Какой нистагм?</h2><div class="opts">
+      ${opt('postR','При пробе справа','data-go="post" data-side="R"')}
+      ${opt('postL','При пробе слева','data-go="post" data-side="L"')}
+      ${opt('down','При пробе с любой стороны','data-go="ant"')}
+      ${opt('none','Нет нистагма или он горизонтальный — к roll-тесту','data-go="roll"')}
+    </div></div>`);
+  } else if(s.step==='roll'){
+    crumbs('roll');
+    w.innerHTML=`<button class="back" data-go="dh">← назад</button><div class="card"><h2>2. Roll-тест</h2><p class="small">Лёжа, голова приподнята на 30°; быстрый поворот головы на 90° вправо и влево. На рисунке глаза — голова повёрнута на бок, линия внизу — пол.</p></div>`;
+    w.appendChild(wp); wp.hidden=false; wizPlayer.load('roll','R');
+    w.insertAdjacentHTML('beforeend',`<div class="card"><h2>Нистагм в обе стороны бьёт…</h2><div class="opts">
+      ${opt('geo','К полу — геотропный','data-go="side" data-form="geo"')}
+      ${opt('apo','К потолку — апогеотропный','data-go="side" data-form="apo"')}
+      ${opt('','Позиционного нистагма нет','data-go="nobppv"',true)}
+    </div></div>`);
+  } else if(s.step==='side'){
+    crumbs('side');
+    const geo=s.form==='geo';
+    wp.hidden=true; wizPlayer.stopAll();
+    w.innerHTML=`<button class="back" data-go="roll">← назад</button><div class="card"><h2>3. Где нистагм ${geo?'сильнее':'сильнее'}?</h2>
+      <p class="small">${geo?'При геотропной форме больная сторона — та, при повороте в которую нистагм <b style="color:var(--ink)">сильнее</b>.':'При апогеотропной форме больная сторона — та, при повороте в которую нистагм <b style="color:var(--ink)">слабее</b>, то есть противоположная более сильной.'}</p>
+      <div class="opts">${opt('','Сильнее при повороте вправо','data-go="hc" data-strong="R"')}${opt('','Сильнее при повороте влево','data-go="hc" data-strong="L"')}</div>
+      <p class="small" style="margin-top:10px">Если разницы не видно: при геотропной форме нистагм при укладывании на спину обычно бьёт в здоровую сторону, при наклоне головы вперёд сидя — в больную; при апогеотропной — наоборот.</p></div>`;
+  } else if(s.step==='res'){
+    crumbs('res'); w.innerHTML=s.html; w.appendChild(wp); wp.hidden=false; wizPlayer.load(s.key,s.side||'R');
+  }
+  w.scrollIntoView({block:'start'}); window.scrollTo(0,0);
+}
+function result(dx,note,mans,side,extra=''){
+  const btns=mans.map((m,i)=>`<button class="${i?'alt':''}" data-man="${m}" data-side="${side||''}">${MAN[m].title.replace('Манёвр ','')}</button>`).join('');
+  wizState={step:'res',key:mans[0],side,html:`<button class="back" data-go="dh">← к началу</button>
+    <div class="card result"><div class="small">Вывод</div><div class="dx">${dx}</div><p class="small" style="color:var(--body)">${note}</p><div class="mbtns">${btns}</div></div>${extra}`};
+  renderWiz();
+}
+$('wiz').addEventListener('click',e=>{
+  const b=e.target.closest('[data-go],[data-man]'); if(!b) return;
+  if(b.dataset.man){ wizPlayer.load(b.dataset.man,b.dataset.side||'R'); wp.scrollIntoView({behavior:'smooth'}); return; }
+  const g=b.dataset.go;
+  if(g==='dh'||g==='roll'){ wizState={step:g}; renderWiz(); }
+  else if(g==='post'){ const sd=b.dataset.side; result(`ДППГ заднего канала, ${EAR[sd]} ухо`,'Выберите манёвр. Эффективность Эпли и Семонта сопоставима; Семонт удобнее при ограничении разгибания шеи.',['epley','semont'],sd); }
+  else if(g==='ant'){ result('Возможен передний канал','Встречается редко. Нистагм вниз чаще других бывает центральным — сначала оцените неврологический статус.',['yacovino'],'',CENTRAL); }
+  else if(g==='side'){ wizState={step:'side',form:b.dataset.form}; renderWiz(); }
+  else if(g==='hc'){ const strong=b.dataset.strong, geo=wizState.form==='geo'; const sd=geo?strong:(strong==='R'?'L':'R');
+    if(geo) result(`Горизонтальный канал, геотропная форма, ${SIDE[sd]}`,'Каналолитиаз. Лемперт — вращение в здоровую сторону; Гуфони — лечь на здоровый бок. Дополнительно: ночь на здоровом боку.',['lempert','gufoniGeo'],sd);
+    else result(`Горизонтальный канал, апогеотропная форма, ${SIDE[sd]}`,'Купулолитиаз или частицы у ампулы. Гуфони — лечь на больной бок, затем голову носом вверх. После — повторный roll-тест: если форма стала геотропной, лечить как геотропную.',['gufoniApo','gufoniGeo'],sd); }
+  else if(g==='nobppv'){ wizState={step:'res',key:'roll',html:`<button class="back" data-go="dh">← к началу</button><div class="card"><div class="dx" style="color:var(--ink);font-weight:600">Позиционный нистагм не выявлен</div><p>ДППГ не подтверждено. Возможна спонтанная ремиссия к моменту осмотра — при сохранении жалоб повторить пробы в другой день. Рассмотреть другие причины головокружения.</p></div>${CENTRAL}`}; renderWiz(); }
+});
+
+// анимация глаз
+function eyes(){ const t=performance.now()/1000; document.querySelectorAll('.eyebox').forEach(el=>{ if(el.offsetParent) el.innerHTML=eyeSVG(el.dataset.type,t,!!el.dataset.compact); }); requestAnimationFrame(eyes); }
+requestAnimationFrame(eyes);
+
+// все манёвры
+const ORDER=[['epley','Задний канал'],['semont','Задний канал'],['lempert','Горизонтальный, геотропная'],['gufoniGeo','Горизонтальный, геотропная'],['gufoniApo','Горизонтальный, апогеотропная'],['yacovino','Передний канал'],['dh','Диагностика'],['roll','Диагностика']];
+function renderList(active){ $('manList').innerHTML=ORDER.map(([k,c])=>`<button data-k="${k}" class="${k===active?'on':''}"><b>${MAN[k].title}</b><span>${c}</span></button>`).join(''); }
+$('manList').addEventListener('click',e=>{const b=e.target.closest('[data-k]'); if(!b)return; manPlayer.load(b.dataset.k,manPlayer.side); renderList(b.dataset.k); window.scrollTo({top:0,behavior:'smooth'});});
+
+// вкладки
+document.querySelector('nav.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]'); if(!b)return;
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  ['wiz','man','ref'].forEach(t=>$('s-'+t).hidden=t!==b.dataset.tab);
+  if(b.dataset.tab!=='wiz') wizPlayer.stopAll(); if(b.dataset.tab!=='man') manPlayer.stopAll();
+  if(b.dataset.tab==='man' && !manPlayer.key){ manPlayer.load('epley','R'); renderList('epley'); }
+  window.scrollTo(0,0);});
+
+renderWiz();
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('/bppv-6uzwpx-sw.js',{scope:'/bppv-6uzwpx'}).catch(()=>{});
+</script>
+</body>
+</html>
