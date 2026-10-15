@@ -6,6 +6,13 @@
 <title>Дневник головной боли онлайн — бесплатно, с подсчётом дней и сводкой для врача</title>
 <meta name="description" content="Бесплатный онлайн-дневник головной боли от врача-невролога: запись приступов с телефона, подсчёт дней с головной болью и обезболивающими, график по месяцам, сводка для врача в PDF. Данные хранятся только на вашем устройстве.">
 <meta name="theme-color" content="#08080D">
+<link rel="manifest" href="diary.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="diary-icon-192.png">
+<link rel="apple-touch-icon" href="diary-apple-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Дневник боли">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Дневник головной боли онлайн">
 <meta property="og:description" content="Запись приступов, подсчёт дней с болью и таблетками, сводка для врача. Бесплатно, без регистрации.">
@@ -76,6 +83,24 @@ input[type=range]{width:100%; accent-color:var(--grad1); height:28px;}
 .card .lbl{font-size:13px; color:var(--muted);}
 .card.red{border-color:rgba(255,138,122,0.5);} .card.red .num{color:var(--warn);}
 .card.amber{border-color:rgba(255,197,107,0.45);} .card.amber .num{color:var(--amber);}
+.install{display:flex; gap:14px; align-items:flex-start; margin:16px 0; padding:16px 18px; border-radius:16px; background:rgba(79,224,255,0.06); border:1px solid rgba(79,224,255,0.25); font-size:15px;}
+.install[hidden]{display:none;}
+.install img{width:44px; height:44px; border-radius:11px; flex:none;}
+.install p{margin:0 0 8px;}
+.install p:last-child{margin-bottom:0;}
+.install .btn-primary{padding:10px 18px; font-size:14px; margin-top:4px;}
+.install .x{margin-left:auto; background:none; border:0; color:var(--muted); font-size:20px; line-height:1; cursor:pointer; padding:0 2px;}
+.head{display:flex; gap:10px; justify-content:center; margin:4px 0 6px;}
+.head figure{margin:0; flex:1; max-width:200px; text-align:center;}
+.head figcaption{font-size:13px; color:var(--muted); margin-top:2px;}
+.head svg{width:100%; height:auto; display:block; -webkit-tap-highlight-color:transparent;}
+.head .z{cursor:pointer; fill:rgba(255,255,255,0.05); stroke:rgba(255,255,255,0.22); stroke-width:1;}
+.head .z:hover{fill:rgba(255,138,122,0.22);}
+.head .z.on{fill:rgba(255,138,122,0.8);}
+.head .z:focus{outline:none; stroke:#4FE0FF; stroke-width:2;}
+.head.heat .z{cursor:default;}
+.head.heat .z:hover{fill:inherit;}
+.locsel{font-size:14px; color:var(--body); min-height:22px;}
 .callout{margin:16px 0; padding:16px 18px; border-radius:16px; background:var(--glass); border:1px solid var(--line); font-size:15px;}
 .callout p{margin:0;}
 .callout.warn{border-color:rgba(255,138,122,0.35); background:rgba(255,138,122,0.05);}
@@ -129,6 +154,9 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
   #printArea th, #printArea td{border:1px solid #999; padding:3pt 5pt; text-align:left; vertical-align:top;}
   #printArea th{background:#eee;}
   #printArea .pnote{font-size:9pt; color:#444;}
+  #printArea .head{display:flex; gap:10pt; justify-content:flex-start;}
+  #printArea .head figure{max-width:130pt; margin:0;}
+  #printArea .head figcaption{color:#444; font-size:9pt;}
   @page{margin:14mm;}
 }
 </style>
@@ -162,6 +190,18 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
     <h1>Дневник головной боли</h1>
     <p class="lead">Записывайте приступы за полминуты с телефона или компьютера. Дневник сам посчитает дни с головной болью и с обезболивающими и подготовит сводку для врача.</p>
     <p class="privacy">🔒 Записи хранятся только на этом устройстве, в вашем браузере. Никуда не отправляются, врач и сайт их не видят. Чтобы не потерять данные, иногда сохраняйте резервную копию во вкладке «Данные».</p>
+    <div id="installBox" class="install" hidden>
+      <img src="diary-icon-192.png" alt="">
+      <div>
+        <p><strong>Установите дневник на телефон</strong> — он появится на главном экране как приложение и будет открываться без интернета.</p>
+        <div id="installAndroid" hidden><button type="button" class="btn-primary" id="installBtn">Установить</button></div>
+        <div id="installIOS" hidden>
+          <p>В Safari нажмите «Поделиться» (квадрат со стрелкой вверх) → «На экран „Домой“» → «Добавить».</p>
+          <p class="small">Если вы уже делали записи в Safari: на iPhone приложение хранит данные отдельно от браузера. Сначала сохраните копию во вкладке «Данные», затем откройте дневник с иконки и загрузите её там же.</p>
+        </div>
+      </div>
+      <button type="button" class="x" id="installClose" aria-label="Скрыть">×</button>
+    </div>
     <div id="storageWarn" class="callout warn" hidden><p>Браузер не даёт сохранять данные (например, в режиме инкогнито). Записи пропадут после закрытия страницы.</p></div>
   </div>
 
@@ -185,6 +225,15 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
         <label for="fInt">Сила боли: <b id="intVal">5</b> <span id="intLbl" class="muted">умеренная</span></label>
         <input type="range" id="fInt" min="1" max="10" value="5">
         <div class="scale"><span>1 — едва заметная</span><span>10 — невыносимая</span></div>
+      </div>
+
+      <div class="field">
+        <span class="flabel">Где болело <span class="muted">— нажмите на зоны</span></span>
+        <div class="head" id="locPick"></div>
+        <div class="quick" id="locQuick">
+          <button type="button" data-q="r">Вся правая половина</button><button type="button" data-q="l">Вся левая</button><button type="button" data-q="all">Вся голова</button><button type="button" data-q="none">Сбросить</button>
+        </div>
+        <div class="locsel" id="locSel"></div>
       </div>
 
       <div class="field">
@@ -321,12 +370,62 @@ function vals(box){return [...$(box).querySelectorAll('input:checked')].map(i=>i
 function setVals(box,arr){$(box).querySelectorAll('input').forEach(i=>i.checked=arr.includes(i.value)); syncChips(box);}
 function updateEffect(){const m=vals('medChips'); $('effectField').hidden=!(m.length&&!m.includes('none'));}
 
+// локализация боли
+const ZONES=[['fr_r','лоб справа'],['fr_l','лоб слева'],['tp_r','висок справа'],['tp_l','висок слева'],['ey_r','глаз справа'],['ey_l','глаз слева'],['fc_r','лицо справа'],['fc_l','лицо слева'],['vx','темя'],['oc_r','затылок справа'],['oc_l','затылок слева'],['nk_r','шея справа'],['nk_l','шея слева']];
+const ZL=LBL(ZONES);
+// на обоих видах правая сторона головы — справа на рисунке
+const ZG={front:[['fr_l',55,18,45,62],['fr_r',100,18,45,62],['tp_l',18,30,37,92],['tp_r',145,30,37,92],['ey_l',55,80,45,42],['ey_r',100,80,45,42],['fc_l',18,122,82,90],['fc_r',100,122,82,90]],
+  back:[['vx',18,18,164,44],['oc_l',18,62,82,137],['oc_r',100,62,82,137],['nk_l',58,199,42,55],['nk_r',100,199,42,55]]};
+let svgN=0;
+function headView(view,mode,data,max){
+  const id='hc'+(++svgN), back=view==='back', print=mode==='print';
+  const line=print?'#999':'rgba(255,255,255,0.35)', soft=print?'#bbb':'rgba(255,255,255,0.18)', txt=print?'#555':'#8B8B98';
+  let g=`<svg viewBox="0 0 200 262" role="group" aria-label="${back?'Голова сзади':'Голова спереди'}"><defs><clipPath id="${id}"><ellipse cx="100" cy="110" rx="70" ry="90"/>${back?'<rect x="72" y="150" width="56" height="102" rx="8"/>':''}</clipPath></defs>`;
+  g+=`<ellipse cx="29" cy="118" rx="9" ry="20" fill="none" stroke="${soft}"/><ellipse cx="171" cy="118" rx="9" ry="20" fill="none" stroke="${soft}"/>`;
+  if(!back) g+=`<path d="M78 196 L78 252 M122 196 L122 252" stroke="${soft}" fill="none"/>`;
+  g+=`<g clip-path="url(#${id})">`;
+  ZG[view].forEach(([z,x,y,w,h])=>{
+    let attr='', fill='';
+    if(mode==='pick') attr=` class="z${data.has(z)?' on':''}" data-z="${z}" tabindex="0" role="button" aria-pressed="${data.has(z)}" aria-label="${ZL[z]}"`;
+    else{const c=data[z]||0, r=max?c/max:0; fill=c?(print?`rgba(220,60,40,${0.15+0.7*r})`:`rgba(255,138,122,${0.18+0.72*r})`):(print?'#fff':'rgba(255,255,255,0.04)'); attr=` class="z" style="fill:${fill};stroke:${soft}"`;}
+    g+=`<rect x="${x}" y="${y}" width="${w}" height="${h}"${attr}><title>${ZL[z]}</title></rect>`;
+  });
+  g+='</g>';
+  g+=`<ellipse cx="100" cy="110" rx="70" ry="90" fill="none" stroke="${line}" stroke-width="1.5" pointer-events="none"/>`;
+  if(back) g+=`<path d="M72 196 L72 252 M128 196 L128 252" stroke="${line}" stroke-width="1.5" fill="none" pointer-events="none"/>`;
+  else g+=`<g stroke="${soft}" fill="none" stroke-width="1.5" pointer-events="none"><path d="M66 100 q12 -8 24 0"/><path d="M110 100 q12 -8 24 0"/><path d="M100 108 L95 140 L104 142"/><path d="M84 162 q16 8 32 0"/></g>`;
+  if(mode!=='pick') ZG[view].forEach(([z,x,y,w,h])=>{const c=data[z]||0; if(!c)return; let cx=x+w/2, cy=y+h/2; if(x<40)cx=x+w-12; if(x>140)cx=x+12; if(z.startsWith('nk'))cy=y+28; g+=`<text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="15" font-weight="600" fill="${print?'#000':'#F2F2F5'}" pointer-events="none">${c}</text>`;});
+  g+=`<text x="4" y="14" font-size="12" fill="${txt}">левая</text><text x="196" y="14" font-size="12" fill="${txt}" text-anchor="end">правая</text></svg>`;
+  return `<figure>${g}<figcaption>${back?'Сзади':'Спереди'}</figcaption></figure>`;
+}
+function headHTML(mode,data){
+  let max=0; if(mode!=='pick') max=Math.max(0,...Object.values(data));
+  return headView('front',mode,data,max)+headView('back',mode,data,max);
+}
+let locSet=new Set();
+function renderLocPick(){$('locPick').innerHTML=headHTML('pick',locSet); $('locSel').textContent=locSet.size?'Выбрано: '+locText([...locSet]):'Не выбрано';}
+function locText(arr){return ZONES.filter(([z])=>arr.includes(z)).map(([,l])=>l).join(', ');}
+function toggleZone(z){if(locSet.has(z))locSet.delete(z); else locSet.add(z); renderLocPick();}
+function sideOf(loc){if(!loc||!loc.length)return null; const r=loc.some(z=>z.endsWith('_r')), l=loc.some(z=>z.endsWith('_l')); return r&&l?'both':r?'r':l?'l':'mid';}
+function locBlock(list,mode){
+  const withLoc=list.filter(e=>e.loc&&e.loc.length); if(!withLoc.length) return '';
+  const cnt={}; withLoc.forEach(e=>e.loc.forEach(z=>cnt[z]=(cnt[z]||0)+1));
+  const sc={r:0,l:0,both:0,mid:0}; withLoc.forEach(e=>sc[sideOf(e.loc)]++);
+  const parts=[sc.r?`только справа — ${sc.r}`:'',sc.l?`только слева — ${sc.l}`:'',sc.both?`с обеих сторон — ${sc.both}`:'',sc.mid?`по средней линии — ${sc.mid}`:''].filter(Boolean).join(', ');
+  let h=`<h2>Где болит</h2><div class="head${mode==='print'?'':' heat'}">${headHTML(mode==='print'?'print':'heat',cnt)}</div>`;
+  h+=`<p class="small">Цифра в зоне — в скольких приступах болела эта зона. Локализация отмечена в ${withLoc.length} из ${list.length} ${plural(list.length,'записи','записей','записей')}: ${parts}.</p>`;
+  if(mode!=='print'){
+    const one=(sc.r>=5&&!sc.l&&!sc.both)||(sc.l>=5&&!sc.r&&!sc.both);
+    if(one) h+=`<div class="callout amber"><p>Все отмеченные приступы — только с одной стороны. Обязательно покажите это врачу: боль, которая никогда не меняет сторону, требует уточнения причины.</p></div>`;
+  }
+  return h;
+}
 function intLabel(v){return v<=3?'лёгкая':v<=6?'умеренная':'сильная';}
 function updInt(){const v=+$('fInt').value; $('intVal').textContent=v; $('intLbl').textContent=intLabel(v);}
 
 function resetForm(){
   editId=null; $('fDate').value=today(); $('fInt').value=5; updInt(); $('fHours').value=''; $('fMedName').value=''; $('fNote').value='';
-  ['medChips','effectChips','symChips','trigChips'].forEach(b=>setVals(b,[])); updateEffect();
+  ['medChips','effectChips','symChips','trigChips'].forEach(b=>setVals(b,[])); updateEffect(); locSet=new Set(); renderLocPick();
   $('saveBtn').textContent='Сохранить запись'; $('cancelEdit').hidden=true; $('editBanner').hidden=true;
 }
 let saving=false;
@@ -339,7 +438,7 @@ function saveEntry(){
   const e={id:editId||Date.now().toString(36)+Math.random().toString(36).slice(2,6), date, intensity:+$('fInt').value,
     hours:parseFloat(String($('fHours').value).replace(',','.'))||null, meds, medName:$('fMedName').value.trim(),
     effect:(meds.length&&!meds.includes('none'))?(vals('effectChips')[0]||null):null,
-    symptoms:vals('symChips'), triggers:vals('trigChips'), note:$('fNote').value.trim()};
+    loc:ZONES.map(([z])=>z).filter(z=>locSet.has(z)), symptoms:vals('symChips'), triggers:vals('trigChips'), note:$('fNote').value.trim()};
   if(wasEdit){entries=entries.map(x=>x.id===e.id?e:x);} else entries.push(e);
   entries.sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
   const ok=persist(); goal('diary_save');
@@ -361,7 +460,7 @@ function startEdit(id){
   const e=entries.find(x=>x.id===id); if(!e) return;
   showTab('entry'); editId=id;
   $('fDate').value=e.date; $('fInt').value=e.intensity; updInt(); $('fHours').value=e.hours||''; $('fMedName').value=e.medName||''; $('fNote').value=e.note||'';
-  setVals('medChips',e.meds||[]); setVals('effectChips',e.effect?[e.effect]:[]); setVals('symChips',e.symptoms||[]); setVals('trigChips',e.triggers||[]); updateEffect();
+  setVals('medChips',e.meds||[]); setVals('effectChips',e.effect?[e.effect]:[]); setVals('symChips',e.symptoms||[]); setVals('trigChips',e.triggers||[]); updateEffect(); locSet=new Set(e.loc||[]); renderLocPick();
   $('saveBtn').textContent='Сохранить изменения'; $('cancelEdit').hidden=false; $('editBanner').innerHTML='<p><strong>Редактирование записи от '+fmtDate(e.date)+'.</strong> Внесите изменения и нажмите «Сохранить изменения».</p>'; $('editBanner').hidden=false; window.scrollTo({top:0,behavior:'smooth'});
 }
 function delEntry(id){if(!confirm('Удалить эту запись?'))return; entries=entries.filter(x=>x.id!==id); persist(); renderAll(); toast('Запись удалена');}
@@ -467,6 +566,7 @@ function renderSummary(){
     h+=warnBlocks(per,false,tot.hDays);
     h+=`<h2>Календарь</h2><div class="legend"><span><i style="background:#6BE3A4"></i>лёгкая</span><span><i style="background:#FFC56B"></i>умеренная</span><span><i style="background:#FF8A7A"></i>сильная</span><span>● приём препаратов</span></div>${calendar(months[0])}`;
   }
+  h+=locBlock(list,'screen');
   h+=triggersBlock(list);
   out.innerHTML=h;
 }
@@ -510,7 +610,7 @@ function renderHistory(){
   if(!entries.length){out.innerHTML='<p class="muted">Записей пока нет. Добавьте первую во вкладке «Запись».</p>'; return;}
   out.innerHTML=`<p class="small">Всего записей: ${entries.length}</p>`+entries.map(e=>{
     const meds=(e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':'');
-    const bits=[e.hours?fmtNum(e.hours)+' ч':null, meds||null, e.effect?EFFL[e.effect].toLowerCase():null,
+    const bits=[(e.loc||[]).length?locText(e.loc):null, e.hours?fmtNum(e.hours)+' ч':null, meds||null, e.effect?EFFL[e.effect].toLowerCase():null,
       (e.symptoms||[]).map(x=>SYML[x]).join(', ')||null, (e.triggers||[]).length?'провокаторы: '+e.triggers.map(x=>TRIGL[x]).join(', '):null, e.note||null].filter(Boolean);
     return `<div class="entry" data-entry="${e.id}"><div><div class="top"><span class="pill" style="background:${intColor(e.intensity)}">${e.intensity}</span>${fmtDate(e.date)}</div><div class="meta">${esc(bits.join(' · '))}</div></div>
       <div class="btns"><button data-edit="${e.id}">Изменить</button><button data-del="${e.id}">✕</button></div></div>`;
@@ -534,8 +634,9 @@ function printSummary(){
   <p>Пациент: ______________________________ &nbsp; Возраст: ______</p>
   <h2>По месяцам</h2><table><tr><th>Месяц</th><th>Дни с ГБ</th><th>Приступов</th><th>Дни с препаратами</th><th>из них простые анальгетики</th><th>из них триптаны / комбинированные</th><th>Ср. сила (1–10)</th><th>Ср. длит., ч</th></tr>`+
   per.map(x=>`<tr><td>${mName(x.k)}</td><td>${x.s.hDays}</td><td>${x.s.attacks}</td><td>${x.s.mDays}</td><td>${x.s.sDays}</td><td>${x.s.tDays}</td><td>${x.s.attacks?fmtNum(x.s.avgInt):'—'}</td><td>${x.s.avgH!=null?fmtNum(x.s.avgH):'—'}</td></tr>`).join('')+`</table>
-  <h2>Записи</h2><table><tr><th>Дата</th><th>Сила</th><th>Длит., ч</th><th>Препараты</th><th>Эффект</th><th>Сопутствующее</th><th>Провокаторы</th><th>Заметка</th></tr>`+
-  list.map(e=>`<tr><td>${fmtDate(e.date)}</td><td>${e.intensity}</td><td>${e.hours?fmtNum(e.hours):''}</td><td>${esc((e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':''))}</td><td>${e.effect?EFFL[e.effect]:''}</td><td>${esc((e.symptoms||[]).map(x=>SYML[x]).join(', '))}</td><td>${esc((e.triggers||[]).map(x=>TRIGL[x]).join(', '))}</td><td>${esc(e.note)}</td></tr>`).join('')+`</table>
+  ${locBlock(list,'print')}
+  <h2>Записи</h2><table><tr><th>Дата</th><th>Сила</th><th>Длит., ч</th><th>Локализация</th><th>Препараты</th><th>Эффект</th><th>Сопутствующее</th><th>Провокаторы</th><th>Заметка</th></tr>`+
+  list.map(e=>`<tr><td>${fmtDate(e.date)}</td><td>${e.intensity}</td><td>${e.hours?fmtNum(e.hours):''}</td><td>${esc(locText(e.loc||[]))}</td><td>${esc((e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':''))}</td><td>${e.effect?EFFL[e.effect]:''}</td><td>${esc((e.symptoms||[]).map(x=>SYML[x]).join(', '))}</td><td>${esc((e.triggers||[]).map(x=>TRIGL[x]).join(', '))}</td><td>${esc(e.note)}</td></tr>`).join('')+`</table>
   <p class="pnote">Сводка составлена пациентом в дневнике головной боли на сайте vdorogov89.github.io. Показатели не являются диагнозом.</p>`;
   $('printArea').innerHTML=h; goal('diary_print'); window.print();
 }
@@ -566,6 +667,10 @@ $('fDate').max=today(); resetForm();
 $('fInt').addEventListener('input',updInt);
 $('hoursQuick').addEventListener('click',e=>{if(e.target.dataset.h)$('fHours').value=e.target.dataset.h;});
 $('saveBtn').addEventListener('click',saveEntry);
+$('locPick').addEventListener('click',e=>{const z=e.target.closest('[data-z]'); if(z)toggleZone(z.dataset.z);});
+$('locPick').addEventListener('keydown',e=>{const z=e.target.closest('[data-z]'); if(z&&(e.key==='Enter'||e.key===' ')){e.preventDefault(); toggleZone(z.dataset.z); const n=$('locPick').querySelector(`[data-z="${z.dataset.z}"]`); if(n)n.focus();}});
+$('locQuick').addEventListener('click',e=>{const q=e.target.dataset.q; if(!q)return; const all=ZONES.map(([z])=>z);
+  locSet=new Set(q==='all'?all:q==='none'?[]:all.filter(z=>z.endsWith('_'+q))); renderLocPick();});
 $('cancelEdit').addEventListener('click',resetForm);
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
 $('periods').addEventListener('click',e=>{if(!e.target.dataset.p)return; period=e.target.dataset.p; document.querySelectorAll('#periods button').forEach(b=>b.classList.toggle('active',b===e.target)); renderSummary();});
@@ -574,6 +679,21 @@ $('printBtn').addEventListener('click',printSummary);
 $('exportBtn').addEventListener('click',exportData);
 $('importFile').addEventListener('change',e=>{if(e.target.files[0])importData(e.target.files[0]); e.target.value='';});
 $('clearBtn').addEventListener('click',()=>{if(!entries.length)return; if(confirm('Удалить все записи с этого устройства? Восстановить их будет невозможно, если нет резервной копии.')){entries=[]; persist(); renderAll(); toast('Все записи удалены');}});
+// установка на главный экран
+(function(){
+  const box=$('installBox'); let deferred=null;
+  const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  let hidden=false; try{hidden=localStorage.getItem('hd_install_hide')==='1';}catch(e){}
+  if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('/diary-sw.js',{scope:'/diary'}).catch(()=>{});
+  if(standalone||hidden) return;
+  const ua=navigator.userAgent, isIOS=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const isSafari=isIOS&&/Safari/.test(ua)&&!/CriOS|FxiOS|EdgiOS|YaBrowser/.test(ua);
+  if(isSafari){box.hidden=false; $('installIOS').hidden=false;}
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault(); deferred=e; box.hidden=false; $('installAndroid').hidden=false;});
+  $('installBtn').addEventListener('click',async()=>{if(!deferred)return; deferred.prompt(); const r=await deferred.userChoice; deferred=null; if(r.outcome==='accepted'){box.hidden=true; goal('diary_install');}});
+  window.addEventListener('appinstalled',()=>{box.hidden=true;});
+  $('installClose').addEventListener('click',()=>{box.hidden=true; try{localStorage.setItem('hd_install_hide','1');}catch(e){}});
+})();
 $('year').textContent=new Date().getFullYear();
 renderAll();
 })();
