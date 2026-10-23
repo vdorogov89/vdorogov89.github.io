@@ -59,6 +59,10 @@ input[type=date], input[type=number], input[type=text], textarea{
   width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.05);
   color:var(--ink); font:16px 'Inter',sans-serif; color-scheme:dark;}
 input:focus, textarea:focus{outline:2px solid var(--grad1); outline-offset:1px;}
+/* iOS Safari: поле даты имеет собственную минимальную ширину и вылезает за край */
+input[type=date]{-webkit-appearance:none; appearance:none; display:block; min-width:0; max-width:100%; min-height:48px; text-align:left;}
+input[type=date]::-webkit-date-and-time-value{text-align:left; margin:0;}
+.field{min-width:0;}
 #fMedName{margin-top:10px;}
 input[type=range]{width:100%; accent-color:var(--grad1); height:28px;}
 #intVal{font-size:22px; color:var(--grad1); margin:0 4px;}
@@ -70,7 +74,7 @@ input[type=range]{width:100%; accent-color:var(--grad1); height:28px;}
 .chips{display:flex; flex-wrap:wrap; gap:8px;}
 .switch{display:flex; align-items:center; gap:10px; font-size:15.5px; color:var(--ink); cursor:pointer; margin:6px 0 10px;}
 .switch input{width:20px; height:20px; accent-color:#4FE0FF;}
-.wxrow{display:flex; gap:8px; margin:8px 0;} .wxrow input{flex:1;}
+.wxrow{display:flex; gap:8px; margin:8px 0;} .wxrow input{flex:1; min-width:0;}
 .wxres{display:flex; flex-direction:column; gap:6px; margin:6px 0;} .wxres button{text-align:left;}
 .wxhint{font-size:14px; color:var(--muted); margin-top:8px; min-height:20px;}
 .chip{display:inline-flex; align-items:center; padding:9px 14px; border-radius:100px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body); font-size:14.5px; cursor:pointer; user-select:none;}
@@ -452,7 +456,8 @@ function pressureBlock(list,months,mode){
     if(hd.has(d)){hN++; if(drop)hD++;} else {nN++; if(drop)nD++;}}
   const title='<h2>Атмосферное давление</h2>';
   if(hN<8||nN<20){
-    const msg=`Пока мало данных для сравнения: дней с болью, по которым есть давление, — ${hN}. Сравнение появится, когда наберётся хотя бы 8 таких дней и месяц наблюдений.`;
+    const need=[hN<8?`ещё ${8-hN} ${plural(8-hN,'день','дня','дней')} с болью`:null, nN<20?`ещё ${20-nN} ${plural(20-nN,'день','дня','дней')} без боли`:null].filter(Boolean).join(' и ');
+    const msg=`Для сравнения нужно хотя бы 8 дней с болью и 20 дней без боли, по которым известно давление. Сейчас: с болью — ${hN}, без боли — ${nN}. Осталось набрать ${need}.`;
     return mode==='print'?'':title+`<p class="small">${msg}</p>`;
   }
   const A=Math.round(hD/hN*100), B=Math.round(nD/nN*100);
