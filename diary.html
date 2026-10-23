@@ -76,6 +76,9 @@ input[type=range]{width:100%; accent-color:var(--grad1); height:28px;}
 .switch input{width:20px; height:20px; accent-color:#4FE0FF;}
 .wxrow{display:flex; gap:8px; margin:8px 0;} .wxrow input{flex:1; min-width:0;}
 .wxres{display:flex; flex-direction:column; gap:6px; margin:6px 0;} .wxres button{text-align:left;}
+.subbox{margin-top:12px; padding:4px 14px 14px; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,0.03);}
+.flabel.sm{font-size:14px; font-weight:500; margin:14px 0 8px;}
+.subbox .callout{margin:12px 0 0; font-size:14px;}
 .wxhint{font-size:14px; color:var(--muted); margin-top:8px; min-height:20px;}
 .chip{display:inline-flex; align-items:center; padding:9px 14px; border-radius:100px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body); font-size:14.5px; cursor:pointer; user-select:none;}
 .chip input{position:absolute; opacity:0; pointer-events:none;}
@@ -285,6 +288,21 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
       <div class="field">
         <span class="flabel">Что было вместе с болью</span>
         <div class="chips" id="symChips"></div>
+        <div class="subbox" id="auraBox" hidden>
+          <span class="flabel sm">Какой была аура <span class="muted">— можно несколько</span></span>
+          <div class="chips" id="auraType"></div>
+          <div id="auraEyeRow" hidden>
+            <span class="flabel sm">Если закрыть один глаз, нарушение зрения…</span>
+            <div class="chips" id="auraEye"></div>
+          </div>
+          <span class="flabel sm">Как развивалась</span>
+          <div class="chips" id="auraOnset"></div>
+          <span class="flabel sm">Сколько длилась</span>
+          <div class="chips" id="auraDur"></div>
+          <span class="flabel sm">Головная боль после ауры</span>
+          <div class="chips" id="auraHd"></div>
+          <div id="auraWarn"></div>
+        </div>
       </div>
 
       <div class="field">
@@ -368,6 +386,13 @@ const KEY='hd_diary_v1';
 const MEDS=[['none','Не принимал(а)'],['simple','Простое обезболивающее'],['combo','Комбинированное обезболивающее'],['triptan','Триптан'],['other','Другое']];
 const EFFECTS=[['yes','Помогло'],['partly','Частично'],['no','Не помогло']];
 const SYMS=[['nausea','Тошнота'],['light','Раздражает свет'],['sound','Раздражают звуки'],['aura','Аура'],['vomit','Рвота']];
+const AURA_T=[['vis_pos','Мерцание, зигзаги, вспышки'],['vis_neg','Пятно, выпадение части поля зрения'],['sens','Онемение, покалывание'],['speech','Трудно говорить или подобрать слова'],['motor','Слабость в руке или ноге']];
+const AURA_EYE=[['both','видно обоими глазами'],['one','только в одном глазу'],['nc','не проверял(а)']];
+const AURA_ON=[['grad','Нарастала постепенно, расползалась'],['sudden','Возникла сразу, в полную силу']];
+const AURA_D=[['lt5','Меньше 5 минут'],['5to60','5–60 минут'],['gt60','Больше часа']];
+const AURA_HD=[['within','Началась в течение часа'],['later','Позже чем через час'],['none','Головной боли не было']];
+const AUL=Object.fromEntries([...AURA_T,...AURA_EYE,...AURA_ON,...AURA_D,...AURA_HD]);
+const AUSHORT={vis_pos:'мерцание',vis_neg:'выпадение поля',sens:'онемение',speech:'речь',motor:'слабость',lt5:'<5 мин','5to60':'5–60 мин',gt60:'>1 ч'};
 const TODS=[['morning','Утро (6–12)'],['day','День (12–18)'],['evening','Вечер (18–24)'],['night','Ночь (0–6)']];
 const TODSHORT={morning:'утро',day:'день',evening:'вечер',night:'ночь'};
 const TRIGS=[['sleepless','Недосып'],['oversleep','Долгий сон'],['stress','Стресс'],['relax','Расслабление после стресса'],['meal','Пропуск еды'],['alcohol','Алкоголь'],['weather','Погода'],['cycle','Дни цикла'],['screen','Долгая работа за экраном'],['other','Другое']];
@@ -470,6 +495,44 @@ function pressureBlock(list,months,mode){
     <p class="small">${line} ${verdict} Это совпадения по времени, а не доказательство причины. Данные: Open-Meteo, ${esc(wx.name)}.</p>`;
 }
 
+// аура
+function auraGet(){ if(!vals('symChips').includes('aura')) return null;
+  const types=vals('auraType'); return {types, eye:types.some(t=>t.startsWith('vis'))?(vals('auraEye')[0]||null):null, onset:vals('auraOnset')[0]||null, dur:vals('auraDur')[0]||null, hd:vals('auraHd')[0]||null}; }
+function auraSet(a){ a=a||{}; setVals('auraType',a.types||[]); setVals('auraEye',a.eye?[a.eye]:[]); setVals('auraOnset',a.onset?[a.onset]:[]); setVals('auraDur',a.dur?[a.dur]:[]); setVals('auraHd',a.hd?[a.hd]:[]); auraUI(); }
+function auraFlags(a){ if(!a) return [];
+  const f=[]; const t=a.types||[];
+  if(t.includes('motor')) f.push(['warn','motor','Слабость в руке или ноге во время ауры требует обследования у невролога. Если это случилось впервые или происходит прямо сейчас — вызывайте 103 или 112: так может проявляться инсульт.']);
+  if(a.onset==='sudden') f.push(['warn','sudden','Мигренозная аура обычно нарастает постепенно, за несколько минут. Если симптомы возникли сразу в полную силу, особенно впервые, нужно исключить нарушение кровообращения. Если это происходит сейчас — 103 или 112.']);
+  if(t.includes('speech')&&!t.some(x=>x.startsWith('vis')||x==='sens')) f.push(['amber','speech','Нарушение речи как единственный симптом ауры — повод обязательно показать запись неврологу.']);
+  if(a.dur==='gt60') f.push(['amber','gt60','Аура дольше часа — повод показать эту запись врачу.']);
+  if(a.eye==='one') f.push(['amber','one','Если нарушение было только в одном глазу, нужен осмотр офтальмолога: это может быть не аура, а проблема самого глаза или его сосудов.']);
+  if(a.hd==='none') f.push(['note','none','Аура без головной боли бывает при мигрени, но если такое впервые, особенно после 40 лет, обсудите это с неврологом.']);
+  return f;
+}
+function auraUI(){
+  const on=vals('symChips').includes('aura'); $('auraBox').hidden=!on;
+  $('auraEyeRow').hidden=!vals('auraType').some(t=>t.startsWith('vis'));
+  const f=on?auraFlags(auraGet()):[];
+  $('auraWarn').innerHTML=f.map(([c,,t])=>`<div class="callout ${c==='note'?'':c}"><p>${t}</p></div>`).join('');
+}
+function auraShort(a){ if(!a) return 'аура'; const b=[(a.types||[]).map(t=>AUSHORT[t]).join(', '), a.dur?AUSHORT[a.dur]:'', a.eye==='one'?'один глаз':'', a.onset==='sudden'?'внезапно':''].filter(Boolean); return 'аура'+(b.length?' ('+b.join('; ')+')':''); }
+function auraFull(a){ if(!a) return ''; return [(a.types||[]).map(t=>AUL[t]).join(', '), a.eye?'зрение: '+AUL[a.eye]:'', a.onset?AUL[a.onset].toLowerCase():'', a.dur?AUL[a.dur].toLowerCase():'', a.hd?'боль: '+AUL[a.hd].toLowerCase():''].filter(Boolean).join('; '); }
+function auraBlock(list,mode){
+  const wa=list.filter(e=>(e.symptoms||[]).includes('aura')); if(!wa.length) return '';
+  const tc={}; wa.forEach(e=>((e.aura&&e.aura.types)||[]).forEach(t=>tc[t]=(tc[t]||0)+1));
+  const typical=wa.filter(e=>e.aura&&e.aura.onset==='grad'&&e.aura.dur==='5to60'&&e.aura.hd==='within').length;
+  const fl={}; wa.forEach(e=>auraFlags(e.aura).forEach(([,k])=>fl[k]=(fl[k]||0)+1));
+  const FL={motor:'слабость в руке или ноге',sudden:'внезапное начало',speech:'изолированное нарушение речи',gt60:'длительность больше часа',one:'нарушение только в одном глазу',none:'без последующей головной боли'};
+  const flTxt=Object.keys(FL).filter(k=>fl[k]).map(k=>`${FL[k]} — ${fl[k]}`).join(', ');
+  const types=AURA_T.filter(([k])=>tc[k]).map(([k,l])=>`${l.toLowerCase()} — ${tc[k]}`).join(', ');
+  const line=`Аура была в ${wa.length} из ${list.length} ${plural(list.length,'приступа','приступов','приступов')}.${types?' Виды: '+types+'.':''} Все типичные черты мигренозной ауры (нарастала постепенно, длилась 5–60 минут, головная боль началась в течение часа) отмечены в ${typical} из ${wa.length}.`;
+  if(mode==='print') return `<p><b>Аура:</b> ${line}${flTxt?' Отмечено: '+flTxt+'.':''}</p>`;
+  let h=`<h2>Аура</h2><p class="small">${line}</p>`;
+  if(fl.motor||fl.sudden) h+=`<div class="callout warn"><p>В записях есть ${[fl.motor?'слабость в руке или ноге':'',fl.sudden?'внезапное начало ауры':''].filter(Boolean).join(' и ')}. Это нужно обязательно показать неврологу.</p></div>`;
+  else if(flTxt) h+=`<div class="callout amber"><p>Покажите врачу записи, где отмечено: ${flTxt}.</p></div>`;
+  return h;
+}
+
 // chips
 function buildChips(box,opts,name,type){
   $(box).innerHTML=opts.map(([v,l])=>`<label class="chip"><input type="${type}" name="${name}" value="${v}">${l}</label>`).join('');
@@ -547,7 +610,7 @@ function updInt(){const v=+$('fInt').value; $('intVal').textContent=v; $('intLbl
 
 function resetForm(){
   editId=null; $('fDate').value=today(); $('fInt').value=5; updInt(); $('fHours').value=''; $('fMedName').value=''; $('fNote').value='';
-  ['todChips','medChips','effectChips','symChips','trigChips'].forEach(b=>setVals(b,[])); updateEffect(); locSet=new Set(); renderLocPick();
+  ['todChips','medChips','effectChips','symChips','trigChips'].forEach(b=>setVals(b,[])); auraSet(null); updateEffect(); locSet=new Set(); renderLocPick();
   $('saveBtn').textContent='Сохранить запись'; $('cancelEdit').hidden=true; $('editBanner').hidden=true; wxHintUpd();
 }
 let saving=false;
@@ -560,7 +623,7 @@ function saveEntry(){
   const e={id:editId||Date.now().toString(36)+Math.random().toString(36).slice(2,6), date, tod:vals('todChips')[0]||null, intensity:+$('fInt').value,
     hours:parseFloat(String($('fHours').value).replace(',','.'))||null, meds, medName:$('fMedName').value.trim(),
     effect:(meds.length&&!meds.includes('none'))?(vals('effectChips')[0]||null):null,
-    loc:ZONES.map(([z])=>z).filter(z=>locSet.has(z)), symptoms:vals('symChips'), triggers:vals('trigChips'), note:$('fNote').value.trim()};
+    loc:ZONES.map(([z])=>z).filter(z=>locSet.has(z)), symptoms:vals('symChips'), aura:auraGet(), triggers:vals('trigChips'), note:$('fNote').value.trim()};
   if(wasEdit){entries=entries.map(x=>x.id===e.id?e:x);} else entries.push(e);
   entries.sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
   const ok=persist(); goal('diary_save'); setTimeout(()=>wxSync(false),1600);
@@ -582,7 +645,7 @@ function startEdit(id){
   const e=entries.find(x=>x.id===id); if(!e) return;
   showTab('entry'); editId=id;
   $('fDate').value=e.date; $('fInt').value=e.intensity; updInt(); $('fHours').value=e.hours||''; $('fMedName').value=e.medName||''; $('fNote').value=e.note||'';
-  setVals('todChips',e.tod?[e.tod]:[]); setVals('medChips',e.meds||[]); setVals('effectChips',e.effect?[e.effect]:[]); setVals('symChips',e.symptoms||[]); setVals('trigChips',e.triggers||[]); updateEffect(); locSet=new Set(e.loc||[]); renderLocPick(); wxHintUpd();
+  setVals('todChips',e.tod?[e.tod]:[]); setVals('medChips',e.meds||[]); setVals('effectChips',e.effect?[e.effect]:[]); setVals('symChips',e.symptoms||[]); auraSet(e.aura); setVals('trigChips',e.triggers||[]); updateEffect(); locSet=new Set(e.loc||[]); renderLocPick(); wxHintUpd();
   $('saveBtn').textContent='Сохранить изменения'; $('cancelEdit').hidden=false; $('editBanner').innerHTML='<p><strong>Редактирование записи от '+fmtDate(e.date)+'.</strong> Внесите изменения и нажмите «Сохранить изменения».</p>'; $('editBanner').hidden=false; window.scrollTo({top:0,behavior:'smooth'});
 }
 function delEntry(id){if(!confirm('Удалить эту запись?'))return; entries=entries.filter(x=>x.id!==id); persist(); renderAll(); toast('Запись удалена');}
@@ -711,6 +774,7 @@ function renderSummary(){
     h+=`<h2>Календарь</h2><div class="legend"><span><i style="background:#6BE3A4"></i>лёгкая</span><span><i style="background:#FFC56B"></i>умеренная</span><span><i style="background:#FF8A7A"></i>сильная</span><span>● приём препаратов</span></div>${calendar(months[0])}`;
   }
   h+=locBlock(list,'screen');
+  h+=auraBlock(list,'screen');
   h+=todBlock(list,'screen');
   h+=pressureBlock(list,months,'screen');
   h+=triggersBlock(list);
@@ -757,7 +821,7 @@ function renderHistory(){
   out.innerHTML=`<p class="small">Всего записей: ${entries.length}</p>`+entries.map(e=>{
     const meds=(e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':'');
     const bits=[e.tod?'начало: '+TODSHORT[e.tod]:null, (e.loc||[]).length?locText(e.loc):null, e.hours?fmtNum(e.hours)+' ч':null, meds||null, e.effect?EFFL[e.effect].toLowerCase():null,
-      (e.symptoms||[]).map(x=>SYML[x]).join(', ')||null, (e.triggers||[]).length?'провокаторы: '+e.triggers.map(x=>TRIGL[x]).join(', '):null, wxEntry(e)?'давление '+wxText(wxEntry(e),true):null, e.note||null].filter(Boolean);
+      (e.symptoms||[]).map(x=>x==='aura'?auraShort(e.aura):SYML[x]).join(', ')||null, (e.triggers||[]).length?'провокаторы: '+e.triggers.map(x=>TRIGL[x]).join(', '):null, wxEntry(e)?'давление '+wxText(wxEntry(e),true):null, e.note||null].filter(Boolean);
     return `<div class="entry" data-entry="${e.id}"><div><div class="top"><span class="pill" style="background:${intColor(e.intensity)}">${e.intensity}</span>${fmtDate(e.date)}</div><div class="meta">${esc(bits.join(' · '))}</div></div>
       <div class="btns"><button data-edit="${e.id}">Изменить</button><button data-del="${e.id}">✕</button></div></div>`;
   }).join('');
@@ -781,10 +845,11 @@ function printSummary(){
   <h2>По месяцам</h2><table><tr><th>Месяц</th><th>Дни с ГБ</th><th>Приступов</th><th>Дни с препаратами</th><th>из них простые анальгетики</th><th>из них триптаны / комбинированные</th><th>Ср. сила (1–10)</th><th>Ср. длит., ч</th></tr>`+
   per.map(x=>`<tr><td>${mName(x.k)}</td><td>${x.s.hDays}</td><td>${x.s.attacks}</td><td>${x.s.mDays}</td><td>${x.s.sDays}</td><td>${x.s.tDays}</td><td>${x.s.attacks?fmtNum(x.s.avgInt):'—'}</td><td>${x.s.avgH!=null?fmtNum(x.s.avgH):'—'}</td></tr>`).join('')+`</table>
   ${locBlock(list,'print')}
+  ${auraBlock(list,'print')}
   ${todBlock(list,'print')}
   ${pressureBlock(list,months,'print')}
   <h2>Записи</h2><table><tr><th>Дата</th><th>Начало</th><th>Сила</th><th>Длит., ч</th><th>Локализация</th><th>Препараты</th><th>Эффект</th><th>Сопутствующее</th><th>Провокаторы</th>${wx.on&&wx.lat?'<th>Давление, мм рт. ст.</th>':''}<th>Заметка</th></tr>`+
-  list.map(e=>`<tr><td>${fmtDate(e.date)}</td><td>${e.tod?TODSHORT[e.tod]:''}</td><td>${e.intensity}</td><td>${e.hours?fmtNum(e.hours):''}</td><td>${esc(locText(e.loc||[]))}</td><td>${esc((e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':''))}</td><td>${e.effect?EFFL[e.effect]:''}</td><td>${esc((e.symptoms||[]).map(x=>SYML[x]).join(', '))}</td><td>${esc((e.triggers||[]).map(x=>TRIGL[x]).join(', '))}</td>${wx.on&&wx.lat?'<td>'+wxText(wxEntry(e),true)+'</td>':''}<td>${esc(e.note)}</td></tr>`).join('')+`</table>
+  list.map(e=>`<tr><td>${fmtDate(e.date)}</td><td>${e.tod?TODSHORT[e.tod]:''}</td><td>${e.intensity}</td><td>${e.hours?fmtNum(e.hours):''}</td><td>${esc(locText(e.loc||[]))}</td><td>${esc((e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':''))}</td><td>${e.effect?EFFL[e.effect]:''}</td><td>${esc((e.symptoms||[]).map(x=>x==='aura'&&e.aura?'Аура: '+auraFull(e.aura):SYML[x]).join(', '))}</td><td>${esc((e.triggers||[]).map(x=>TRIGL[x]).join(', '))}</td>${wx.on&&wx.lat?'<td>'+wxText(wxEntry(e),true)+'</td>':''}<td>${esc(e.note)}</td></tr>`).join('')+`</table>
   <p class="pnote">Сводка составлена пациентом в дневнике головной боли на сайте vdorogov89.github.io. Показатели не являются диагнозом.</p>`;
   $('printArea').innerHTML=h; goal('diary_print'); window.print();
 }
@@ -810,7 +875,7 @@ function importData(file){
 // init
 load(); wxLoad(); if(!storageOK) $('storageWarn').hidden=false;
 try{localStorage.setItem('__t','1'); localStorage.removeItem('__t');}catch(e){$('storageWarn').hidden=false;}
-buildChips('todChips',TODS,'tod','radio'); radioToggle('todChips'); radioToggle('effectChips'); buildChips('medChips',MEDS,'med','checkbox'); buildChips('effectChips',EFFECTS,'eff','radio'); buildChips('symChips',SYMS,'sym','checkbox'); buildChips('trigChips',TRIGS,'trig','checkbox');
+buildChips('todChips',TODS,'tod','radio'); radioToggle('todChips'); radioToggle('effectChips'); buildChips('medChips',MEDS,'med','checkbox'); buildChips('effectChips',EFFECTS,'eff','radio'); buildChips('symChips',SYMS,'sym','checkbox'); buildChips('auraType',AURA_T,'aut','checkbox'); buildChips('auraEye',AURA_EYE,'aue','radio'); buildChips('auraOnset',AURA_ON,'auo','radio'); buildChips('auraDur',AURA_D,'aud','radio'); buildChips('auraHd',AURA_HD,'auh','radio'); ['auraEye','auraOnset','auraDur','auraHd'].forEach(radioToggle); ['symChips','auraType','auraEye','auraOnset','auraDur','auraHd'].forEach(b=>{$(b).addEventListener('change',auraUI); $(b).addEventListener('click',()=>setTimeout(auraUI,0));}); buildChips('trigChips',TRIGS,'trig','checkbox');
 $('fDate').max=today(); resetForm();
 $('fInt').addEventListener('input',updInt);
 $('hoursQuick').addEventListener('click',e=>{if(e.target.dataset.h)$('fHours').value=e.target.dataset.h;});
