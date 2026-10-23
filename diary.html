@@ -663,9 +663,22 @@ function renderSummary(){
 
   if(multi){
     const curK=today().slice(0,7);
-    const full=per.filter(x=>x.k!==curK); const base=full.length?full:per, nb=base.length;
-    const partial=full.length<per.length;
-    const avgA=base.reduce((a,x)=>a+x.s.attacks,0)/nb, avgHD=base.reduce((a,x)=>a+x.s.hDays,0)/nb, avgMD=base.reduce((a,x)=>a+x.s.mDays,0)/nb;
+    // среднее считаем только по полным месяцам: без текущего (не закончился) и без месяца, в котором дневник начат после 7-го числа
+    const firstDate=entries.reduce((m,e)=>e.date<m?e.date:m,'9999-99-99'), firstK=mkey(firstDate), lateStart=+firstDate.slice(8)>7;
+    const full=per.filter(x=>x.k!==curK&&!(x.k===firstK&&lateStart)), nb=full.length;
+    const excl=[]; if(per.some(x=>x.k===firstK)&&lateStart&&firstK!==curK) excl.push(`${MONTHS[+firstK.slice(5)-1]} (дневник начат ${+firstDate.slice(8)}-го числа)`); if(per.some(x=>x.k===curK)) excl.push('текущий месяц (ещё не закончился)');
+    let avgA,avgHD,avgMD,avgNote;
+    if(nb){
+      avgA=full.reduce((a,x)=>a+x.s.attacks,0)/nb; avgHD=full.reduce((a,x)=>a+x.s.hDays,0)/nb; avgMD=full.reduce((a,x)=>a+x.s.mDays,0)/nb;
+      avgNote=` Средние посчитаны по ${nb} ${plural(nb,'полному месяцу','полным месяцам','полным месяцам')}${excl.length?'; не учтены '+excl.join(' и '):''}.`;
+    } else {
+      // полных месяцев ещё нет: пересчитываем на 30 дней от первой записи
+      const t=today(), endK=months[months.length-1]; let start=months[0]+'-01'; if(firstDate>start) start=firstDate;
+      const days=Math.max(1,Math.round((Date.parse(t+'T12:00:00')-Date.parse(start+'T12:00:00'))/864e5)+1), f=30/Math.max(days,14);
+      avgA=tot.attacks*f; avgHD=tot.hDays*f; avgMD=tot.mDays*f;
+      avgNote=` Полных месяцев наблюдения пока нет, поэтому средние пересчитаны на 30 дней по ${days} ${plural(days,'дню','дням','дням')} с первой записи${days<14?' (пока меньше двух недель — цифры очень приблизительные)':''}.`;
+    }
+    const cur=per.find(x=>x.k===curK), curNote=cur&&nb?` В текущем месяце пока: ${cur.s.attacks} ${plural(cur.s.attacks,'приступ','приступа','приступов')}, ${cur.s.hDays} ${plural(cur.s.hDays,'день','дня','дней')} с болью.`:'';
     const worst=per.map(x=>medLevel(x.s)).includes('red')?'red':per.map(x=>medLevel(x.s)).includes('amber')?'amber':'';
     h+=`<h2>Дни с головной болью по месяцам</h2>${chartLegend(avgHD)}<div class="chartbox">${daysChart(per,avgHD)}</div>
       <div class="cards">
@@ -674,8 +687,8 @@ function renderSummary(){
         <div class="card ${worst}"><div class="num">${fmtNum(avgMD)}</div><div class="lbl">дней с препаратами в месяц, в среднем</div></div>
         <div class="card"><div class="num">${fmtNum(tot.avgInt)}</div><div class="lbl">средняя сила боли из 10</div></div>
       </div>
-      <p class="small">Всего приступов за период: ${tot.attacks}.${effect}${partial&&full.length?' Текущий месяц ещё не закончился, поэтому в средние значения не входит.':''}</p>`;
-    h+=warnBlocks(per,true,avgHD);
+      <p class="small">Всего приступов за период: ${tot.attacks}.${effect}${avgNote}${curNote}</p>`;
+    h+=warnBlocks(per,true,Math.max(avgHD,cur?cur.s.hDays:0));
     h+=`<h2>По месяцам</h2><div class="mtable"><table><tr><th>Месяц</th><th>Приступов</th><th>Дни с болью</th><th>Дни с препаратами</th><th>Ср. сила</th></tr>`+
       per.slice().reverse().map(x=>{const lv=medLevel(x.s); return `<tr><td style="white-space:nowrap">${MSHORT[+x.k.slice(5)-1]} ${x.k.slice(0,4)}${x.k===today().slice(0,7)?'*':''}</td><td>${x.s.attacks}</td><td>${x.s.hDays}</td><td class="${lv}">${x.s.mDays}</td><td>${x.s.attacks?fmtNum(x.s.avgInt):'—'}</td></tr>`;}).join('')+`</table></div>`;
   } else {

@@ -1,5 +1,5 @@
 // Офлайн-работа дневника головной боли. Записи хранятся в localStorage и сюда не попадают.
-const CACHE = 'diary-v5';
+const CACHE = 'diary-v6';
 const CORE = ['/diary.html', '/diary-icon-192.png', '/diary-icon-512.png', '/diary-apple-icon.png', '/diary.webmanifest'];
 
 self.addEventListener('install', e => {
