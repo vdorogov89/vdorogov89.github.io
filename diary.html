@@ -68,6 +68,11 @@ input[type=range]{width:100%; accent-color:var(--grad1); height:28px;}
 .periods{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
 .periods button.active{border-color:var(--grad1); color:var(--ink); background:rgba(79,224,255,0.1);}
 .chips{display:flex; flex-wrap:wrap; gap:8px;}
+.switch{display:flex; align-items:center; gap:10px; font-size:15.5px; color:var(--ink); cursor:pointer; margin:6px 0 10px;}
+.switch input{width:20px; height:20px; accent-color:#4FE0FF;}
+.wxrow{display:flex; gap:8px; margin:8px 0;} .wxrow input{flex:1;}
+.wxres{display:flex; flex-direction:column; gap:6px; margin:6px 0;} .wxres button{text-align:left;}
+.wxhint{font-size:14px; color:var(--muted); margin-top:8px; min-height:20px;}
 .chip{display:inline-flex; align-items:center; padding:9px 14px; border-radius:100px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body); font-size:14.5px; cursor:pointer; user-select:none;}
 .chip input{position:absolute; opacity:0; pointer-events:none;}
 .chip.on{border-color:var(--grad1); background:rgba(79,224,255,0.12); color:var(--ink);}
@@ -234,6 +239,12 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
       </div>
 
       <div class="field">
+        <span class="flabel">Когда началась боль</span>
+        <div class="chips" id="todChips"></div>
+        <div class="wxhint" id="wxHint"></div>
+      </div>
+
+      <div class="field">
         <label for="fInt">Сила боли: <b id="intVal">5</b> <span id="intLbl" class="muted">умеренная</span></label>
         <input type="range" id="fInt" min="1" max="10" value="5">
         <div class="scale"><span>1 — едва заметная</span><span>10 — невыносимая</span></div>
@@ -319,6 +330,15 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
       <label class="btn-ghost filebtn">Восстановить из файла<input type="file" id="importFile" accept=".json,application/json" hidden></label>
     </div>
     <p class="small" id="dataInfo"></p>
+    <h2>Атмосферное давление</h2>
+    <p>Дневник может сам подтягивать давление в вашем городе за дни приступов. Через 2–3 месяца в сводке появится сравнение: как часто давление резко падало в дни с головной болью и в дни без неё.</p>
+    <label class="switch"><input type="checkbox" id="wxOn"> Учитывать атмосферное давление</label>
+    <div id="wxBox" hidden>
+      <div class="wxrow"><input type="text" id="wxCity" placeholder="Ваш город, например Москва"><button type="button" class="btn-ghost" id="wxFind">Найти</button></div>
+      <div class="wxres" id="wxRes"></div>
+      <p class="small" id="wxStatus"></p>
+    </div>
+    <p class="small">Для этого в погодный сервис Open-Meteo отправляются только координаты выбранного города с точностью около 10 км. Записи дневника никуда не передаются. Данные о погоде: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>.</p>
     <h2>Удаление</h2>
     <p>Удалит все записи с этого устройства без возможности восстановления.</p>
     <button type="button" class="btn-danger" id="clearBtn">Удалить все записи</button>
@@ -344,6 +364,8 @@ const KEY='hd_diary_v1';
 const MEDS=[['none','Не принимал(а)'],['simple','Простое обезболивающее'],['combo','Комбинированное обезболивающее'],['triptan','Триптан'],['other','Другое']];
 const EFFECTS=[['yes','Помогло'],['partly','Частично'],['no','Не помогло']];
 const SYMS=[['nausea','Тошнота'],['light','Раздражает свет'],['sound','Раздражают звуки'],['aura','Аура'],['vomit','Рвота']];
+const TODS=[['morning','Утро (6–12)'],['day','День (12–18)'],['evening','Вечер (18–24)'],['night','Ночь (0–6)']];
+const TODSHORT={morning:'утро',day:'день',evening:'вечер',night:'ночь'};
 const TRIGS=[['sleepless','Недосып'],['oversleep','Долгий сон'],['stress','Стресс'],['relax','Расслабление после стресса'],['meal','Пропуск еды'],['alcohol','Алкоголь'],['weather','Погода'],['cycle','Дни цикла'],['screen','Долгая работа за экраном'],['other','Другое']];
 const LBL=o=>Object.fromEntries(o);
 const MEDL=LBL(MEDS), EFFL=LBL(EFFECTS), SYML=LBL(SYMS), TRIGL=LBL(TRIGS);
@@ -364,6 +386,85 @@ function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function intColor(i){return i>=7?'#FF8A7A':i>=4?'#FFC56B':'#6BE3A4';}
 function toast(t){const el=$('toast'); el.textContent=t; el.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>el.hidden=true,2200);}
 
+// атмосферное давление
+const WXKEY='hd_wx', WXC='hd_wx_cache', WXH=[3,9,12,15,21], TODH={morning:9,day:15,evening:21,night:3}, DROP=4;
+let wx={on:false}, wxc={k:'',h:{},t:0}, wxBusy=false;
+function wxLoad(){try{wx=JSON.parse(localStorage.getItem(WXKEY))||{on:false}; wxc=JSON.parse(localStorage.getItem(WXC))||{k:'',h:{},t:0};}catch(e){}}
+function wxSave(){try{localStorage.setItem(WXKEY,JSON.stringify(wx)); localStorage.setItem(WXC,JSON.stringify(wxc));}catch(e){}}
+function dPlus(date,n){const d=new Date(date+'T12:00:00'); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+const MMHG=0.750062;
+function wxPoint(date,hour){
+  if(!wx.on||!wx.lat) return null; const k=h=>h<10?'0'+h:''+h;
+  const p=wxc.h[date+'T'+k(hour)], q=wxc.h[dPlus(date,-1)+'T'+k(hour)];
+  if(p==null) return null; return {p:p*MMHG, d:q==null?null:(p-q)*MMHG};
+}
+function wxEntry(e){return wxPoint(e.date, e.tod?TODH[e.tod]:12);}
+function wxText(pt,short){
+  if(!pt) return ''; let t=Math.round(pt.p)+(short?' мм':' мм рт. ст.');
+  if(pt.d!=null){const d=Math.round(pt.d); t+=d<=-1?' ↓'+(-d):d>=1?' ↑'+d:' ≈'; if(!short) t+=d<=-1||d>=1?' за сутки':' без изменений за сутки';}
+  return t;
+}
+function wxRange(){
+  const t=today(); let start=dPlus(t,-2);
+  if(entries.length){const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); start=dPlus(first,-1);}
+  const lim=dPlus(t,-400); if(start<lim) start=lim; return [start,t];
+}
+async function wxFetch(url){const r=await fetch(url); if(!r.ok) throw new Error(r.status); return r.json();}
+function wxMerge(j){const tm=j.hourly&&j.hourly.time, v=j.hourly&&j.hourly.surface_pressure; if(!tm) return;
+  tm.forEach((x,i)=>{const h=+x.slice(11,13); if(v[i]!=null&&WXH.includes(h)) wxc.h[x.slice(0,13)]=Math.round(v[i]*10)/10;});}
+async function wxSync(force){
+  if(!wx.on||!wx.lat||wxBusy) return; if(navigator.onLine===false){wxStat('Нет интернета — давление подтянется позже.'); return;}
+  const key=wx.lat+','+wx.lon; if(wxc.k!==key) wxc={k:key,h:{},t:0};
+  const [start,end]=wxRange(), recent=dPlus(end,-88);
+  const miss=[]; for(let d=start; d<=end; d=dPlus(d,1)) if(wxc.h[d+'T12']==null) miss.push(d);
+  const oldMiss=miss.filter(d=>d<recent), archEnd=dPlus(end,-6);
+  const needRecent=force||Date.now()-wxc.t>3*3600e3||miss.some(d=>d>=recent&&d<end);
+  if(!needRecent&&!oldMiss.length) return;
+  wxBusy=true; let fail=false; const base=`latitude=${wx.lat}&longitude=${wx.lon}&hourly=surface_pressure&timezone=auto`;
+  try{ if(needRecent){ wxMerge(await wxFetch(`https://api.open-meteo.com/v1/forecast?${base}&past_days=92&forecast_days=1`)); wxc.t=Date.now(); } }catch(e){fail=true;}
+  try{ if(oldMiss.length){ const s2=oldMiss[0], e2=oldMiss[oldMiss.length-1]<archEnd?oldMiss[oldMiss.length-1]:archEnd;
+    if(s2<=e2) wxMerge(await wxFetch(`https://archive-api.open-meteo.com/v1/archive?${base}&start_date=${s2}&end_date=${e2}`)); } }catch(e){fail=true;}
+  Object.keys(wxc.h).forEach(k=>{if(k.slice(0,10)<dPlus(start,-1)) delete wxc.h[k];});
+  wxBusy=false; wxSave(); wxStat(fail?'Часть данных о давлении не загрузилась, попробуем при следующем открытии.':''); renderAll(); wxHintUpd();
+}
+function wxStat(t){const el=$('wxStatus'); if(el) el.textContent=t||(!wx.on?'':wx.lat?'Город: '+wx.name+'. Давление подтягивается автоматически. Чтобы сменить город, найдите другой.':'Найдите и выберите свой город.');}
+function wxHintUpd(){const el=$('wxHint'); if(!el) return; if(!wx.on||!wx.lat){el.textContent=''; return;}
+  const d=$('fDate').value, t=vals('todChips')[0]; const pt=d?wxPoint(d,t?TODH[t]:12):null;
+  el.textContent=pt?'Давление: '+wxText(pt,false):'';}
+async function wxFind(){
+  const q=$('wxCity').value.trim(); if(q.length<2){toast('Введите название города'); return;}
+  $('wxRes').innerHTML='<span class="small">Ищу…</span>';
+  try{const j=await wxFetch('https://geocoding-api.open-meteo.com/v1/search?count=5&language=ru&name='+encodeURIComponent(q));
+    const r=j.results||[]; if(!r.length){$('wxRes').innerHTML='<span class="small">Город не найден. Попробуйте иначе.</span>'; return;}
+    $('wxRes').innerHTML=r.map((c,i)=>`<button type="button" class="btn-ghost" data-i="${i}">${esc(c.name)}${c.admin1&&c.admin1!==c.name?', '+esc(c.admin1):''}${c.country?', '+esc(c.country):''}</button>`).join('');
+    $('wxRes').onclick=e=>{const b=e.target.closest('[data-i]'); if(!b)return; const c=r[+b.dataset.i];
+      wx={on:true, name:c.name+(c.country?', '+c.country:''), lat:Math.round(c.latitude*10)/10, lon:Math.round(c.longitude*10)/10};
+      wxSave(); $('wxRes').innerHTML=''; $('wxCity').value=''; wxStat('Загружаю давление…'); wxSync(true); goal('diary_wx_on');};
+  }catch(e){$('wxRes').innerHTML='<span class="small">Не удалось связаться с сервисом погоды. Проверьте интернет.</span>';}
+}
+function wxUI(){ $('wxOn').checked=!!wx.on; $('wxBox').hidden=!wx.on; wxStat(); wxHintUpd(); }
+function pressureBlock(list,months,mode){
+  if(!wx.on||!wx.lat) return '';
+  const t=today(); let start=months[0]+'-01'; const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); if(first>start) start=first;
+  const lastM=months[months.length-1]; let end=dPlus((lastM.slice(5)==='12'?(+lastM.slice(0,4)+1)+'-01':lastM.slice(0,5)+pad(+lastM.slice(5)+1))+'-01',-1); if(end>t) end=t;
+  const hd=new Set(list.map(e=>e.date)); let hN=0,hD=0,nN=0,nD=0;
+  for(let d=start; d<=end; d=dPlus(d,1)){const pt=wxPoint(d,12); if(!pt||pt.d==null) continue; const drop=pt.d<=-DROP;
+    if(hd.has(d)){hN++; if(drop)hD++;} else {nN++; if(drop)nD++;}}
+  const title='<h2>Атмосферное давление</h2>';
+  if(hN<8||nN<20){
+    const msg=`Пока мало данных для сравнения: дней с болью, по которым есть давление, — ${hN}. Сравнение появится, когда наберётся хотя бы 8 таких дней и месяц наблюдений.`;
+    return mode==='print'?'':title+`<p class="small">${msg}</p>`;
+  }
+  const A=Math.round(hD/hN*100), B=Math.round(nD/nN*100);
+  const verdict=(A>=B*1.5&&A-B>=10)?'В дни с головной болью резкое падение давления бывало заметно чаще. Возможно, вы чувствительны к перемене погоды — это стоит обсудить с врачом.'
+    :(Math.abs(A-B)<10?'Заметной разницы нет: судя по вашим записям, давление вряд ли главный провокатор боли.':'Разница небольшая, делать выводы пока рано.');
+  const line=`Резкое падение давления (на ${DROP} мм рт. ст. и больше за сутки) было в ${A}% дней с головной болью (${hD} из ${hN}) и в ${B}% дней без боли (${nD} из ${nN}).`;
+  if(mode==='print') return `<p><b>Атмосферное давление</b> (${esc(wx.name)}): ${line}</p>`;
+  const mx=Math.max(A,B,1);
+  return title+`<div class="bars"><div class="row"><span>Дни с болью</span><div class="track"><div class="fill" style="width:${A/mx*100}%"></div></div><span>${A}%</span></div><div class="row"><span>Дни без боли</span><div class="track"><div class="fill" style="width:${B/mx*100}%"></div></div><span>${B}%</span></div></div>
+    <p class="small">${line} ${verdict} Это совпадения по времени, а не доказательство причины. Данные: Open-Meteo, ${esc(wx.name)}.</p>`;
+}
+
 // chips
 function buildChips(box,opts,name,type){
   $(box).innerHTML=opts.map(([v,l])=>`<label class="chip"><input type="${type}" name="${name}" value="${v}">${l}</label>`).join('');
@@ -376,6 +477,10 @@ function buildChips(box,opts,name,type){
     }
     syncChips(box);
   });
+}
+function radioToggle(box){
+  $(box).addEventListener('click',e=>{const lab=e.target.closest('.chip'); if(!lab)return; const inp=lab.querySelector('input'); if(inp.type!=='radio')return;
+    if(inp.checked&&lab.classList.contains('on')){e.preventDefault(); inp.checked=false; syncChips(box);} });
 }
 function syncChips(box){$(box).querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.querySelector('input').checked));}
 function vals(box){return [...$(box).querySelectorAll('input:checked')].map(i=>i.value);}
@@ -437,8 +542,8 @@ function updInt(){const v=+$('fInt').value; $('intVal').textContent=v; $('intLbl
 
 function resetForm(){
   editId=null; $('fDate').value=today(); $('fInt').value=5; updInt(); $('fHours').value=''; $('fMedName').value=''; $('fNote').value='';
-  ['medChips','effectChips','symChips','trigChips'].forEach(b=>setVals(b,[])); updateEffect(); locSet=new Set(); renderLocPick();
-  $('saveBtn').textContent='Сохранить запись'; $('cancelEdit').hidden=true; $('editBanner').hidden=true;
+  ['todChips','medChips','effectChips','symChips','trigChips'].forEach(b=>setVals(b,[])); updateEffect(); locSet=new Set(); renderLocPick();
+  $('saveBtn').textContent='Сохранить запись'; $('cancelEdit').hidden=true; $('editBanner').hidden=true; wxHintUpd();
 }
 let saving=false;
 function saveEntry(){
@@ -447,13 +552,13 @@ function saveEntry(){
   if(!date){toast('Укажите дату'); return;}
   if(date>today()){toast('Дата не может быть в будущем'); return;}
   const meds=vals('medChips'), wasEdit=!!editId;
-  const e={id:editId||Date.now().toString(36)+Math.random().toString(36).slice(2,6), date, intensity:+$('fInt').value,
+  const e={id:editId||Date.now().toString(36)+Math.random().toString(36).slice(2,6), date, tod:vals('todChips')[0]||null, intensity:+$('fInt').value,
     hours:parseFloat(String($('fHours').value).replace(',','.'))||null, meds, medName:$('fMedName').value.trim(),
     effect:(meds.length&&!meds.includes('none'))?(vals('effectChips')[0]||null):null,
     loc:ZONES.map(([z])=>z).filter(z=>locSet.has(z)), symptoms:vals('symChips'), triggers:vals('trigChips'), note:$('fNote').value.trim()};
   if(wasEdit){entries=entries.map(x=>x.id===e.id?e:x);} else entries.push(e);
   entries.sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
-  const ok=persist(); goal('diary_save');
+  const ok=persist(); goal('diary_save'); setTimeout(()=>wxSync(false),1600);
   saving=true;
   const btn=$('saveBtn'); btn.disabled=true; btn.classList.add('done');
   btn.textContent=wasEdit?'✓ Изменения сохранены':'✓ Запись сохранена';
@@ -472,7 +577,7 @@ function startEdit(id){
   const e=entries.find(x=>x.id===id); if(!e) return;
   showTab('entry'); editId=id;
   $('fDate').value=e.date; $('fInt').value=e.intensity; updInt(); $('fHours').value=e.hours||''; $('fMedName').value=e.medName||''; $('fNote').value=e.note||'';
-  setVals('medChips',e.meds||[]); setVals('effectChips',e.effect?[e.effect]:[]); setVals('symChips',e.symptoms||[]); setVals('trigChips',e.triggers||[]); updateEffect(); locSet=new Set(e.loc||[]); renderLocPick();
+  setVals('todChips',e.tod?[e.tod]:[]); setVals('medChips',e.meds||[]); setVals('effectChips',e.effect?[e.effect]:[]); setVals('symChips',e.symptoms||[]); setVals('trigChips',e.triggers||[]); updateEffect(); locSet=new Set(e.loc||[]); renderLocPick(); wxHintUpd();
   $('saveBtn').textContent='Сохранить изменения'; $('cancelEdit').hidden=false; $('editBanner').innerHTML='<p><strong>Редактирование записи от '+fmtDate(e.date)+'.</strong> Внесите изменения и нажмите «Сохранить изменения».</p>'; $('editBanner').hidden=false; window.scrollTo({top:0,behavior:'smooth'});
 }
 function delEntry(id){if(!confirm('Удалить эту запись?'))return; entries=entries.filter(x=>x.id!==id); persist(); renderAll(); toast('Запись удалена');}
@@ -516,6 +621,15 @@ function warnBlocks(per,multi,refHD){
   }
   if(refHD>=15) h+=`<div class="callout warn"><p>Головная боль 15 и более дней в месяц — повод обязательно обратиться к неврологу для подбора лечения.</p></div>`;
   else if(refHD>=4) h+=`<div class="callout"><p>При 4 и более днях с головной болью в месяц стоит обсудить с врачом профилактическое лечение, которое уменьшает число приступов.</p></div>`;
+  return h;
+}
+function todBlock(list,mode){
+  const tc={}; let n=0; list.forEach(e=>{if(e.tod){tc[e.tod]=(tc[e.tod]||0)+1; n++;}});
+  if(!n) return '';
+  if(mode==='print') return `<p><b>Время начала боли</b> (отмечено в ${n} из ${list.length}): `+TODS.filter(([k])=>tc[k]).map(([k])=>`${TODSHORT[k]} — ${tc[k]}`).join(', ')+`.</p>`;
+  const mx=Math.max(...Object.values(tc));
+  let h=`<h2>Когда начинается боль</h2><div class="bars">`+TODS.map(([k,l])=>`<div class="row"><span>${esc(l)}</span><div class="track"><div class="fill" style="width:${(tc[k]||0)/mx*100}%"></div></div><span>${tc[k]||0}</span></div>`).join('')+`</div>`;
+  if(n<list.length) h+=`<p class="small">Время начала отмечено в ${n} из ${list.length} записей.</p>`;
   return h;
 }
 function triggersBlock(list){
@@ -579,6 +693,8 @@ function renderSummary(){
     h+=`<h2>Календарь</h2><div class="legend"><span><i style="background:#6BE3A4"></i>лёгкая</span><span><i style="background:#FFC56B"></i>умеренная</span><span><i style="background:#FF8A7A"></i>сильная</span><span>● приём препаратов</span></div>${calendar(months[0])}`;
   }
   h+=locBlock(list,'screen');
+  h+=todBlock(list,'screen');
+  h+=pressureBlock(list,months,'screen');
   h+=triggersBlock(list);
   out.innerHTML=h;
 }
@@ -622,8 +738,8 @@ function renderHistory(){
   if(!entries.length){out.innerHTML='<p class="muted">Записей пока нет. Добавьте первую во вкладке «Запись».</p>'; return;}
   out.innerHTML=`<p class="small">Всего записей: ${entries.length}</p>`+entries.map(e=>{
     const meds=(e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':'');
-    const bits=[(e.loc||[]).length?locText(e.loc):null, e.hours?fmtNum(e.hours)+' ч':null, meds||null, e.effect?EFFL[e.effect].toLowerCase():null,
-      (e.symptoms||[]).map(x=>SYML[x]).join(', ')||null, (e.triggers||[]).length?'провокаторы: '+e.triggers.map(x=>TRIGL[x]).join(', '):null, e.note||null].filter(Boolean);
+    const bits=[e.tod?'начало: '+TODSHORT[e.tod]:null, (e.loc||[]).length?locText(e.loc):null, e.hours?fmtNum(e.hours)+' ч':null, meds||null, e.effect?EFFL[e.effect].toLowerCase():null,
+      (e.symptoms||[]).map(x=>SYML[x]).join(', ')||null, (e.triggers||[]).length?'провокаторы: '+e.triggers.map(x=>TRIGL[x]).join(', '):null, wxEntry(e)?'давление '+wxText(wxEntry(e),true):null, e.note||null].filter(Boolean);
     return `<div class="entry" data-entry="${e.id}"><div><div class="top"><span class="pill" style="background:${intColor(e.intensity)}">${e.intensity}</span>${fmtDate(e.date)}</div><div class="meta">${esc(bits.join(' · '))}</div></div>
       <div class="btns"><button data-edit="${e.id}">Изменить</button><button data-del="${e.id}">✕</button></div></div>`;
   }).join('');
@@ -647,8 +763,10 @@ function printSummary(){
   <h2>По месяцам</h2><table><tr><th>Месяц</th><th>Дни с ГБ</th><th>Приступов</th><th>Дни с препаратами</th><th>из них простые анальгетики</th><th>из них триптаны / комбинированные</th><th>Ср. сила (1–10)</th><th>Ср. длит., ч</th></tr>`+
   per.map(x=>`<tr><td>${mName(x.k)}</td><td>${x.s.hDays}</td><td>${x.s.attacks}</td><td>${x.s.mDays}</td><td>${x.s.sDays}</td><td>${x.s.tDays}</td><td>${x.s.attacks?fmtNum(x.s.avgInt):'—'}</td><td>${x.s.avgH!=null?fmtNum(x.s.avgH):'—'}</td></tr>`).join('')+`</table>
   ${locBlock(list,'print')}
-  <h2>Записи</h2><table><tr><th>Дата</th><th>Сила</th><th>Длит., ч</th><th>Локализация</th><th>Препараты</th><th>Эффект</th><th>Сопутствующее</th><th>Провокаторы</th><th>Заметка</th></tr>`+
-  list.map(e=>`<tr><td>${fmtDate(e.date)}</td><td>${e.intensity}</td><td>${e.hours?fmtNum(e.hours):''}</td><td>${esc(locText(e.loc||[]))}</td><td>${esc((e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':''))}</td><td>${e.effect?EFFL[e.effect]:''}</td><td>${esc((e.symptoms||[]).map(x=>SYML[x]).join(', '))}</td><td>${esc((e.triggers||[]).map(x=>TRIGL[x]).join(', '))}</td><td>${esc(e.note)}</td></tr>`).join('')+`</table>
+  ${todBlock(list,'print')}
+  ${pressureBlock(list,months,'print')}
+  <h2>Записи</h2><table><tr><th>Дата</th><th>Начало</th><th>Сила</th><th>Длит., ч</th><th>Локализация</th><th>Препараты</th><th>Эффект</th><th>Сопутствующее</th><th>Провокаторы</th>${wx.on&&wx.lat?'<th>Давление, мм рт. ст.</th>':''}<th>Заметка</th></tr>`+
+  list.map(e=>`<tr><td>${fmtDate(e.date)}</td><td>${e.tod?TODSHORT[e.tod]:''}</td><td>${e.intensity}</td><td>${e.hours?fmtNum(e.hours):''}</td><td>${esc(locText(e.loc||[]))}</td><td>${esc((e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':''))}</td><td>${e.effect?EFFL[e.effect]:''}</td><td>${esc((e.symptoms||[]).map(x=>SYML[x]).join(', '))}</td><td>${esc((e.triggers||[]).map(x=>TRIGL[x]).join(', '))}</td>${wx.on&&wx.lat?'<td>'+wxText(wxEntry(e),true)+'</td>':''}<td>${esc(e.note)}</td></tr>`).join('')+`</table>
   <p class="pnote">Сводка составлена пациентом в дневнике головной боли на сайте vdorogov89.github.io. Показатели не являются диагнозом.</p>`;
   $('printArea').innerHTML=h; goal('diary_print'); window.print();
 }
@@ -672,9 +790,9 @@ function importData(file){
 }
 
 // init
-load(); if(!storageOK) $('storageWarn').hidden=false;
+load(); wxLoad(); if(!storageOK) $('storageWarn').hidden=false;
 try{localStorage.setItem('__t','1'); localStorage.removeItem('__t');}catch(e){$('storageWarn').hidden=false;}
-buildChips('medChips',MEDS,'med','checkbox'); buildChips('effectChips',EFFECTS,'eff','radio'); buildChips('symChips',SYMS,'sym','checkbox'); buildChips('trigChips',TRIGS,'trig','checkbox');
+buildChips('todChips',TODS,'tod','radio'); radioToggle('todChips'); radioToggle('effectChips'); buildChips('medChips',MEDS,'med','checkbox'); buildChips('effectChips',EFFECTS,'eff','radio'); buildChips('symChips',SYMS,'sym','checkbox'); buildChips('trigChips',TRIGS,'trig','checkbox');
 $('fDate').max=today(); resetForm();
 $('fInt').addEventListener('input',updInt);
 $('hoursQuick').addEventListener('click',e=>{if(e.target.dataset.h)$('fHours').value=e.target.dataset.h;});
@@ -706,8 +824,13 @@ $('clearBtn').addEventListener('click',()=>{if(!entries.length)return; if(confir
   window.addEventListener('appinstalled',()=>{box.hidden=true;});
   $('installClose').addEventListener('click',()=>{box.hidden=true; try{localStorage.setItem('hd_install_hide','1');}catch(e){}});
 })();
+$('wxOn').addEventListener('change',e=>{wx.on=e.target.checked; wxSave(); wxUI(); renderAll(); if(wx.on&&!wx.lat) $('wxCity').focus(); else wxSync(true);});
+$('wxFind').addEventListener('click',wxFind);
+$('wxCity').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); wxFind();}});
+$('fDate').addEventListener('change',wxHintUpd); $('todChips').addEventListener('change',wxHintUpd); $('todChips').addEventListener('click',()=>setTimeout(wxHintUpd,0));
+window.addEventListener('online',()=>wxSync(false));
 $('year').textContent=new Date().getFullYear();
-renderAll();
+wxUI(); renderAll(); wxSync(false);
 })();
 </script>
 </body>
