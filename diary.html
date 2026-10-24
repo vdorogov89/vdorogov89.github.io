@@ -76,6 +76,9 @@ input[type=range]{width:100%; accent-color:var(--grad1); height:28px;}
 .switch input{width:20px; height:20px; accent-color:#4FE0FF;}
 .wxrow{display:flex; gap:8px; margin:8px 0;} .wxrow input{flex:1; min-width:0;}
 .wxres{display:flex; flex-direction:column; gap:6px; margin:6px 0;} .wxres button{text-align:left;}
+.cyccard{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:0 0 18px; padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,0.03); font-size:14.5px;}
+.cyccard b{color:var(--ink);} .cyccard .btn-ghost{padding:8px 16px; font-size:14px;}
+.cyclist{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0;} .cyclist span{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--line); border-radius:100px; font-size:13.5px;} .cyclist button{background:none; border:0; color:var(--muted); cursor:pointer; font-size:14px; padding:0 2px;}
 .subbox{margin-top:12px; padding:4px 14px 14px; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,0.03);}
 .flabel.sm{font-size:14px; font-weight:500; margin:14px 0 8px;}
 .subbox .callout{margin:12px 0 0; font-size:14px;}
@@ -238,11 +241,13 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
 
   <!-- ENTRY -->
   <section class="panel" id="tab-entry">
+    <div class="cyccard" id="cycCard" hidden></div>
     <form id="entryForm" onsubmit="return false">
       <div id="editBanner" class="callout amber" hidden></div>
       <div class="field">
         <label for="fDate">Дата приступа</label>
         <input type="date" id="fDate" required>
+        <div class="wxhint" id="cycHint"></div>
       </div>
 
       <div class="field">
@@ -352,6 +357,17 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
       <label class="btn-ghost filebtn">Восстановить из файла<input type="file" id="importFile" accept=".json,application/json" hidden></label>
     </div>
     <p class="small" id="dataInfo"></p>
+    <h2>Менструальный цикл</h2>
+    <p>Дневник может сам определять, приходятся ли приступы на дни менструации. Достаточно один раз указать начало последних месячных и обычную длину цикла. Дальше дневник считает дни цикла сам, а кнопка «Начались месячные» на вкладке «Запись» уточняет даты: так анализ точнее.</p>
+    <label class="switch"><input type="checkbox" id="cycOn"> Учитывать менструальный цикл</label>
+    <div id="cycBox" hidden>
+      <div class="field" style="margin:10px 0 12px"><label for="cycStart">Первый день последних месячных</label><input type="date" id="cycStart"></div>
+      <div class="field" style="margin:0 0 12px"><label for="cycLen">Обычная длина цикла, дней</label><input type="number" id="cycLen" min="18" max="45" step="1" inputmode="numeric" placeholder="например, 28"></div>
+      <button type="button" class="btn-ghost" id="cycAdd">Сохранить</button>
+      <p class="small" id="cycInfoTxt"></p>
+      <div class="cyclist" id="cycList"></div>
+    </div>
+    <p class="small">При приёме гормональных контрацептивов без перерыва или во время беременности анализ по циклу не имеет смысла — выключите его. Данные о цикле, как и все записи, хранятся только на этом устройстве.</p>
     <h2>Атмосферное давление</h2>
     <p>Дневник может сам подтягивать давление в вашем городе за дни приступов. Через 2–3 месяца в сводке появится сравнение: как часто давление резко падало в дни с головной болью и в дни без неё.</p>
     <label class="switch"><input type="checkbox" id="wxOn"> Учитывать атмосферное давление</label>
@@ -414,6 +430,70 @@ function fmtNum(x){return (Math.round(x*10)/10).toString().replace('.',',');}
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function intColor(i){return i>=7?'#FF8A7A':i>=4?'#FFC56B':'#6BE3A4';}
 function toast(t){const el=$('toast'); el.textContent=t; el.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>el.hidden=true,2200);}
+
+// менструальный цикл
+const CYCKEY='hd_cyc';
+let cyc={on:false,len:28,starts:[]};
+function cycLoad(){try{cyc=Object.assign({on:false,len:28,starts:[]},JSON.parse(localStorage.getItem(CYCKEY))||{});}catch(e){}}
+function cycSave(){try{localStorage.setItem(CYCKEY,JSON.stringify(cyc));}catch(e){}}
+function dd(a,b){return Math.round((Date.parse(a+'T12:00:00')-Date.parse(b+'T12:00:00'))/864e5);}
+function cycAvg(){ const s=[...new Set(cyc.starts)].sort(); const iv=[]; for(let i=1;i<s.length;i++){const d=dd(s[i],s[i-1]); if(d>=18&&d<=45) iv.push(d);} const last=iv.slice(-6);
+  return last.length?Math.round(last.reduce((a,b)=>a+b,0)/last.length):(cyc.len||28); }
+function cycAll(){ // фактические и рассчитанные даты начала
+  const act=[...new Set(cyc.starts)].sort(); if(!act.length) return []; const L=cycAvg(), out=act.map(d=>({d,pred:false}));
+  const lim=dPlus(today(),L+5); let d=act[act.length-1]; while(true){d=dPlus(d,L); if(d>lim)break; out.push({d,pred:true});}
+  let b=dPlus(act[0],-L); out.unshift({d:b,pred:true}); // один цикл назад от первой отметки
+  return out.sort((x,y)=>x.d<y.d?-1:1);
+}
+function cycInfo(date,all){ if(!cyc.on) return null; all=all||cycAll(); if(!all.length||date<all[0].d) return null;
+  let prev=null,next=null; for(const x of all){ if(x.d<=date) prev=x; else {next=x; break;} }
+  const op=prev?dd(date,prev.d):null, on=next?dd(date,next.d):null;
+  const inWin=(op!=null&&op<=2)||(on!=null&&on>=-2);
+  const ref=(op!=null&&op<=2)?prev:((on!=null&&on>=-2)?next:prev);
+  return {day:op!=null?op+1:null, before:on!=null&&on>=-2?-on:null, inWin, pred:ref?ref.pred:true};
+}
+function cycText(ci,short){ if(!ci) return ''; let t;
+  if(ci.before) t=short?`${ci.before} дн. до месячных`:`за ${ci.before} ${plural(ci.before,'день','дня','дней')} до месячных`;
+  else t=short?`день цикла ${ci.day}`:`${ci.day}-й день цикла`;
+  if(ci.inWin) t+=short?' (менстр. окно)':' — менструальное окно';
+  if(ci.pred&&!short) t+=' (по расчёту)';
+  return t; }
+function cycUI(){
+  $('cycOn').checked=!!cyc.on; $('cycBox').hidden=!cyc.on;
+  const act=[...new Set(cyc.starts)].sort();
+  $('cycLen').value=cyc.len||''; $('cycStart').value='';
+  $('cycList').innerHTML=act.slice().reverse().map(d=>`<span>${fmtDate(d)}<button type="button" data-cdel="${d}" aria-label="Удалить">✕</button></span>`).join('');
+  $('cycInfoTxt').textContent=cyc.on?(act.length?`Отмечено начал месячных: ${act.length}. Средняя длина цикла: ${cycAvg()} ${plural(cycAvg(),'день','дня','дней')}${act.length<2?' (по вашим данным; уточнится, когда будут отмечены следующие месячные)':''}. Можно добавить и прошлые даты — так анализ сразу станет точнее.`:'Укажите первый день последних месячных и нажмите «Сохранить».'):'';
+  const card=$('cycCard'); if(!cyc.on||!act.length){card.hidden=true;} else {
+    const t=today(), ci=cycInfo(t), last=act[act.length-1], recent=dd(t,last)<=10;
+    card.hidden=false;
+    card.innerHTML=`<span>${ci?'Сегодня '+(ci.before?'<b>'+cycText(ci,false)+'</b>':'<b>'+ci.day+'-й день цикла</b>'+(ci.inWin?' — менструальное окно':'')):''}</span>`+
+      (recent?`<span class="small">Начало месячных отмечено: ${fmtDate(last)}${last===t?' · <button type="button" class="linkbtn" id="cycUndo" style="background:none;border:0;color:var(--grad1);cursor:pointer;padding:0;font:inherit">отменить</button>':''}</span>`:`<button type="button" class="btn-ghost" id="cycToday">Начались месячные сегодня</button>`);
+    const b=$('cycToday'); if(b) b.onclick=()=>{cyc.starts.push(t); cycSave(); cycUI(); renderAll(); cycHintUpd(); toast('Отмечено начало месячных'); goal('diary_cycle_mark');};
+    const u=$('cycUndo'); if(u) u.onclick=()=>{cyc.starts=cyc.starts.filter(x=>x!==t); cycSave(); cycUI(); renderAll(); cycHintUpd();};
+  }
+}
+function cycHintUpd(){const el=$('cycHint'); if(!el) return; const d=$('fDate').value; const ci=d?cycInfo(d):null; el.textContent=ci?'Цикл: '+cycText(ci,false):'';}
+function cycBlock(list,months,mode){
+  if(!cyc.on) return ''; const all=cycAll(); if(!all.length) return '';
+  const t=today(); let start=months[0]+'-01'; const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); if(first>start) start=first; if(all[0].d>start) start=all[0].d;
+  const lastM=months[months.length-1]; let end=dPlus((lastM.slice(5)==='12'?(+lastM.slice(0,4)+1)+'-01':lastM.slice(0,5)+pad(+lastM.slice(5)+1))+'-01',-1); if(end>t) end=t;
+  const att=list.filter(e=>e.date>=start&&e.date<=end); if(!att.length) return '';
+  const inW=att.filter(e=>{const c=cycInfo(e.date,all); return c&&c.inWin;}).length;
+  const cycles=all.filter(x=>dd(x.d,start)>=2&&dd(end,x.d)>=2); // окно целиком внутри периода наблюдения
+  const cycHit=cycles.filter(x=>att.some(e=>{const o=dd(e.date,x.d); return o>=-2&&o<=2;})).length;
+  const predN=cycles.filter(x=>x.pred).length;
+  const outside=att.length-inW, L=cycAvg(), expected=Math.round(5/L*100), share=Math.round(inW/att.length*100);
+  let verdict;
+  if(cycles.length<3) verdict=`Для вывода о связи с циклом нужно хотя бы 3 полных цикла наблюдения, сейчас ${cycles.length}.`;
+  else if(cycHit/cycles.length>=2/3) verdict=outside===0?'Все приступы пришлись на менструальное окно, и это повторялось не менее чем в двух циклах из трёх. Такая картина похожа на чисто менструальную мигрень — покажите сводку врачу.':'Приступы в менструальном окне повторялись не менее чем в двух циклах из трёх, но бывают и в другие дни. Такая картина похожа на мигрень, связанную с менструацией, — покажите сводку врачу.';
+  else verdict=share<=expected+10?'Заметной связи приступов с менструацией не видно.':'Приступы в менструальном окне бывают чаще, чем в другие дни, но не в большинстве циклов. Продолжайте наблюдение.';
+  const line=`На менструальное окно (с −2 по +3 день цикла) пришлось ${inW} из ${att.length} ${plural(att.length,'приступа','приступов','приступов')} (${share}%). Если бы связи не было, ожидалось бы около ${expected}%.${cycles.length?` Приступы в окне были в ${cycHit} из ${cycles.length} ${plural(cycles.length,'цикла','циклов','циклов')}.`:''}`;
+  const predNote=predN?` Даты ${predN} из ${cycles.length} ${plural(cycles.length,'цикла','циклов','циклов')} рассчитаны, а не отмечены — отмечайте начало месячных кнопкой на вкладке «Запись», так анализ точнее.`:'';
+  if(mode==='print') return `<p><b>Связь с менструальным циклом:</b> ${line} ${cycles.length>=3?verdict:''} Средняя длина цикла: ${L} дн.${predN?' Часть дат начала цикла рассчитана.':''}</p>`;
+  const mx=Math.max(share,expected,1);
+  return `<h2>Связь с менструальным циклом</h2><div class="bars"><div class="row"><span>Приступы в окне</span><div class="track"><div class="fill" style="width:${share/mx*100}%"></div></div><span>${share}%</span></div><div class="row"><span>Без связи было бы</span><div class="track"><div class="fill" style="width:${expected/mx*100}%;opacity:.45"></div></div><span>${expected}%</span></div></div><p class="small">${line} ${verdict}${predNote}</p>`;
+}
 
 // атмосферное давление
 const WXKEY='hd_wx', WXC='hd_wx_cache', WXH=[3,9,12,15,21], TODH={morning:9,day:15,evening:21,night:3}, DROP=4;
@@ -611,7 +691,7 @@ function updInt(){const v=+$('fInt').value; $('intVal').textContent=v; $('intLbl
 function resetForm(){
   editId=null; $('fDate').value=today(); $('fInt').value=5; updInt(); $('fHours').value=''; $('fMedName').value=''; $('fNote').value='';
   ['todChips','medChips','effectChips','symChips','trigChips'].forEach(b=>setVals(b,[])); auraSet(null); updateEffect(); locSet=new Set(); renderLocPick();
-  $('saveBtn').textContent='Сохранить запись'; $('cancelEdit').hidden=true; $('editBanner').hidden=true; wxHintUpd();
+  $('saveBtn').textContent='Сохранить запись'; $('cancelEdit').hidden=true; $('editBanner').hidden=true; wxHintUpd(); cycHintUpd();
 }
 let saving=false;
 function saveEntry(){
@@ -645,7 +725,7 @@ function startEdit(id){
   const e=entries.find(x=>x.id===id); if(!e) return;
   showTab('entry'); editId=id;
   $('fDate').value=e.date; $('fInt').value=e.intensity; updInt(); $('fHours').value=e.hours||''; $('fMedName').value=e.medName||''; $('fNote').value=e.note||'';
-  setVals('todChips',e.tod?[e.tod]:[]); setVals('medChips',e.meds||[]); setVals('effectChips',e.effect?[e.effect]:[]); setVals('symChips',e.symptoms||[]); auraSet(e.aura); setVals('trigChips',e.triggers||[]); updateEffect(); locSet=new Set(e.loc||[]); renderLocPick(); wxHintUpd();
+  setVals('todChips',e.tod?[e.tod]:[]); setVals('medChips',e.meds||[]); setVals('effectChips',e.effect?[e.effect]:[]); setVals('symChips',e.symptoms||[]); auraSet(e.aura); setVals('trigChips',e.triggers||[]); updateEffect(); locSet=new Set(e.loc||[]); renderLocPick(); wxHintUpd(); cycHintUpd();
   $('saveBtn').textContent='Сохранить изменения'; $('cancelEdit').hidden=false; $('editBanner').innerHTML='<p><strong>Редактирование записи от '+fmtDate(e.date)+'.</strong> Внесите изменения и нажмите «Сохранить изменения».</p>'; $('editBanner').hidden=false; window.scrollTo({top:0,behavior:'smooth'});
 }
 function delEntry(id){if(!confirm('Удалить эту запись?'))return; entries=entries.filter(x=>x.id!==id); persist(); renderAll(); toast('Запись удалена');}
@@ -774,6 +854,7 @@ function renderSummary(){
     h+=`<h2>Календарь</h2><div class="legend"><span><i style="background:#6BE3A4"></i>лёгкая</span><span><i style="background:#FFC56B"></i>умеренная</span><span><i style="background:#FF8A7A"></i>сильная</span><span>● приём препаратов</span></div>${calendar(months[0])}`;
   }
   h+=locBlock(list,'screen');
+  h+=cycBlock(list,months,'screen');
   h+=auraBlock(list,'screen');
   h+=todBlock(list,'screen');
   h+=pressureBlock(list,months,'screen');
@@ -820,7 +901,7 @@ function renderHistory(){
   if(!entries.length){out.innerHTML='<p class="muted">Записей пока нет. Добавьте первую во вкладке «Запись».</p>'; return;}
   out.innerHTML=`<p class="small">Всего записей: ${entries.length}</p>`+entries.map(e=>{
     const meds=(e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':'');
-    const bits=[e.tod?'начало: '+TODSHORT[e.tod]:null, (e.loc||[]).length?locText(e.loc):null, e.hours?fmtNum(e.hours)+' ч':null, meds||null, e.effect?EFFL[e.effect].toLowerCase():null,
+    const bits=[cycInfo(e.date)?cycText(cycInfo(e.date),true):null, e.tod?'начало: '+TODSHORT[e.tod]:null, (e.loc||[]).length?locText(e.loc):null, e.hours?fmtNum(e.hours)+' ч':null, meds||null, e.effect?EFFL[e.effect].toLowerCase():null,
       (e.symptoms||[]).map(x=>x==='aura'?auraShort(e.aura):SYML[x]).join(', ')||null, (e.triggers||[]).length?'провокаторы: '+e.triggers.map(x=>TRIGL[x]).join(', '):null, wxEntry(e)?'давление '+wxText(wxEntry(e),true):null, e.note||null].filter(Boolean);
     return `<div class="entry" data-entry="${e.id}"><div><div class="top"><span class="pill" style="background:${intColor(e.intensity)}">${e.intensity}</span>${fmtDate(e.date)}</div><div class="meta">${esc(bits.join(' · '))}</div></div>
       <div class="btns"><button data-edit="${e.id}">Изменить</button><button data-del="${e.id}">✕</button></div></div>`;
@@ -845,11 +926,12 @@ function printSummary(){
   <h2>По месяцам</h2><table><tr><th>Месяц</th><th>Дни с ГБ</th><th>Приступов</th><th>Дни с препаратами</th><th>из них простые анальгетики</th><th>из них триптаны / комбинированные</th><th>Ср. сила (1–10)</th><th>Ср. длит., ч</th></tr>`+
   per.map(x=>`<tr><td>${mName(x.k)}</td><td>${x.s.hDays}</td><td>${x.s.attacks}</td><td>${x.s.mDays}</td><td>${x.s.sDays}</td><td>${x.s.tDays}</td><td>${x.s.attacks?fmtNum(x.s.avgInt):'—'}</td><td>${x.s.avgH!=null?fmtNum(x.s.avgH):'—'}</td></tr>`).join('')+`</table>
   ${locBlock(list,'print')}
+  ${cycBlock(list,months,'print')}
   ${auraBlock(list,'print')}
   ${todBlock(list,'print')}
   ${pressureBlock(list,months,'print')}
-  <h2>Записи</h2><table><tr><th>Дата</th><th>Начало</th><th>Сила</th><th>Длит., ч</th><th>Локализация</th><th>Препараты</th><th>Эффект</th><th>Сопутствующее</th><th>Провокаторы</th>${wx.on&&wx.lat?'<th>Давление, мм рт. ст.</th>':''}<th>Заметка</th></tr>`+
-  list.map(e=>`<tr><td>${fmtDate(e.date)}</td><td>${e.tod?TODSHORT[e.tod]:''}</td><td>${e.intensity}</td><td>${e.hours?fmtNum(e.hours):''}</td><td>${esc(locText(e.loc||[]))}</td><td>${esc((e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':''))}</td><td>${e.effect?EFFL[e.effect]:''}</td><td>${esc((e.symptoms||[]).map(x=>x==='aura'&&e.aura?'Аура: '+auraFull(e.aura):SYML[x]).join(', '))}</td><td>${esc((e.triggers||[]).map(x=>TRIGL[x]).join(', '))}</td>${wx.on&&wx.lat?'<td>'+wxText(wxEntry(e),true)+'</td>':''}<td>${esc(e.note)}</td></tr>`).join('')+`</table>
+  <h2>Записи</h2><table><tr><th>Дата</th>${cyc.on&&cyc.starts.length?'<th>Цикл</th>':''}<th>Начало</th><th>Сила</th><th>Длит., ч</th><th>Локализация</th><th>Препараты</th><th>Эффект</th><th>Сопутствующее</th><th>Провокаторы</th>${wx.on&&wx.lat?'<th>Давление, мм рт. ст.</th>':''}<th>Заметка</th></tr>`+
+  list.map(e=>`<tr><td>${fmtDate(e.date)}</td>${cyc.on&&cyc.starts.length?'<td>'+esc(cycText(cycInfo(e.date),true))+'</td>':''}<td>${e.tod?TODSHORT[e.tod]:''}</td><td>${e.intensity}</td><td>${e.hours?fmtNum(e.hours):''}</td><td>${esc(locText(e.loc||[]))}</td><td>${esc((e.meds||[]).map(x=>MEDL[x]).join(', ')+(e.medName?' ('+e.medName+')':''))}</td><td>${e.effect?EFFL[e.effect]:''}</td><td>${esc((e.symptoms||[]).map(x=>x==='aura'&&e.aura?'Аура: '+auraFull(e.aura):SYML[x]).join(', '))}</td><td>${esc((e.triggers||[]).map(x=>TRIGL[x]).join(', '))}</td>${wx.on&&wx.lat?'<td>'+wxText(wxEntry(e),true)+'</td>':''}<td>${esc(e.note)}</td></tr>`).join('')+`</table>
   <p class="pnote">Сводка составлена пациентом в дневнике головной боли на сайте vdorogov89.github.io. Показатели не являются диагнозом.</p>`;
   $('printArea').innerHTML=h; goal('diary_print'); window.print();
 }
@@ -873,7 +955,7 @@ function importData(file){
 }
 
 // init
-load(); wxLoad(); if(!storageOK) $('storageWarn').hidden=false;
+load(); wxLoad(); cycLoad(); if(!storageOK) $('storageWarn').hidden=false;
 try{localStorage.setItem('__t','1'); localStorage.removeItem('__t');}catch(e){$('storageWarn').hidden=false;}
 buildChips('todChips',TODS,'tod','radio'); radioToggle('todChips'); radioToggle('effectChips'); buildChips('medChips',MEDS,'med','checkbox'); buildChips('effectChips',EFFECTS,'eff','radio'); buildChips('symChips',SYMS,'sym','checkbox'); buildChips('auraType',AURA_T,'aut','checkbox'); buildChips('auraEye',AURA_EYE,'aue','radio'); buildChips('auraOnset',AURA_ON,'auo','radio'); buildChips('auraDur',AURA_D,'aud','radio'); buildChips('auraHd',AURA_HD,'auh','radio'); ['auraEye','auraOnset','auraDur','auraHd'].forEach(radioToggle); ['symChips','auraType','auraEye','auraOnset','auraDur','auraHd'].forEach(b=>{$(b).addEventListener('change',auraUI); $(b).addEventListener('click',()=>setTimeout(auraUI,0));}); buildChips('trigChips',TRIGS,'trig','checkbox');
 $('fDate').max=today(); resetForm();
@@ -909,11 +991,19 @@ $('clearBtn').addEventListener('click',()=>{if(!entries.length)return; if(confir
 })();
 $('wxOn').addEventListener('change',e=>{wx.on=e.target.checked; wxSave(); wxUI(); renderAll(); if(wx.on&&!wx.lat) $('wxCity').focus(); else wxSync(true);});
 $('wxFind').addEventListener('click',wxFind);
+$('cycOn').addEventListener('change',e=>{cyc.on=e.target.checked; cycSave(); cycUI(); renderAll(); cycHintUpd(); if(cyc.on&&!cyc.starts.length) $('cycStart').focus();});
+$('cycAdd').addEventListener('click',()=>{const d=$('cycStart').value, L=parseInt($('cycLen').value,10);
+  if(L){ if(L<18||L>45){toast('Длина цикла обычно от 18 до 45 дней'); return;} cyc.len=L; }
+  if(d){ if(d>today()){toast('Дата не может быть в будущем'); return;} if(!cyc.starts.includes(d)) cyc.starts.push(d); }
+  if(!d&&!cyc.starts.length){toast('Укажите первый день последних месячных'); return;}
+  cycSave(); cycUI(); renderAll(); cycHintUpd(); toast('Сохранено'); goal('diary_cycle_on');});
+$('cycList').addEventListener('click',e=>{const b=e.target.closest('[data-cdel]'); if(!b)return; cyc.starts=cyc.starts.filter(x=>x!==b.dataset.cdel); cycSave(); cycUI(); renderAll(); cycHintUpd();});
+$('fDate').addEventListener('change',cycHintUpd);
 $('wxCity').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); wxFind();}});
 $('fDate').addEventListener('change',wxHintUpd); $('todChips').addEventListener('change',wxHintUpd); $('todChips').addEventListener('click',()=>setTimeout(wxHintUpd,0));
 window.addEventListener('online',()=>wxSync(false));
 $('year').textContent=new Date().getFullYear();
-wxUI(); renderAll(); wxSync(false);
+wxUI(); cycUI(); cycHintUpd(); renderAll(); wxSync(false);
 })();
 </script>
 </body>
