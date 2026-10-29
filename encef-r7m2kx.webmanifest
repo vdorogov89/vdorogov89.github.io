@@ -1,0 +1,31 @@
+{
+ "id": "/encef-r7m2kx.html",
+ "name": "Энцефалит: алгоритм",
+ "short_name": "Энцефалит",
+ "lang": "ru",
+ "start_url": "/encef-r7m2kx.html",
+ "scope": "/encef-r7m2kx",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/encef-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/encef-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/encef-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

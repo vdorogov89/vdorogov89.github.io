@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Энцефалит: алгоритм</title>
+<meta name="theme-color" content="#08080D">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="encef-r7m2kx.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="encef-icon-192.png">
+<link rel="apple-touch-icon" href="encef-apple-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Энцефалит">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="author" content="Василий Дорогов">
+<meta name="copyright" content="© 2026 Василий Дорогов">
+<style>
+:root{--bg:#08080D; --ink:#F2F2F5; --body:#C9C9D3; --muted:#8B8B98; --line:rgba(255,255,255,0.09); --glass:rgba(255,255,255,0.045); --acc:#4FE0FF; --acc2:#8A5CFF; --warn:#FF8A7A; --amber:#FFC56B; --ok:#6BE3A4;}
+*{box-sizing:border-box;}
+html,body{margin:0; background:var(--bg); color:var(--body); font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif; -webkit-font-smoothing:antialiased;}
+button{font:inherit; color:inherit; cursor:pointer;}
+.app{max-width:560px; margin:0 auto; padding:0 16px calc(84px + env(safe-area-inset-bottom));}
+header{padding:calc(16px + env(safe-area-inset-top)) 0 10px; display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+header h1{margin:0; font-size:20px; color:var(--ink); letter-spacing:-0.01em;}
+header span{font-size:12.5px; color:var(--muted); white-space:nowrap;}
+nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center; gap:4px; padding:10px 8px calc(10px + env(safe-area-inset-bottom)); background:rgba(10,10,16,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--line);}
+nav.tabs button{flex:1; max-width:120px; padding:9px 2px; border-radius:12px; border:0; background:transparent; color:var(--muted); font-size:12.5px;}
+nav.tabs button.on{background:rgba(79,224,255,0.12); color:var(--ink);}
+section{display:none;} section.on{display:block;}
+.card{background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:16px; margin:12px 0;}
+h2{font-size:17px; color:var(--ink); margin:4px 0 8px;}
+h3{font-size:15px; color:var(--ink); margin:14px 0 6px;}
+p{margin:6px 0;}
+.muted{color:var(--muted); font-size:13px;}
+.crumbs{display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 4px;}
+.crumbs span{font-size:12px; padding:3px 9px; border-radius:20px; background:rgba(255,255,255,0.06); color:var(--muted);}
+.crumbs span.on{background:rgba(79,224,255,0.14); color:var(--ink);}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+label.f{display:block; font-size:12.5px; color:var(--muted);}
+input[type=number],input[type=date],select{width:100%; min-width:0; max-width:100%; -webkit-appearance:none; appearance:none; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px; display:block;}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%; background-size:5px 5px; background-repeat:no-repeat; padding-right:32px;}
+select option{background:#16171f; color:var(--ink);}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.8);}
+input:focus,select:focus{outline:none; border-color:rgba(79,224,255,0.6);}
+.chk{display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); color:var(--ink);}
+.chk:first-of-type{border-top:0;}
+.chk input{-webkit-appearance:none; appearance:none; width:22px; height:22px; flex:0 0 22px; margin:1px 0 0; border-radius:7px; border:1.5px solid rgba(255,255,255,0.25); background:transparent; display:grid; place-content:center;}
+.chk input:checked{background:linear-gradient(120deg,var(--acc),var(--acc2)); border-color:transparent;}
+.chk input:checked::after{content:''; width:10px; height:6px; border:2.5px solid #08080D; border-top:0; border-right:0; transform:rotate(-45deg) translate(1px,-1px);}
+.chk small{display:block; color:var(--muted); font-size:12.5px;}
+.out{border-radius:16px; padding:12px 14px; margin:10px 0; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body);}
+.out b.t{display:block; margin-bottom:4px; color:var(--ink); font-size:15px;}
+.out.ok{border-color:rgba(107,227,164,0.35); background:rgba(107,227,164,0.06);} .out.ok b.t{color:var(--ok);}
+.out.warn{border-color:rgba(255,197,107,0.4); background:rgba(255,197,107,0.06);} .out.warn b.t{color:var(--amber);}
+.out.bad{border-color:rgba(255,138,122,0.4); background:rgba(255,138,122,0.06);} .out.bad b.t{color:var(--warn);}
+.out.info{border-color:rgba(79,224,255,0.25); background:rgba(79,224,255,0.04);} .out.info b.t{color:var(--acc);}
+.out ul{margin:6px 0 0; padding-left:20px;} li{margin:3px 0;}
+.out b{color:var(--ink);}
+.dose{font-weight:600; color:var(--acc); white-space:nowrap;}
+.stepnav{display:flex; gap:8px; margin:16px 0 4px;}
+.stepnav button{flex:1; padding:11px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.04); color:var(--ink);}
+.stepnav button.main{flex:2; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.mbtns button{padding:10px 14px; border-radius:12px; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns button.alt{background:rgba(255,255,255,0.08); color:var(--ink); font-weight:500;}
+pre{white-space:pre-wrap; font:13.5px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; color:var(--ink); background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:14px; padding:12px; margin:8px 0;}
+a{color:var(--acc);}
+.foot{font-size:12px; color:var(--muted); margin:18px 0;}
+.copy{font-size:11.5px; color:var(--muted); line-height:1.45; margin:22px 0 6px; padding-top:12px; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="app">
+  <header><h1>Энцефалит: алгоритм</h1><span>автор — В.&nbsp;Дорогов</span></header>
+  <div class="crumbs" id="crumbs"></div>
+<!-- ШАГ 1 -->
+<section id="s1" class="on">
+  <div class="card">
+    <h2>Пациент</h2>
+    <div class="row">
+      <label class="f">Возраст, лет<input type="number" id="age" inputmode="numeric" min="0" max="110"></label>
+      <label class="f">Вес, кг<input type="number" id="wt" inputmode="decimal" min="1" max="300"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label class="f">Пол<select id="sex"><option value="m">Мужской</option><option value="f">Женский</option></select></label>
+      <label class="f">Креатинин, мкмоль/л<input type="number" id="cr" inputmode="decimal" min="10" max="2000"></label>
+    </div>
+    <p class="muted" id="crcl"></p>
+  </div>
+
+  <div class="card">
+    <h2>Критерии энцефалита (International Encephalitis Consortium)</h2>
+    <label class="chk"><input type="checkbox" id="major"><span><b>Изменение сознания, поведения или личности ≥ 24 ч</b><small>Большой критерий, без другой объяснимой причины</small></span></label>
+    <label class="chk"><input type="checkbox" id="fever"><span>Лихорадка ≥ 38 °C (в пределах 72 ч)</span></label>
+    <label class="chk"><input type="checkbox" id="seiz"><span>Судороги, не объяснимые известной эпилепсией</span></label>
+    <label class="chk"><input type="checkbox" id="focal"><span>Новая очаговая симптоматика</span></label>
+    <p class="muted">Ликвор, МРТ и ЭЭГ — малые критерии — вносятся на шаге 3, классификация пересчитается.</p>
+    <div id="iec1"></div>
+  </div>
+
+  <div class="card">
+    <h2>Показания к КТ перед пункцией</h2>
+    <label class="chk"><input type="checkbox" id="ct_gcs"><span>Угнетение сознания (ШКГ &lt; 13)</span></label>
+    <label class="chk"><input type="checkbox" id="ct_papil"><span>Отёк диска зрительного нерва</span></label>
+    <p class="muted">Очаговая симптоматика, судороги и иммуносупрессия учитываются из других пунктов.</p>
+  </div>
+
+  <div class="card">
+    <h2>Анамнез и экспозиция</h2>
+    <label class="chk"><input type="checkbox" id="imm"><span>Иммуносупрессия (ВИЧ, трансплантация, химиотерапия, стероиды, биологическая терапия)</span></label>
+    <label class="chk"><input type="checkbox" id="bact"><span>Не исключён бактериальный менингит<small>Менингизм, быстрое развитие, септическое состояние, нейтрофильный ликвор</small></span></label>
+    <label class="chk"><input type="checkbox" id="tick"><span>Укус клеща или сырое молоко, апрель–октябрь</span></label>
+    <label class="chk"><input type="checkbox" id="south"><span>Лето, поездка на юг России или в тропики (лихорадка Западного Нила, арбовирусы)</span></label>
+    <label class="chk"><input type="checkbox" id="rash"><span>Везикулярная сыпь или опоясывающий герпес</span></label>
+    <label class="chk"><input type="checkbox" id="child"><span>Ребёнок, лето–осень, сыпь или герпангина (энтеровирусы)</span></label>
+    <label class="chk"><input type="checkbox" id="posthsv"><span>ВПГ-энцефалит 2–6 недель назад, сейчас новое ухудшение</span></label>
+    <label class="chk"><input type="checkbox" id="subacute"><span>Подострое начало: память, психика, поведение — нарастают за дни–недели (&lt; 3 мес)</span></label>
+  </div>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Далее</button></div>
+</section>
+
+<!-- ШАГ 2 -->
+<section id="s2">
+  <div id="s2out"></div>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Далее</button></div>
+</section>
+
+<!-- ШАГ 3 -->
+<section id="s3">
+  <div class="card">
+    <h2>Ликвор</h2>
+    <div class="row">
+      <label class="f">Цитоз, клеток/мкл<input type="number" id="cells" inputmode="numeric" min="0"></label>
+      <label class="f">Нейтрофилы, %<input type="number" id="neut" inputmode="numeric" min="0" max="100"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label class="f">Белок, г/л<input type="number" id="prot" inputmode="decimal" min="0" step="0.01"></label>
+      <label class="f">Эритроциты, клеток/мкл<input type="number" id="rbc" inputmode="numeric" min="0"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label class="f">Глюкоза ликвора, ммоль/л<input type="number" id="glc" inputmode="decimal" min="0" step="0.1"></label>
+      <label class="f">Глюкоза крови, ммоль/л<input type="number" id="glb" inputmode="decimal" min="0" step="0.1"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label class="f">Дней от начала до ЛП<input type="number" id="lpday" inputmode="numeric" min="0"></label>
+      <label class="f">ПЦР ВПГ в ликворе<select id="pcr"><option value="">ждём</option><option value="pos">положительная</option><option value="neg">отрицательная</option></select></label>
+    </div>
+    <div id="csfout"></div>
+  </div>
+
+  <div class="card">
+    <h2>МРТ</h2>
+    <label class="f">Картина<select id="mri">
+      <option value="">не выполнена / ждём</option>
+      <option value="norm">Норма</option>
+      <option value="hsv">Асимметрично височные доли, островок, поясная извилина, геморрагии</option>
+      <option value="limbic">Двусторонне медиальные височные доли, симметрично, без геморрагий</option>
+      <option value="thal">Таламусы, базальные ганглии, ствол</option>
+      <option value="rhomb">Ствол и мозжечок (ромбэнцефалит)</option>
+      <option value="cortical">Лентовидный корковый сигнал на DWI</option>
+      <option value="multi">Множественные кортико-субкортикальные очаги FLAIR</option>
+      <option value="radial">Радиальное перивентрикулярное контрастирование</option>
+      <option value="vasc">Инфаркты, васкулопатия</option>
+      <option value="ring">Кольцевидные очаги</option>
+      <option value="wm">Очаги белого вещества без отёка и контраста</option>
+    </select></label>
+    <div id="mriout"></div>
+  </div>
+
+  <div class="card">
+    <h2>ЭЭГ</h2>
+    <label class="f">Находка<select id="eeg">
+      <option value="">не выполнена / ждём</option>
+      <option value="norm">Норма</option>
+      <option value="slow">Диффузное замедление</option>
+      <option value="temp">Височная эпилептиформная или медленноволновая активность</option>
+      <option value="lpd">Периодические латерализованные разряды в височных отведениях</option>
+      <option value="edb">Extreme delta brush</option>
+      <option value="ncse">Бессудорожный эпистатус</option>
+    </select></label>
+    <div id="eegout"></div>
+  </div>
+
+  <div class="card">
+    <h2>Итог по критериям</h2>
+    <div id="iec3"></div>
+    <div id="hsvout"></div>
+  </div>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Далее</button></div>
+</section>
+
+<!-- ШАГ 4 -->
+<section id="s4">
+  <div class="card">
+    <h2>Возможный аутоиммунный энцефалит (Graus 2016)</h2>
+    <p class="muted">Подострое начало и пункты из шагов 1 и 3 подставлены автоматически.</p>
+    <label class="chk"><input type="checkbox" id="g_excl"><span><b>Другие причины разумно исключены</b><small>Инфекция (ПЦР, посев), метаболические, токсические, сосудистые, опухоль</small></span></label>
+    <div id="grausout"></div>
+  </div>
+
+  <div class="card">
+    <h2>Анти-NMDAR: 6 групп симптомов</h2>
+    <label class="chk"><input type="checkbox" class="nm"><span>Нарушения поведения или когнитивных функций</span></label>
+    <label class="chk"><input type="checkbox" class="nm"><span>Нарушения речи (вербальная продукция, мутизм)</span></label>
+    <label class="chk"><input type="checkbox" class="nm" id="nm_seiz"><span>Судороги</span></label>
+    <label class="chk"><input type="checkbox" class="nm"><span>Двигательные нарушения: дискинезии, ригидность, патологические позы</span></label>
+    <label class="chk"><input type="checkbox" class="nm"><span>Снижение уровня сознания</span></label>
+    <label class="chk"><input type="checkbox" class="nm"><span>Вегетативная дисфункция или центральная гиповентиляция</span></label>
+    <label class="chk"><input type="checkbox" id="terat"><span>Найдена тератома</span></label>
+    <div id="nmdaout"></div>
+  </div>
+
+  <div class="card">
+    <h2>Какие антитела найдены?</h2>
+    <label class="f">Результат<select id="ab">
+      <option value="">ещё нет / отрицательно</option>
+      <option value="nmdar">NMDAR (GluN1)</option>
+      <option value="lgi1">LGI1</option>
+      <option value="caspr2">CASPR2</option>
+      <option value="gabab">GABA-B</option>
+      <option value="ampa">AMPAR</option>
+      <option value="gabaa">GABA-A</option>
+      <option value="gad">GAD65 (высокий титр)</option>
+      <option value="dppx">DPPX</option>
+      <option value="iglon5">IgLON5</option>
+      <option value="mog">MOG</option>
+      <option value="gfap">GFAP</option>
+      <option value="hu">Hu (ANNA-1)</option>
+      <option value="ma2">Ma2</option>
+      <option value="cv2">CV2/CRMP5</option>
+      <option value="amph">Амфифизин</option>
+      <option value="yo">Yo (PCA-1)</option>
+      <option value="ri">Ri (ANNA-2)</option>
+      <option value="sox1">SOX1</option>
+      <option value="klhl11">KLHL11</option>
+    </select></label>
+    <div id="about"></div>
+  </div>
+
+  <div class="card">
+    <h2>Иммунотерапия: сроки</h2>
+    <label class="f">Дата начала первой линии<input type="date" id="d1"></label>
+    <div id="itout"></div>
+  </div>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Далее</button></div>
+</section>
+
+<!-- ШАГ 5 -->
+<section id="s5">
+  <div class="card">
+    <h2>Сводка для истории болезни</h2>
+    <p class="muted">Текст собирается из введённых данных. Скопируйте и проверьте перед вставкой.</p>
+    <pre id="sum"></pre>
+    <div class="mbtns"><button id="copy">Скопировать</button><button id="reset" class="alt">Новый пациент</button></div>
+  </div>
+  <p class="foot">Помощник для врача, а не замена клиническому решению. Дозы — для взрослых; сверяйте с действующими клиническими рекомендациями и инструкциями к препаратам. Введённые данные никуда не отправляются и не сохраняются — после закрытия страницы они стираются. Подробный обзор: <a href="https://encefality-obzor.netlify.app/">Энцефалиты — полный разбор</a>. Источники: Venkatesan 2013 (International Encephalitis Consortium); Graus 2016, 2021; Titulaer 2013; рекомендации IDSA и ESCMID по бактериальному менингиту.</p><p class="copy">© 2026 Василий Дорогов, врач-невролог. Все права защищены. Копирование, переработка и распространение без письменного разрешения автора запрещены.</p>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Далее</button></div>
+</section>
+
+</div>
+<nav class="tabs"><button data-s="s1" class="on">Пациент</button><button data-s="s2">Старт</button><button data-s="s3">Ликвор</button><button data-s="s4">АИЭ</button><button data-s="s5">Сводка</button></nav>
+<script>
+const $=id=>document.getElementById(id);
+const v=id=>{const e=$(id);if(!e)return null;if(e.type==='checkbox')return e.checked;const x=e.value;return x===''?null:(e.type==='number'?Number(x):x)};
+const order=['s1','s2','s3','s4','s5'];
+let cur='s1';
+function show(s){cur=s;document.querySelectorAll('section').forEach(e=>e.classList.toggle('on',e.id===s));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));const N=['Пациент','Первые часы','Ликвор, МРТ, ЭЭГ','Аутоиммунный?','Сводка'];$('crumbs').innerHTML=N.map((x,i)=>`<span class="${order[i]===s?'on':''}">${i+1}. ${x}</span>`).join('');document.querySelectorAll('section .prev').forEach(b=>b.style.visibility=s==='s1'?'hidden':'visible');window.scrollTo(0,0);render()}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll('section .prev').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);if(i>0)show(order[i-1])});
+document.querySelectorAll('section .next').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);show(order[(i+1)%order.length])});
+document.addEventListener('input',render);document.addEventListener('change',render);
+
+const box=(cls,title,items,extra)=>`<div class="out ${cls}">${title?`<b class="t">${title}</b>`:''}${extra||''}${items&&items.length?'<ul>'+items.map(x=>'<li>'+x+'</li>').join('')+'</ul>':''}</div>`;
+const r50=x=>Math.round(x/50)*50;
+
+function crcl(){const a=v('age'),w=v('wt'),c=v('cr');if(!a||!w||!c)return null;return (140-a)*w*(v('sex')==='f'?1.04:1.23)/c}
+function acyclovir(){const w=v('wt'),cl=crcl();if(!w)return {txt:'10 мг/кг в/в каждые 8 ч (введите вес — посчитаю дозу)',short:'ацикловир 10 мг/кг в/в каждые 8 ч'};
+  const d=r50(10*w);let iv='каждые 8 ч',dd=d;
+  if(cl!==null){if(cl<10){dd=r50(5*w);iv='каждые 24 ч'}else if(cl<25)iv='каждые 24 ч';else if(cl<50)iv='каждые 12 ч'}
+  return {txt:`<span class="dose">${dd} мг в/в ${iv}</span> (10 мг/кг${cl!==null&&cl<10?' → 5 мг/кг':''}${cl!==null?`; КК ≈ ${Math.round(cl)} мл/мин`:''}), инфузия ≥ 1 ч, гидратация${w>100?'. При ожирении считать на скорректированную массу тела':''}`,short:`ацикловир ${dd} мг в/в ${iv}`}}
+
+function minors(){
+  const m=[];if(v('fever'))m.push('лихорадка');if(v('seiz')||v('eeg')==='ncse')m.push('судороги');if(v('focal'))m.push('очаговая симптоматика');
+  if(v('cells')!==null&&v('cells')>=5)m.push('цитоз ≥ 5');
+  const mri=v('mri');if(mri&&mri!=='norm'&&mri!=='wm')m.push('изменения на МРТ');
+  const e=v('eeg');if(e&&e!=='norm')m.push('изменения ЭЭГ');
+  return m}
+function iec(){const m=minors();if(!v('major'))return {cls:'info',t:'Большого критерия нет',d:'Без стойкого изменения сознания или поведения ≥ 24 ч критерии энцефалита не выполнены — ищите другую причину (энцефалопатия, менингит, психиатрия), но при сомнении лечите как энцефалит.',m};
+  if(m.length>=3)return {cls:'bad',t:'Вероятный энцефалит',d:`Большой + ${m.length} малых: ${m.join(', ')}.`,m};
+  if(m.length===2)return {cls:'warn',t:'Возможный энцефалит',d:`Большой + 2 малых: ${m.join(', ')}.`,m};
+  return {cls:'warn',t:'Пока критериев недостаточно',d:`Большой критерий + ${m.length} малых${m.length?': '+m.join(', '):''}. Нужно ≥ 2 для «возможного».`,m}}
+
+function needCT(){const r=[];if(v('focal'))r.push('очаговая симптоматика');if(v('seiz'))r.push('судороги');if(v('ct_gcs'))r.push('угнетение сознания');if(v('imm'))r.push('иммуносупрессия');if(v('ct_papil'))r.push('отёк диска');return r}
+
+function ordersLP(){
+  const base=['Давление открытия; цитоз с формулой, белок, глюкоза (+ парная глюкоза крови), лактат','ПЦР ВПГ-1/2, ВЗВ, энтеровирусы','Окраска по Граму, посев','Олигоклональные полосы (парно с сывороткой)','<b>Заморозить 5–10 мл ликвора и сыворотку</b> до старта стероидов'];
+  const add=[];
+  if(v('imm'))add.push('ПЦР ЦМВ, ВЭБ, ВГЧ-6, JC-вирус; токсоплазма; криптококковый антиген; цитология + проточная цитометрия');
+  if(v('tick'))add.push('IgM/IgG к вирусу клещевого энцефалита и к боррелиям — парно ликвор + сыворотка (интратекальный индекс)');
+  if(v('south'))add.push('IgM к вирусу Западного Нила в ликворе и сыворотке');
+  if(v('subacute')||v('posthsv'))add.push('Антитела: NMDAR в ликворе + LGI1/CASPR2 в сыворотке + скрининг на срезах мозга (см. шаг 4)');
+  if((v('age')||0)>50||v('imm'))add.push('Listeria: посев и ПЦР');
+  return {base,add}}
+function bloods(){const b=['ОАК, СРБ, прокальцитонин','Na, глюкоза, креатинин, печёночные пробы, аммиак','Посевы крови до антибиотиков','ВИЧ (антиген p24 + антитела)','Сифилис: трепонемный тест + РМП/RPR','ТТГ, токсикология по показаниям'];if(v('tick'))b.push('Клещевой энцефалит IgM/IgG, боррелии IgM/IgG');return b}
+
+function renderS1(){const cl=crcl();$('crcl').textContent=cl!==null?`Клиренс креатинина (Кокрофт–Голт) ≈ ${Math.round(cl)} мл/мин`:'Введите возраст, вес и креатинин — посчитаю клиренс и дозу ацикловира.';
+  const r=iec();$('iec1').innerHTML=box(r.cls,r.t,null,r.d)}
+
+function renderS2(){
+  const a=acyclovir(),ct=needCT(),o=ordersLP(),age=v('age')||0,w=v('wt');
+  let h='';
+  h+=box('bad','Сразу, в первые 6 часов',[`Ацикловир: ${a.txt}. Не ждать ЛП и МРТ.`+(v('rash')||v('imm')?' При ВЗВ доза 10–15 мг/кг.':'')]);
+  if(v('bact')){const items=[`Дексаметазон <span class="dose">10 мг в/в</span> за 10–20 мин до первой дозы антибиотика или одновременно, далее 10 мг каждые 6 ч, 4 дня. Отменить, если бактериальный менингит исключён`,`Цефтриаксон <span class="dose">2 г в/в каждые 12 ч</span>`,`Ванкомицин <span class="dose">${w?r50(15*w)+'–'+r50(20*w)+' мг':'15–20 мг/кг'} в/в каждые 8–12 ч</span> — по концентрации в крови`];
+    if(age>50||v('imm'))items.push('Ампициллин <span class="dose">2 г в/в каждые 4 ч</span> (Listeria)');
+    h+=box('bad','Не исключён бактериальный менингит',items)}
+  h+=ct.length?box('warn','КТ перед пункцией',[`Показания: ${ct.join(', ')}`,'Лечение (ацикловир, антибиотики) не откладывать из-за КТ']):box('ok','КТ перед пункцией не обязательна',['Показаний нет — пунктировать сразу']);
+  h+=box('info','Кровь',bloods());
+  h+=box('info','Люмбальная пункция — что заказать',o.base.concat(o.add));
+  h+=box('info','В первые 24–48 часов',['МРТ: T1, T2, FLAIR, DWI/ADC, SWI, T1 с контрастом','ЭЭГ — не пропустить бессудорожный статус, особенно при угнетении сознания']);
+  if(v('posthsv'))h+=box('warn','После ВПГ-энцефалита',['Новое ухудшение через 2–6 недель — повторная ЛП с ПЦР ВПГ и антителами к NMDAR в ликворе','Постинфекционный анти-NMDAR энцефалит лечится иммунотерапией, а не ацикловиром']);
+  $('s2out').innerHTML=h}
+
+function renderS3(){
+  const c=v('cells'),n=v('neut'),p=v('prot'),gc=v('glc'),gb=v('glb'),rbc=v('rbc');let it=[],cls='info',t='Ликвор';
+  if(c!==null){
+    if(c<5){it.push('Цитоз в норме — не исключает энцефалит (ранняя стадия, LGI1, NMDAR, иммуносупрессия)');}
+    else if(c<=500){it.push(`Плеоцитоз ${c}/мкл`+(n!==null&&n>50?' с преобладанием нейтрофилов — в первые часы бывает и при вирусном, но думать о бактериальном':' — типично для вирусного и аутоиммунного процесса'));}
+    else{it.push(`Выраженный плеоцитоз ${c}/мкл — исключать бактериальный, туберкулёзный, грибковый процесс`);cls='warn'}
+  }
+  if(gc!==null&&gb){const r=gc/gb;it.push(`Глюкоза ликвор/кровь = ${r.toFixed(2)}`+(r<0.5?' — <b>снижена</b>: бактериальный, туберкулёзный (+ аденозиндезаминаза, ПЦР GeneXpert MTB/RIF Ultra, посев на микобактерии), грибковый процесс, карциноматоз':' — норма'));if(r<0.5)cls='bad'}
+  if(p!==null)it.push(`Белок ${p} г/л`+(p>1?' — значительно повышен: бактериальный, ТБ, блок':p>0.45?' — умеренно повышен':' — норма'));
+  if(rbc!==null&&rbc>50)it.push('Эритроциты в ликворе — бывают при ВПГ (геморрагический некроз) и при травматичной пункции');
+  $('csfout').innerHTML=it.length?box(cls,t,it):'';
+
+  const M={norm:['info','МРТ в норме',['Типично для анти-NMDAR, раннего ВПГ, клещевого энцефалита, септической и метаболической энцефалопатии','Норма не исключает энцефалит — повторить МРТ при сохранении симптомов']],
+    hsv:['bad','Паттерн ВПГ',['Продолжать ацикловир; при отрицательной ранней ПЦР — повторная ЛП','Дифференциальный ряд: нейросифилис, лимбический энцефалит, эпистатус']],
+    limbic:['warn','Лимбический энцефалит',['Аутоиммунный: LGI1, GABA-B, AMPA, онконевральные Hu, Ma2','Инфекция: ВГЧ-6 (после трансплантации), ВПГ, нейросифилис','С этой находкой критерии «определённого лимбического» выполнимы — см. шаг 4']],
+    thal:['warn','Таламусы, базальные ганглии, ствол',['Клещевой энцефалит, Западного Нила','Острая некротизирующая энцефалопатия (грипп, SARS-CoV-2)','Вернике, тромбоз глубоких вен, Крейцфельдт–Якоб']],
+    rhomb:['bad','Ромбэнцефалит',['Listeria — ампициллин, если ещё не назначен','Энтеровирус 71, Бехчет, KLHL11, Ma2, CLIPPERS, лимфома']],
+    cortical:['warn','Корковый сигнал на DWI',['Крейцфельдт–Якоб (белок 14-3-3, RT-QuIC)','Постиктальные изменения, гипогликемия, MELAS']],
+    multi:['warn','Множественные кортико-субкортикальные очаги',['GABA-A (часто с рефрактерным эпистатусом), ОРЭМ, MOG']],
+    radial:['warn','Радиальное контрастирование',['GFAP-астроцитопатия — антитела к GFAP в ликворе; искать тератому']],
+    vasc:['warn','Инфаркты, васкулопатия',['ВЗВ-васкулопатия (ПЦР и IgG к ВЗВ в ликворе)','Нейросифилис, ТБ, васкулит ЦНС']],
+    ring:['warn','Кольцевидные очаги',['Токсоплазмоз, абсцесс, лимфома, туберкулёма — оценить иммунный статус']],
+    wm:['info','Очаги белого вещества',['ПМЛ (JC-вирус) при иммуносупрессии; ОРЭМ; демиелинизация']]};
+  const mr=v('mri');$('mriout').innerHTML=mr&&M[mr]?box(M[mr][0],M[mr][1],M[mr][2]):'';
+  const E={norm:['info','ЭЭГ в норме',['У пациента с «психозом» делает органическую причину менее вероятной, но не исключает']],slow:['info','Диффузное замедление',['Неспецифично: энцефалит или энцефалопатия']],temp:['warn','Височная активность',['Поддерживает лимбический энцефалит (критерий Graus)']],lpd:['bad','Латерализованные периодические разряды',['В пользу ВПГ-энцефалита']],edb:['warn','Extreme delta brush',['Характерно для анти-NMDAR энцефалита']],ncse:['bad','Бессудорожный эпистатус',['Противоэпилептическая терапия по протоколу эпистатуса','Без ясной причины (NORSE) — искать аутоиммунный процесс, рано обсуждать иммунотерапию']]};
+  const e=v('eeg');$('eegout').innerHTML=e&&E[e]?box(E[e][0],E[e][1],E[e][2]):'';
+
+  const r=iec();$('iec3').innerHTML=box(r.cls,r.t,null,r.d);
+  const pcr=v('pcr'),d=v('lpday');let hs='';
+  if(pcr==='pos')hs=box('bad','ПЦР ВПГ положительная',['Ацикловир 14–21 день; перед отменой — по возможности повторная ПЦР','Через 2–6 недель возможен анти-NMDAR энцефалит — предупредить родственников']);
+  else if(pcr==='neg'){if(d!==null&&d<=3)hs=box('warn','ПЦР отрицательная, но ЛП в первые 72 ч',['Не отменять ацикловир','Повторная ЛП через 3–7 дней']);
+    else if(mr==='hsv')hs=box('warn','ПЦР отрицательная, но МРТ типична для ВПГ',['Продолжать ацикловир, повторить ПЦР','Подумать об интратекальных антителах к ВПГ (после 10–14 дня)']);
+    else hs=box('ok','ПЦР отрицательная, ЛП позже 72 ч',['Если МРТ не типична для ВПГ и есть другое объяснение — ацикловир можно отменить','Если причина не найдена — шаг 4: аутоиммунный энцефалит']);}
+  $('hsvout').innerHTML=hs}
+
+function renderS4(){
+  const sub=v('subacute'),c=v('cells'),mr=v('mri'),e=v('eeg');
+  const one=[];if(v('focal'))one.push('очаговая симптоматика');if(v('seiz')||e==='ncse')one.push('судороги');if(c!==null&&c>5)one.push('плеоцитоз > 5');if(mr&&['limbic','multi','radial','thal','rhomb'].includes(mr))one.push('МРТ-картина энцефалита');
+  let g;
+  if(!sub)g=box('info','Нет подострого начала',['Отметьте на шаге 1 пункт «Подострое начало» (&lt; 3 мес), если он есть']);
+  else if(!one.length)g=box('warn','Не хватает второго условия',['Нужен хотя бы один пункт: очаговая симптоматика, судороги, плеоцитоз > 5, МРТ-картина']);
+  else if(!v('g_excl'))g=box('warn','Почти выполнено',[`Подострое начало + ${one.join(', ')}`,'Осталось: разумно исключить другие причины']);
+  else g=box('bad','Возможный аутоиммунный энцефалит',[`Подострое начало + ${one.join(', ')} + исключены другие причины`,'<b>Можно начинать иммунотерапию первой линии, не дожидаясь антител</b>']);
+  const lim=sub&&mr==='limbic'&&((c!==null&&c>5)||e==='temp');
+  if(lim&&v('g_excl'))g+=box('bad','Определённый аутоиммунный лимбический энцефалит',['Двусторонние изменения медиальных височных долей + плеоцитоз или височная активность на ЭЭГ']);
+  g+=box('info','Антитела — что заказать (Москва)',['<b>Гемотест:</b> NMDAR в ликворе (5 990 ₽), LGI1 + CASPR2 в сыворотке (6 720 ₽), скрининг на срезах мозга в ликворе (5 880 ₽), онконевральный блот (5 780 ₽)','<b>ИНВИТРО:</b> панель NMDAR, LGI1, CASPR2, AMPA1/2, GABA-B — сыворотка № 1582СВ или ликвор № 1582 (~15,5 тыс. ₽); уточнить, выполняется ли','Не путать с «антителами к NR2 субъединице» (ИФА) — это не тест на анти-NMDAR энцефалит']);
+  $('grausout').innerHTML=g;
+
+  const nm=[...document.querySelectorAll('.nm')].filter(x=>x.checked).length,t=v('terat');const sup=(c!==null&&c>5)||(e&&e!=='norm');let nh='';
+  if(nm>=4&&sup)nh=box('bad','Вероятный анти-NMDAR энцефалит',[`${nm} из 6 групп + ${c>5?'плеоцитоз':'изменения ЭЭГ'}`,'Подтверждение — IgG к GluN1 в ликворе','Поиск тератомы: МРТ малого таза + УЗИ (женщины), УЗИ яичек (мужчины)']);
+  else if(nm>=3&&t)nh=box('bad','Вероятный анти-NMDAR энцефалит',['3 группы + тератома']);
+  else if(nm>0)nh=box('info',`${nm} из 6 групп`,[nm>=4?'Нужны изменения ЭЭГ или плеоцитоз/олигоклональные полосы':'Для «вероятного» нужно ≥ 4 групп (или 3 + тератома)']);
+  $('nmdaout').innerHTML=nh;
+
+  const A={nmdar:['Анти-NMDAR','Тератома яичника (женщины 12–45 лет) — МРТ малого таза, УЗИ; мужчины — УЗИ яичек','Катания и возбуждение — бензодиазепины; антипсихотики осторожно (риск ЗНС). Хороший исход у ~80% к 2 годам'],
+    lgi1:['LGI1','Опухоль редко (тимома) — КТ грудной клетки','Фациобрахиальные дистонические приступы лучше отвечают на стероиды, чем на ПЭП; гипонатриемия (СНСАДГ) — корригировать не быстрее 8–10 ммоль/л в сутки'],
+    caspr2:['CASPR2','Тимома, особенно при синдроме Морвана — КТ средостения','Нейромиотония, боль, инсомния'],
+    gabab:['GABA-B','Мелкоклеточный рак лёгкого (~50%) — КТ грудной клетки, при отрицательном ПЭТ-КТ','Тяжёлые ранние приступы'],
+    ampa:['AMPAR','Тимома, мелкоклеточный рак, рак молочной железы — КТ грудной клетки, маммография','Склонность к рецидивам'],
+    gabaa:['GABA-A','Тимома — КТ средостения','Рефрактерный эпистатус, множественные очаги FLAIR'],
+    gad:['GAD65','Редко','Хроническое течение, ответ на иммунотерапию часто неполный; значим только высокий титр или интратекальный синтез'],
+    dppx:['DPPX','B-клеточная лимфома (редко)','Диарея и потеря веса перед неврологией'],
+    iglon5:['IgLON5','Нет','Нарушения сна, бульбарные симптомы; ответ на иммунотерапию ограничен'],
+    mog:['MOG','Нет','Кортикальный энцефалит (FLAMES), ОРЭМ; стероиды'],
+    gfap:['GFAP','Тератома в части случаев','Менингоэнцефаломиелит; хороший ответ на стероиды, возможны рецидивы'],
+    hu:['Hu (высокий риск рака)','Мелкоклеточный рак лёгкого — КТ грудной клетки, ПЭТ-КТ','T-клеточный процесс: лечение опухоли + циклофосфамид; цель — стабилизация'],
+    ma2:['Ma2','Герминогенная опухоль яичка (молодые), рак лёгкого — УЗИ яичек, АФП, β-ХГЧ, КТ грудной клетки','Диэнцефальный и стволовой энцефалит'],
+    cv2:['CV2/CRMP5','Мелкоклеточный рак, тимома — КТ грудной клетки','Хорея, оптическая нейропатия'],
+    amph:['Амфифизин','Рак молочной железы, мелкоклеточный рак — маммография/МРТ, КТ','Синдром ригидного человека'],
+    yo:['Yo','Рак яичника, молочной железы — МРТ малого таза, маммография','Мозжечковая дегенерация'],
+    ri:['Ri','Рак молочной железы, лёгкого','Опсоклонус-миоклонус, стволовой энцефалит'],
+    sox1:['SOX1','Мелкоклеточный рак — КТ грудной клетки','Ламберт–Итон, мозжечковый синдром'],
+    klhl11:['KLHL11','Семинома — УЗИ яичек','Ромбэнцефалит']};
+  const ab=v('ab');let ah='';
+  if(ab&&A[ab]){const x=A[ab];const high=['hu','ma2','cv2','amph','yo','ri','sox1','klhl11'].includes(ab);
+    ah=box(high?'bad':'warn',x[0],[`<b>Поиск опухоли:</b> ${x[1]}`,x[2],high?'Опухоль не найдена — повторять скрининг каждые 4–6 мес в течение 2 лет':'Низкий титр в сыворотке без типичной клиники — осторожно, возможна ложноположительность'])}
+  else ah=box('info','Антитела не найдены',['Отрицательная панель не исключает аутоиммунный энцефалит (серонегативный)','Если выполнены критерии «возможного» и других причин нет — лечение как при аутоиммунном']);
+  $('about').innerHTML=ah;
+
+  const d1=v('d1');let ih=box('info','Первая линия',['Метилпреднизолон 1 г в/в в сутки, 5 дней, далее перорально со снижением','В тяжёлых случаях сразу + ВВИГ 2 г/кг на 5 дней'+(v('wt')?` (≈ ${Math.round(v('wt')*2)} г всего)`:'')+' или плазмаферез 5–7 сеансов']);
+  if(d1){const dt=new Date(d1),f=x=>{const y=new Date(dt);y.setDate(y.getDate()+x);return y.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})};
+    ih+=box('warn','Контрольные точки',[`<b>${f(10)}–${f(14)}</b>: нет значимого улучшения — вторая линия: ритуксимаб 1000 мг × 2 с интервалом 2 недели (или 375 мг/м² × 4), при тяжёлом течении — циклофосфамид 750 мг/м²`,`<b>${f(28)}</b>: оценка по шкале CASE и mRS; лечение начато в первые 4 недели — лучший прогноз (NEOS)`,'Повторный поиск опухоли при плохом ответе'])}
+  $('itout').innerHTML=ih}
+
+function renderS5(){
+  const L=[];const a=v('age'),w=v('wt');
+  L.push(`Пациент: ${a??'—'} лет, ${v('sex')==='f'?'ж':'м'}, вес ${w??'—'} кг`+(crcl()!==null?`, КК ≈ ${Math.round(crcl())} мл/мин`:''));
+  const r=iec();L.push(`Критерии IEC: ${r.t.toLowerCase()} (${r.m.length} малых${r.m.length?': '+r.m.join(', '):''})`);
+  L.push(`Назначено: ${acyclovir().short}`+(v('bact')?'; дексаметазон 10 мг каждые 6 ч, цефтриаксон 2 г каждые 12 ч, ванкомицин'+(((a||0)>50||v('imm'))?', ампициллин 2 г каждые 4 ч':''):''));
+  const ct=needCT();L.push(ct.length?`КТ перед ЛП: показана (${ct.join(', ')})`:'КТ перед ЛП: показаний нет');
+  const c=v('cells');if(c!==null)L.push(`Ликвор: цитоз ${c}/мкл`+(v('neut')!==null?` (нейтрофилы ${v('neut')}%)`:'')+(v('prot')!==null?`, белок ${v('prot')} г/л`:'')+(v('glc')!==null&&v('glb')?`, глюкоза ${v('glc')}/${v('glb')} (${(v('glc')/v('glb')).toFixed(2)})`:''));
+  const pcr=v('pcr');if(pcr)L.push(`ПЦР ВПГ: ${pcr==='pos'?'положительная':'отрицательная'}`+(v('lpday')!==null?` (ЛП на ${v('lpday')}-й день)`:''));
+  const mri=$('mri');if(mri.value)L.push('МРТ: '+mri.options[mri.selectedIndex].text);
+  const eeg=$('eeg');if(eeg.value)L.push('ЭЭГ: '+eeg.options[eeg.selectedIndex].text);
+  const ab=$('ab');if(ab.value)L.push('Антитела: '+ab.options[ab.selectedIndex].text);
+  const o=ordersLP();if(o.add.length)L.push('Дополнительно к стандарту ЛП: '+o.add.map(x=>x.replace(/<[^>]+>/g,'')).join('; '));
+  $('sum').textContent=L.join('\n')}
+
+function render(){renderS1();renderS2();renderS3();renderS4();renderS5()}
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('sum').textContent);$('copy').textContent='Скопировано'}catch(e){$('copy').textContent='Не удалось — выделите текст вручную'}setTimeout(()=>$('copy').textContent='Скопировать',1800)};
+$('reset').onclick=()=>{document.querySelectorAll('input').forEach(i=>{if(i.type==='checkbox')i.checked=false;else i.value=''});document.querySelectorAll('select').forEach(s=>s.selectedIndex=0);show('s1')};
+show('s1');
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('/encef-r7m2kx-sw.js',{scope:'/encef-r7m2kx'}).catch(()=>{});
+</script>
+</body>
+</html>
