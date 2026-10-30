@@ -1,4 +1,4 @@
-const CACHE='encef-r7m2kx-v2';
+const CACHE='encef-r7m2kx-v4';
 const CORE=['/encef-r7m2kx.html','/encef-r7m2kx.webmanifest','/encef-icon-192.png','/encef-icon-512.png','/encef-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('encef-r7m2kx-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});

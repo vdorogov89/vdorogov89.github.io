@@ -80,11 +80,15 @@ a{color:var(--acc);}
     <h2>Пациент</h2>
     <div class="row">
       <label class="f">Возраст, лет<input type="number" id="age" inputmode="numeric" min="0" max="110"></label>
-      <label class="f">Вес, кг<input type="number" id="wt" inputmode="decimal" min="1" max="300"></label>
+      <label class="f">Пол<select id="sex"><option value="m">Мужской</option><option value="f">Женский</option></select></label>
     </div>
     <div class="row" style="margin-top:10px">
-      <label class="f">Пол<select id="sex"><option value="m">Мужской</option><option value="f">Женский</option></select></label>
+      <label class="f">Вес, кг<input type="number" id="wt" inputmode="decimal" min="1" max="300"></label>
+      <label class="f">Рост, см<input type="number" id="ht" inputmode="numeric" min="100" max="230"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
       <label class="f">Креатинин, мкмоль/л<input type="number" id="cr" inputmode="decimal" min="10" max="2000"></label>
+      <span></span>
     </div>
     <p class="muted" id="crcl"></p>
   </div>
@@ -151,20 +155,7 @@ a{color:var(--acc);}
 
   <div class="card">
     <h2>МРТ</h2>
-    <label class="f">Картина<select id="mri">
-      <option value="">не выполнена / ждём</option>
-      <option value="norm">Норма</option>
-      <option value="hsv">Асимметрично височные доли, островок, поясная извилина, геморрагии</option>
-      <option value="limbic">Двусторонне медиальные височные доли, симметрично, без геморрагий</option>
-      <option value="thal">Таламусы, базальные ганглии, ствол</option>
-      <option value="rhomb">Ствол и мозжечок (ромбэнцефалит)</option>
-      <option value="cortical">Лентовидный корковый сигнал на DWI</option>
-      <option value="multi">Множественные кортико-субкортикальные очаги FLAIR</option>
-      <option value="radial">Радиальное перивентрикулярное контрастирование</option>
-      <option value="vasc">Инфаркты, васкулопатия</option>
-      <option value="ring">Кольцевидные очаги</option>
-      <option value="wm">Очаги белого вещества без отёка и контраста</option>
-    </select></label>
+    <p class="muted">Отметьте только то, что есть у пациента.</p><label class="chk"><input type="checkbox" class="mf" data-k="norm" data-l="Норма"><span>Норма</span></label><label class="chk"><input type="checkbox" class="mf" data-k="t_uni" data-l="Височная доля — одна сторона"><span>Височная доля — одна сторона</span></label><label class="chk"><input type="checkbox" class="mf" data-k="t_bi" data-l="Височные доли — обе"><span>Височные доли — обе</span></label><label class="chk"><input type="checkbox" class="mf" data-k="medial" data-l="Преимущественно медиальные отделы (гиппокамп, миндалина)"><span>Преимущественно медиальные отделы (гиппокамп, миндалина)</span></label><label class="chk"><input type="checkbox" class="mf" data-k="insula" data-l="Островок"><span>Островок</span></label><label class="chk"><input type="checkbox" class="mf" data-k="cing" data-l="Поясная извилина"><span>Поясная извилина</span></label><label class="chk"><input type="checkbox" class="mf" data-k="hem" data-l="Геморрагии (SWI / T2*)"><span>Геморрагии (SWI / T2*)</span></label><label class="chk"><input type="checkbox" class="mf" data-k="dwi" data-l="Ограничение диффузии в зоне поражения"><span>Ограничение диффузии в зоне поражения</span></label><label class="chk"><input type="checkbox" class="mf" data-k="thal" data-l="Таламусы, базальные ганглии"><span>Таламусы, базальные ганглии</span></label><label class="chk"><input type="checkbox" class="mf" data-k="stem" data-l="Ствол, мозжечок"><span>Ствол, мозжечок</span></label><label class="chk"><input type="checkbox" class="mf" data-k="ctx" data-l="Лентовидный корковый сигнал на DWI"><span>Лентовидный корковый сигнал на DWI</span></label><label class="chk"><input type="checkbox" class="mf" data-k="multi" data-l="Множественные кортико-субкортикальные очаги FLAIR"><span>Множественные кортико-субкортикальные очаги FLAIR</span></label><label class="chk"><input type="checkbox" class="mf" data-k="radial" data-l="Радиальное перивентрикулярное контрастирование"><span>Радиальное перивентрикулярное контрастирование</span></label><label class="chk"><input type="checkbox" class="mf" data-k="vasc" data-l="Инфаркты, васкулопатия"><span>Инфаркты, васкулопатия</span></label><label class="chk"><input type="checkbox" class="mf" data-k="ring" data-l="Кольцевидные очаги"><span>Кольцевидные очаги</span></label><label class="chk"><input type="checkbox" class="mf" data-k="wm" data-l="Очаги белого вещества без отёка и контраста"><span>Очаги белого вещества без отёка и контраста</span></label>
     <div id="mriout"></div>
   </div>
 
@@ -274,22 +265,29 @@ document.addEventListener('input',render);document.addEventListener('change',ren
 const box=(cls,title,items,extra)=>`<div class="out ${cls}">${title?`<b class="t">${title}</b>`:''}${extra||''}${items&&items.length?'<ul>'+items.map(x=>'<li>'+x+'</li>').join('')+'</ul>':''}</div>`;
 const r50=x=>Math.round(x/50)*50;
 
-function crcl(){const a=v('age'),w=v('wt'),c=v('cr');if(!a||!w||!c)return null;return (140-a)*w*(v('sex')==='f'?1.04:1.23)/c}
-function acyclovir(){const w=v('wt'),cl=crcl();if(!w)return {txt:'10 мг/кг в/в каждые 8 ч (введите вес — посчитаю дозу)',short:'ацикловир 10 мг/кг в/в каждые 8 ч'};
+function mf(){const o={},L=[];document.querySelectorAll('.mf').forEach(x=>{if(x.checked){o[x.dataset.k]=true;L.push(x.dataset.l.charAt(0).toLowerCase()+x.dataset.l.slice(1))}});
+  const tem=o.t_uni||o.t_bi;o.any=L.length>0;o.labels=L;o.abn=Object.keys(o).some(k=>!['norm','wm','any','labels'].includes(k)&&o[k]===true);
+  o.hsv=!!(tem&&(o.hem||o.insula||o.cing));o.limbic=!!(o.t_bi&&o.medial&&!o.hem&&!o.insula&&!o.cing);
+  o.suggest=!!(tem||o.multi||o.radial||o.thal||o.stem);return o}
+function bw(){const w=v('wt'),h=v('ht');if(!w)return null;let ibw=null,abw=null,bmi=null,obese=false;
+  if(h&&h>=120){ibw=(v('sex')==='f'?45.5:50)+0.9*(h-152.4);bmi=w/((h/100)**2);if(w>1.2*ibw){obese=true;abw=ibw+0.4*(w-ibw)}}
+  return {w,ibw,abw,bmi,obese,dw:obese?abw:w}}
+function crcl(){const a=v('age'),b=bw(),c=v('cr');if(!a||!b||!c)return null;return (140-a)*b.dw*(v('sex')==='f'?1.04:1.23)/c}
+function acyclovir(){const b=bw(),w=b?b.dw:null,cl=crcl();if(!w)return {txt:'10 мг/кг в/в каждые 8 ч (введите вес — посчитаю дозу)',short:'ацикловир 10 мг/кг в/в каждые 8 ч'};
   const d=r50(10*w);let iv='каждые 8 ч',dd=d;
   if(cl!==null){if(cl<10){dd=r50(5*w);iv='каждые 24 ч'}else if(cl<25)iv='каждые 24 ч';else if(cl<50)iv='каждые 12 ч'}
-  return {txt:`<span class="dose">${dd} мг в/в ${iv}</span> (10 мг/кг${cl!==null&&cl<10?' → 5 мг/кг':''}${cl!==null?`; КК ≈ ${Math.round(cl)} мл/мин`:''}), инфузия ≥ 1 ч, гидратация${w>100?'. При ожирении считать на скорректированную массу тела':''}`,short:`ацикловир ${dd} мг в/в ${iv}`}}
+  return {txt:`<span class="dose">${dd} мг в/в ${iv}</span> (10 мг/кг${cl!==null&&cl<10?' → 5 мг/кг':''}${cl!==null?`; КК ≈ ${Math.round(cl)} мл/мин`:''}), инфузия ≥ 1 ч, гидратация${b.obese?`. Доза на скорректированную массу ${Math.round(b.abw)} кг (фактическая ${b.w}, идеальная ${Math.round(b.ibw)})`:(!v('ht')&&b.w>100?'. Вес > 100 кг — введите рост, чтобы пересчитать дозу на скорректированную массу':'')}`,short:`ацикловир ${dd} мг в/в ${iv}`}}
 
 function minors(){
   const m=[];if(v('fever'))m.push('лихорадка');if(v('seiz')||v('eeg')==='ncse')m.push('судороги');if(v('focal'))m.push('очаговая симптоматика');
   if(v('cells')!==null&&v('cells')>=5)m.push('цитоз ≥ 5');
-  const mri=v('mri');if(mri&&mri!=='norm'&&mri!=='wm')m.push('изменения на МРТ');
+  if(mf().abn)m.push('изменения на МРТ');
   const e=v('eeg');if(e&&e!=='norm')m.push('изменения ЭЭГ');
   return m}
 function iec(){const m=minors();if(!v('major'))return {cls:'info',t:'Большого критерия нет',d:'Без стойкого изменения сознания или поведения ≥ 24 ч критерии энцефалита не выполнены — ищите другую причину (энцефалопатия, менингит, психиатрия), но при сомнении лечите как энцефалит.',m};
-  if(m.length>=3)return {cls:'bad',t:'Вероятный энцефалит',d:`Большой + ${m.length} малых: ${m.join(', ')}.`,m};
-  if(m.length===2)return {cls:'warn',t:'Возможный энцефалит',d:`Большой + 2 малых: ${m.join(', ')}.`,m};
-  return {cls:'warn',t:'Пока критериев недостаточно',d:`Большой критерий + ${m.length} малых${m.length?': '+m.join(', '):''}. Нужно ≥ 2 для «возможного».`,m}}
+  if(m.length>=3)return {cls:'bad',t:'Вероятный энцефалит',d:`Большой критерий (изменение сознания или поведения ≥ 24 ч) + ${m.length} малых: ${m.join(', ')}.`,m};
+  if(m.length===2)return {cls:'warn',t:'Возможный энцефалит',d:`Большой критерий (изменение сознания или поведения ≥ 24 ч) + 2 малых: ${m.join(', ')}.`,m};
+  return {cls:'warn',t:'Пока критериев недостаточно',d:`Большой критерий (изменение сознания или поведения ≥ 24 ч) + ${m.length} малых${m.length?': '+m.join(', '):''}. Нужно ≥ 2 для «возможного».`,m}}
 
 function needCT(){const r=[];if(v('focal'))r.push('очаговая симптоматика');if(v('seiz'))r.push('судороги');if(v('ct_gcs'))r.push('угнетение сознания');if(v('imm'))r.push('иммуносупрессия');if(v('ct_papil'))r.push('отёк диска');return r}
 
@@ -304,14 +302,14 @@ function ordersLP(){
   return {base,add}}
 function bloods(){const b=['ОАК, СРБ, прокальцитонин','Na, глюкоза, креатинин, печёночные пробы, аммиак','Посевы крови до антибиотиков','ВИЧ (антиген p24 + антитела)','Сифилис: трепонемный тест + РМП/RPR','ТТГ, токсикология по показаниям'];if(v('tick'))b.push('Клещевой энцефалит IgM/IgG, боррелии IgM/IgG');return b}
 
-function renderS1(){const cl=crcl();$('crcl').textContent=cl!==null?`Клиренс креатинина (Кокрофт–Голт) ≈ ${Math.round(cl)} мл/мин`:'Введите возраст, вес и креатинин — посчитаю клиренс и дозу ацикловира.';
+function renderS1(){const cl=crcl(),b=bw();let t=cl!==null?`Клиренс креатинина (Кокрофт–Голт) ≈ ${Math.round(cl)} мл/мин`:'Введите возраст, вес и креатинин — посчитаю клиренс и дозу ацикловира.';if(b&&b.ibw){t+=` · ИМТ ${b.bmi.toFixed(1)}, идеальная масса ${Math.round(b.ibw)} кг`+(b.obese?` · ожирение: дозы ацикловира, ВВИГ и клиренс — на скорректированную массу ${Math.round(b.abw)} кг`:'')}$('crcl').textContent=t;
   const r=iec();$('iec1').innerHTML=box(r.cls,r.t,null,r.d)}
 
 function renderS2(){
   const a=acyclovir(),ct=needCT(),o=ordersLP(),age=v('age')||0,w=v('wt');
   let h='';
   h+=box('bad','Сразу, в первые 6 часов',[`Ацикловир: ${a.txt}. Не ждать ЛП и МРТ.`+(v('rash')||v('imm')?' При ВЗВ доза 10–15 мг/кг.':'')]);
-  if(v('bact')){const items=[`Дексаметазон <span class="dose">10 мг в/в</span> за 10–20 мин до первой дозы антибиотика или одновременно, далее 10 мг каждые 6 ч, 4 дня. Отменить, если бактериальный менингит исключён`,`Цефтриаксон <span class="dose">2 г в/в каждые 12 ч</span>`,`Ванкомицин <span class="dose">${w?r50(15*w)+'–'+r50(20*w)+' мг':'15–20 мг/кг'} в/в каждые 8–12 ч</span> — по концентрации в крови`];
+  if(v('bact')){const items=[`Дексаметазон <span class="dose">10 мг в/в</span> за 10–20 мин до первой дозы антибиотика или одновременно, далее 10 мг каждые 6 ч, 4 дня. Отменить, если бактериальный менингит исключён`,`Цефтриаксон <span class="dose">2 г в/в каждые 12 ч</span>`,`Ванкомицин <span class="dose">${w?Math.min(2000,r50(15*w))+'–'+Math.min(2000,r50(20*w))+' мг':'15–20 мг/кг'} в/в каждые 8–12 ч</span> — на фактический вес (и при ожирении), разовая доза не более 2 г; дальше по концентрации в крови`];
     if(age>50||v('imm'))items.push('Ампициллин <span class="dose">2 г в/в каждые 4 ч</span> (Listeria)');
     h+=box('bad','Не исключён бактериальный менингит',items)}
   h+=ct.length?box('warn','КТ перед пункцией',[`Показания: ${ct.join(', ')}`,'Лечение (ацикловир, антибиотики) не откладывать из-за КТ']):box('ok','КТ перед пункцией не обязательна',['Показаний нет — пунктировать сразу']);
@@ -333,18 +331,24 @@ function renderS3(){
   if(rbc!==null&&rbc>50)it.push('Эритроциты в ликворе — бывают при ВПГ (геморрагический некроз) и при травматичной пункции');
   $('csfout').innerHTML=it.length?box(cls,t,it):'';
 
-  const M={norm:['info','МРТ в норме',['Типично для анти-NMDAR, раннего ВПГ, клещевого энцефалита, септической и метаболической энцефалопатии','Норма не исключает энцефалит — повторить МРТ при сохранении симптомов']],
-    hsv:['bad','Паттерн ВПГ',['Продолжать ацикловир; при отрицательной ранней ПЦР — повторная ЛП','Дифференциальный ряд: нейросифилис, лимбический энцефалит, эпистатус']],
-    limbic:['warn','Лимбический энцефалит',['Аутоиммунный: LGI1, GABA-B, AMPA, онконевральные Hu, Ma2','Инфекция: ВГЧ-6 (после трансплантации), ВПГ, нейросифилис','С этой находкой критерии «определённого лимбического» выполнимы — см. шаг 4']],
-    thal:['warn','Таламусы, базальные ганглии, ствол',['Клещевой энцефалит, Западного Нила','Острая некротизирующая энцефалопатия (грипп, SARS-CoV-2)','Вернике, тромбоз глубоких вен, Крейцфельдт–Якоб']],
-    rhomb:['bad','Ромбэнцефалит',['Listeria — ампициллин, если ещё не назначен','Энтеровирус 71, Бехчет, KLHL11, Ma2, CLIPPERS, лимфома']],
-    cortical:['warn','Корковый сигнал на DWI',['Крейцфельдт–Якоб (белок 14-3-3, RT-QuIC)','Постиктальные изменения, гипогликемия, MELAS']],
-    multi:['warn','Множественные кортико-субкортикальные очаги',['GABA-A (часто с рефрактерным эпистатусом), ОРЭМ, MOG']],
-    radial:['warn','Радиальное контрастирование',['GFAP-астроцитопатия — антитела к GFAP в ликворе; искать тератому']],
-    vasc:['warn','Инфаркты, васкулопатия',['ВЗВ-васкулопатия (ПЦР и IgG к ВЗВ в ликворе)','Нейросифилис, ТБ, васкулит ЦНС']],
-    ring:['warn','Кольцевидные очаги',['Токсоплазмоз, абсцесс, лимфома, туберкулёма — оценить иммунный статус']],
-    wm:['info','Очаги белого вещества',['ПМЛ (JC-вирус) при иммуносупрессии; ОРЭМ; демиелинизация']]};
-  const mr=v('mri');$('mriout').innerHTML=mr&&M[mr]?box(M[mr][0],M[mr][1],M[mr][2]):'';
+  const o=mf();let mo='';
+  if(o.any){
+    if(o.norm&&!o.abn&&!o.wm)mo+=box('info','МРТ в норме',['Типично для анти-NMDAR, раннего ВПГ, клещевого энцефалита, септической и метаболической энцефалопатии','Норма не исключает энцефалит — повторить МРТ при сохранении симптомов']);
+    if(o.hsv)mo+=box('bad','Типично для ВПГ-энцефалита',['Найдено: '+o.labels.filter(x=>!/норма/.test(x)).join(', '),'Продолжать ацикловир; при отрицательной ранней ПЦР — повторная ЛП','Дифференциальный ряд: нейросифилис, аутоиммунный лимбический энцефалит, эпистатус']);
+    else if(o.limbic)mo+=box('warn','Лимбический энцефалит',['Аутоиммунный: LGI1, GABA-B, AMPA, онконевральные Hu, Ma2','Инфекция: ВГЧ-6 (после трансплантации), ВПГ, нейросифилис','С этой находкой критерии «определённого лимбического» выполнимы — см. шаг 4']);
+    else if(o.t_uni)mo+=box('warn','Одностороннее поражение височной доли',['В первую очередь ВПГ — ацикловир не отменять до отрицательной ПЦР после 72 ч','Аутоиммунный лимбический энцефалит бывает односторонним, особенно в начале (LGI1)','Также: постиктальные изменения (корковое ограничение диффузии после приступов), глиома, инфаркт в бассейне задней мозговой артерии']);
+    else if(o.t_bi)mo+=box('warn','Двустороннее поражение височных долей',['ВПГ (часто асимметрично) или аутоиммунный лимбический энцефалит','Отметьте «медиальные отделы», если поражены гиппокамп и миндалина']);
+    if(o.dwi&&!o.hsv&&!(o.t_uni||o.t_bi))mo+=box('info','Ограничение диффузии',['Уточните локализацию — отметьте зону поражения']);
+    if(o.thal)mo+=box('warn','Таламусы, базальные ганглии',['Клещевой энцефалит, Западного Нила','Острая некротизирующая энцефалопатия (грипп, SARS-CoV-2)','Вернике, тромбоз глубоких вен, Крейцфельдт–Якоб']);
+    if(o.stem)mo+=box('bad','Ствол и мозжечок (ромбэнцефалит)',['Listeria — ампициллин, если ещё не назначен','Энтеровирус 71, Бехчет, KLHL11, Ma2, CLIPPERS, лимфома']);
+    if(o.ctx)mo+=box('warn','Корковый сигнал на DWI',['Крейцфельдт–Якоб (белок 14-3-3, RT-QuIC)','Постиктальные изменения, гипогликемия, MELAS']);
+    if(o.multi)mo+=box('warn','Множественные кортико-субкортикальные очаги',['GABA-A (часто с рефрактерным эпистатусом), ОРЭМ, MOG']);
+    if(o.radial)mo+=box('warn','Радиальное контрастирование',['GFAP-астроцитопатия — антитела к GFAP в ликворе; искать тератому']);
+    if(o.vasc)mo+=box('warn','Инфаркты, васкулопатия',['ВЗВ-васкулопатия (ПЦР и IgG к ВЗВ в ликворе)','Нейросифилис, ТБ, васкулит ЦНС']);
+    if(o.ring)mo+=box('warn','Кольцевидные очаги',['Токсоплазмоз, абсцесс, лимфома, туберкулёма — оценить иммунный статус']);
+    if(o.wm)mo+=box('info','Очаги белого вещества',['ПМЛ (JC-вирус) при иммуносупрессии; ОРЭМ; демиелинизация']);
+  }
+  $('mriout').innerHTML=mo;
   const E={norm:['info','ЭЭГ в норме',['У пациента с «психозом» делает органическую причину менее вероятной, но не исключает']],slow:['info','Диффузное замедление',['Неспецифично: энцефалит или энцефалопатия']],temp:['warn','Височная активность',['Поддерживает лимбический энцефалит (критерий Graus)']],lpd:['bad','Латерализованные периодические разряды',['В пользу ВПГ-энцефалита']],edb:['warn','Extreme delta brush',['Характерно для анти-NMDAR энцефалита']],ncse:['bad','Бессудорожный эпистатус',['Противоэпилептическая терапия по протоколу эпистатуса','Без ясной причины (NORSE) — искать аутоиммунный процесс, рано обсуждать иммунотерапию']]};
   const e=v('eeg');$('eegout').innerHTML=e&&E[e]?box(E[e][0],E[e][1],E[e][2]):'';
 
@@ -352,19 +356,19 @@ function renderS3(){
   const pcr=v('pcr'),d=v('lpday');let hs='';
   if(pcr==='pos')hs=box('bad','ПЦР ВПГ положительная',['Ацикловир 14–21 день; перед отменой — по возможности повторная ПЦР','Через 2–6 недель возможен анти-NMDAR энцефалит — предупредить родственников']);
   else if(pcr==='neg'){if(d!==null&&d<=3)hs=box('warn','ПЦР отрицательная, но ЛП в первые 72 ч',['Не отменять ацикловир','Повторная ЛП через 3–7 дней']);
-    else if(mr==='hsv')hs=box('warn','ПЦР отрицательная, но МРТ типична для ВПГ',['Продолжать ацикловир, повторить ПЦР','Подумать об интратекальных антителах к ВПГ (после 10–14 дня)']);
+    else if(o.hsv||o.t_uni)hs=box('warn','ПЦР отрицательная, но МРТ допускает ВПГ',['Продолжать ацикловир, повторить ПЦР','Подумать об интратекальных антителах к ВПГ (после 10–14 дня)']);
     else hs=box('ok','ПЦР отрицательная, ЛП позже 72 ч',['Если МРТ не типична для ВПГ и есть другое объяснение — ацикловир можно отменить','Если причина не найдена — шаг 4: аутоиммунный энцефалит']);}
   $('hsvout').innerHTML=hs}
 
 function renderS4(){
-  const sub=v('subacute'),c=v('cells'),mr=v('mri'),e=v('eeg');
-  const one=[];if(v('focal'))one.push('очаговая симптоматика');if(v('seiz')||e==='ncse')one.push('судороги');if(c!==null&&c>5)one.push('плеоцитоз > 5');if(mr&&['limbic','multi','radial','thal','rhomb'].includes(mr))one.push('МРТ-картина энцефалита');
+  const sub=v('subacute'),c=v('cells'),o=mf(),e=v('eeg');
+  const one=[];if(v('focal'))one.push('очаговая симптоматика');if(v('seiz')||e==='ncse')one.push('судороги');if(c!==null&&c>5)one.push('плеоцитоз > 5');if(o.suggest)one.push('МРТ-картина энцефалита');
   let g;
   if(!sub)g=box('info','Нет подострого начала',['Отметьте на шаге 1 пункт «Подострое начало» (&lt; 3 мес), если он есть']);
   else if(!one.length)g=box('warn','Не хватает второго условия',['Нужен хотя бы один пункт: очаговая симптоматика, судороги, плеоцитоз > 5, МРТ-картина']);
   else if(!v('g_excl'))g=box('warn','Почти выполнено',[`Подострое начало + ${one.join(', ')}`,'Осталось: разумно исключить другие причины']);
   else g=box('bad','Возможный аутоиммунный энцефалит',[`Подострое начало + ${one.join(', ')} + исключены другие причины`,'<b>Можно начинать иммунотерапию первой линии, не дожидаясь антител</b>']);
-  const lim=sub&&mr==='limbic'&&((c!==null&&c>5)||e==='temp');
+  const lim=sub&&o.limbic&&((c!==null&&c>5)||e==='temp');
   if(lim&&v('g_excl'))g+=box('bad','Определённый аутоиммунный лимбический энцефалит',['Двусторонние изменения медиальных височных долей + плеоцитоз или височная активность на ЭЭГ']);
   g+=box('info','Антитела — что заказать (Москва)',['<b>Гемотест:</b> NMDAR в ликворе (5 990 ₽), LGI1 + CASPR2 в сыворотке (6 720 ₽), скрининг на срезах мозга в ликворе (5 880 ₽), онконевральный блот (5 780 ₽)','<b>ИНВИТРО:</b> панель NMDAR, LGI1, CASPR2, AMPA1/2, GABA-B — сыворотка № 1582СВ или ликвор № 1582 (~15,5 тыс. ₽); уточнить, выполняется ли','Не путать с «антителами к NR2 субъединице» (ИФА) — это не тест на анти-NMDAR энцефалит']);
   $('grausout').innerHTML=g;
@@ -400,20 +404,20 @@ function renderS4(){
   else ah=box('info','Антитела не найдены',['Отрицательная панель не исключает аутоиммунный энцефалит (серонегативный)','Если выполнены критерии «возможного» и других причин нет — лечение как при аутоиммунном']);
   $('about').innerHTML=ah;
 
-  const d1=v('d1');let ih=box('info','Первая линия',['Метилпреднизолон 1 г в/в в сутки, 5 дней, далее перорально со снижением','В тяжёлых случаях сразу + ВВИГ 2 г/кг на 5 дней'+(v('wt')?` (≈ ${Math.round(v('wt')*2)} г всего)`:'')+' или плазмаферез 5–7 сеансов']);
+  const d1=v('d1');let ih=box('info','Первая линия',['Метилпреднизолон 1 г в/в в сутки, 5 дней, далее перорально со снижением','В тяжёлых случаях сразу + ВВИГ 2 г/кг на 5 дней'+(bw()?` (≈ ${Math.round(bw().dw*2)} г всего${bw().obese?', на скорректированную массу':''})`:'')+' или плазмаферез 5–7 сеансов']);
   if(d1){const dt=new Date(d1),f=x=>{const y=new Date(dt);y.setDate(y.getDate()+x);return y.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})};
     ih+=box('warn','Контрольные точки',[`<b>${f(10)}–${f(14)}</b>: нет значимого улучшения — вторая линия: ритуксимаб 1000 мг × 2 с интервалом 2 недели (или 375 мг/м² × 4), при тяжёлом течении — циклофосфамид 750 мг/м²`,`<b>${f(28)}</b>: оценка по шкале CASE и mRS; лечение начато в первые 4 недели — лучший прогноз (NEOS)`,'Повторный поиск опухоли при плохом ответе'])}
   $('itout').innerHTML=ih}
 
 function renderS5(){
   const L=[];const a=v('age'),w=v('wt');
-  L.push(`Пациент: ${a??'—'} лет, ${v('sex')==='f'?'ж':'м'}, вес ${w??'—'} кг`+(crcl()!==null?`, КК ≈ ${Math.round(crcl())} мл/мин`:''));
-  const r=iec();L.push(`Критерии IEC: ${r.t.toLowerCase()} (${r.m.length} малых${r.m.length?': '+r.m.join(', '):''})`);
+  L.push(`Пациент: ${a??'—'} лет, ${v('sex')==='f'?'ж':'м'}, вес ${w??'—'} кг`+(v('ht')?`, рост ${v('ht')} см`:'')+(bw()&&bw().obese?`, скорректированная масса ${Math.round(bw().abw)} кг`:'')+(crcl()!==null?`, КК ≈ ${Math.round(crcl())} мл/мин`:''));
+  const r=iec();L.push(`Критерии энцефалита International Encephalitis Consortium (Venkatesan, 2013): ${r.t.toLowerCase()}`+(v('major')?` — большой критерий (изменение сознания или поведения ≥ 24 ч) + ${r.m.length} малых${r.m.length?': '+r.m.join(', '):''}`:` — большого критерия нет${r.m.length?'; малые: '+r.m.join(', '):''}`));
   L.push(`Назначено: ${acyclovir().short}`+(v('bact')?'; дексаметазон 10 мг каждые 6 ч, цефтриаксон 2 г каждые 12 ч, ванкомицин'+(((a||0)>50||v('imm'))?', ампициллин 2 г каждые 4 ч':''):''));
   const ct=needCT();L.push(ct.length?`КТ перед ЛП: показана (${ct.join(', ')})`:'КТ перед ЛП: показаний нет');
   const c=v('cells');if(c!==null)L.push(`Ликвор: цитоз ${c}/мкл`+(v('neut')!==null?` (нейтрофилы ${v('neut')}%)`:'')+(v('prot')!==null?`, белок ${v('prot')} г/л`:'')+(v('glc')!==null&&v('glb')?`, глюкоза ${v('glc')}/${v('glb')} (${(v('glc')/v('glb')).toFixed(2)})`:''));
   const pcr=v('pcr');if(pcr)L.push(`ПЦР ВПГ: ${pcr==='pos'?'положительная':'отрицательная'}`+(v('lpday')!==null?` (ЛП на ${v('lpday')}-й день)`:''));
-  const mri=$('mri');if(mri.value)L.push('МРТ: '+mri.options[mri.selectedIndex].text);
+  const mo=mf();if(mo.any)L.push('МРТ: '+mo.labels.join('; '));
   const eeg=$('eeg');if(eeg.value)L.push('ЭЭГ: '+eeg.options[eeg.selectedIndex].text);
   const ab=$('ab');if(ab.value)L.push('Антитела: '+ab.options[ab.selectedIndex].text);
   const o=ordersLP();if(o.add.length)L.push('Дополнительно к стандарту ЛП: '+o.add.map(x=>x.replace(/<[^>]+>/g,'')).join('; '));
