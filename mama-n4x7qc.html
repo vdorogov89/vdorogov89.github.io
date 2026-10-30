@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Беременность и ГВ: препараты</title>
+<title>ЛС беременным</title>
 <meta name="theme-color" content="#08080D">
 <meta name="robots" content="noindex, nofollow">
 <link rel="manifest" href="mama-n4x7qc.webmanifest">
@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="mama-apple-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Беременность">
+<meta name="apple-mobile-web-app-title" content="ЛС беременным">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="author" content="Василий Дорогов">
 <meta name="copyright" content="© 2026 Василий Дорогов">
@@ -76,6 +76,8 @@ h3.sub{font-size:13px; text-transform:uppercase; letter-spacing:0.04em; color:va
 .rf .codes b{display:block; font-size:12.5px; font-weight:600;}
 .rf p{margin:4px 0 0; font-size:12.5px;}
 .rf a{color:var(--acc); font-size:12.5px;}
+.regq{font-size:12px; color:var(--muted); margin-top:6px;}
+.regq .cp{border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--ink); border-radius:8px; padding:2px 8px; font-size:12px; margin-left:4px;}
 .r-ok,.r-pr{color:var(--ok);} .r-c{color:var(--amber);} .r-nr{color:#FFB08A;} .r-no{color:var(--warn);} .r-nd{color:var(--gray);}
 .offbox{margin-top:8px; font-size:12.5px; color:var(--amber);}
 .search{position:relative; margin:12px 0 4px;}
@@ -141,7 +143,7 @@ a{color:var(--acc);}
     </div>
     <div class="card"><h2>Источники</h2>
       <ul>
-        <li>Инструкции РФ — справочник Видаль (vidal.ru), сверка 31.10.2026; для каждого препарата указано, по какой инструкции. Юридически значима версия в Государственном реестре лекарственных средств (ГРЛС): ссылка «ГРЛС» открывает поиск по торговому названию, сайт просит ввести код с картинки. Инструкции разных производителей одного МНН могут отличаться.</li>
+        <li>Инструкции РФ — справочник Видаль (vidal.ru), сверка 31.10.2026; для каждого препарата указано, по какой инструкции. Юридически значимы ОХЛП и листок-вкладыш в реестре ЕАЭС (lk.regmed.ru): ссылка в карточке открывает реестр, название для поиска можно скопировать кнопкой; сайт просит ввести код с картинки. Инструкции разных производителей одного МНН могут отличаться.</li>
         <li>Лактация — LactMed (NIH), e-lactancia, рекомендации ACR по контрастам.</li>
         <li>Беременность — FDA (НПВП после 20 недель, 2020; магния сульфат, 2013; статины, 2021; ацетаминофен, 2025), EMA (метамизол, 2018; ПИТРС), ACOG, NICE, AHA/ASA.</li>
         <li>РС — рекомендации EAN/ECTRIMS, данные MINORE и SOPRANINO по окрелизумабу.</li>
@@ -330,8 +332,8 @@ function detail(d){
   const cells=d.E.map((e,i)=>`<div class="cell ${i===grp?'sel':''}"><div class="g"><span>${GL[i]}</span><span class="pill p-${e}">${EL[e]}</span></div>${w[GK[i]]?`<p>${esc(w[GK[i]])}</p>`:''}</div>`).join('');
   const offs=d.E.map((e,i)=>off(d,i)?G[i]:null).filter(Boolean);
   const tn=(d.rt&&d.rt.includes(':')?d.rt.split(':')[0].split(',')[0]:(d.a||'').split(',')[0]).replace(/\(.*?\)/g,'').trim();
-  const grls=tn&&d.R.some(r=>r!=='nd')?`https://grls.rosminzdrav.ru/GRLS.aspx?RegNumber=&MnnR=&lf=&TradeNmR=${encodeURIComponent(tn)}&OwnerName=&MnfOrg=&MnfOrgCountry=&isfs=0&isND=-1&regtype=1&pageSize=10&order=RegDate&orderType=desc&pageNum=1`:'';
-  const rfLink=[d.ru?`<a href="https://www.vidal.ru/drugs/${d.ru}" target="_blank" rel="noopener">Видаль ↗</a>`:'',grls?`<a href="${grls}" target="_blank" rel="noopener">ГРЛС — официальная инструкция ↗</a>`:''].filter(Boolean).join(' · ');
+  const reg=tn&&d.R.some(r=>r!=='nd');
+  const rfLink=[d.ru?`<a href="https://www.vidal.ru/drugs/${d.ru}" target="_blank" rel="noopener">Видаль ↗</a>`:'',reg?`<a href="https://lk.regmed.ru/Register/EAEU_smpc" target="_blank" rel="noopener">Реестр ОХЛП и ЛВ ЕАЭС ↗</a>`:''].filter(Boolean).join(' · ')+(reg?`<div class="regq">Искать в реестре: <button class="cp" data-cp="${esc(tn)}">${esc(tn)}</button></div>`:'');
   return `<div class="det">
     ${d.d&&d.d!=='—'?`<div class="dose"><span>Доза (взрослые)</span>${esc(d.d)}</div>`:''}
     <div class="grid">${cells}</div>
@@ -375,6 +377,7 @@ $('secChips').addEventListener('click',e=>{const b=e.target.closest('[data-s]');
 $('hideNo').addEventListener('change',renderSec);
 document.addEventListener('click',e=>{const b=e.target.closest('.drug>button.hd');if(!b)return;const i=Number(b.parentElement.dataset.i);open.has(i)?open.delete(i):open.add(i);
   const html=row(D[i]);document.querySelectorAll(`.drug[data-i="${i}"]`).forEach(el=>el.outerHTML=html)});
+document.addEventListener('click',async e=>{const b=e.target.closest('.cp');if(!b)return;e.stopPropagation();try{await navigator.clipboard.writeText(b.dataset.cp);const t=b.textContent;b.textContent='скопировано';setTimeout(()=>b.textContent=t,1400)}catch(_){}});
 $('q').addEventListener('input',()=>{open.clear();renderFind()});
 const QUICK=['Нурофен','Суматриптан','Парацетамол','Мидокалм','Клексан','Копаксон','Сертралин','Мильгамма','Мексидол','Гадолиний'];
 $('quick').innerHTML=QUICK.map(x=>`<button>${x}</button>`).join('');
