@@ -1,0 +1,31 @@
+{
+ "id": "/mama-n4x7qc.html",
+ "name": "Беременность и ГВ: препараты",
+ "short_name": "Беременность",
+ "lang": "ru",
+ "start_url": "/mama-n4x7qc.html",
+ "scope": "/mama-n4x7qc",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/mama-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/mama-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/mama-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
