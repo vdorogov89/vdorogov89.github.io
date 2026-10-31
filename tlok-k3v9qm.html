@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Синкопе или приступ</title>
+<meta name="theme-color" content="#08080D">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="tlok-k3v9qm.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="tlok-icon-192.png">
+<link rel="apple-touch-icon" href="tlok-apple-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Синкопе">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="author" content="Василий Дорогов">
+<meta name="copyright" content="© 2026 Василий Дорогов">
+<style>
+:root{--bg:#08080D; --ink:#F2F2F5; --body:#C9C9D3; --muted:#8B8B98; --line:rgba(255,255,255,0.09); --glass:rgba(255,255,255,0.045); --acc:#4FE0FF; --acc2:#8A5CFF; --warn:#FF8A7A; --amber:#FFC56B; --ok:#6BE3A4;}
+*{box-sizing:border-box;}
+html,body{margin:0; background:var(--bg); color:var(--body); font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif; -webkit-font-smoothing:antialiased;}
+button{font:inherit; color:inherit; cursor:pointer;}
+.app{max-width:560px; margin:0 auto; padding:0 16px calc(84px + env(safe-area-inset-bottom));}
+header{padding:calc(16px + env(safe-area-inset-top)) 0 10px; display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+header h1{margin:0; font-size:20px; color:var(--ink); letter-spacing:-0.01em;}
+header span{font-size:12.5px; color:var(--muted); white-space:nowrap;}
+nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center; gap:4px; padding:10px 8px calc(10px + env(safe-area-inset-bottom)); background:rgba(10,10,16,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--line);}
+nav.tabs button{flex:1; max-width:120px; padding:9px 2px; border-radius:12px; border:0; background:transparent; color:var(--muted); font-size:12.5px;}
+nav.tabs button.on{background:rgba(79,224,255,0.12); color:var(--ink);}
+section{display:none;} section.on{display:block;}
+.card{background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:16px; margin:12px 0;}
+h2{font-size:17px; color:var(--ink); margin:4px 0 8px;}
+h3{font-size:15px; color:var(--ink); margin:14px 0 6px;}
+p{margin:6px 0;}
+.muted{color:var(--muted); font-size:13px;}
+.crumbs{display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 4px;}
+.crumbs span{font-size:12px; padding:3px 9px; border-radius:20px; background:rgba(255,255,255,0.06); color:var(--muted);}
+.crumbs span.on{background:rgba(79,224,255,0.14); color:var(--ink);}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+label.f{display:block; font-size:12.5px; color:var(--muted);}
+input[type=number],input[type=date],select{width:100%; min-width:0; max-width:100%; -webkit-appearance:none; appearance:none; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px; display:block;}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%; background-size:5px 5px; background-repeat:no-repeat; padding-right:32px;}
+select option{background:#16171f; color:var(--ink);}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.8);}
+input:focus,select:focus{outline:none; border-color:rgba(79,224,255,0.6);}
+.chk{display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); color:var(--ink);}
+.chk:first-of-type{border-top:0;}
+.chk input{-webkit-appearance:none; appearance:none; width:22px; height:22px; flex:0 0 22px; margin:1px 0 0; border-radius:7px; border:1.5px solid rgba(255,255,255,0.25); background:transparent; display:grid; place-content:center;}
+.chk input:checked{background:linear-gradient(120deg,var(--acc),var(--acc2)); border-color:transparent;}
+.chk input:checked::after{content:''; width:10px; height:6px; border:2.5px solid #08080D; border-top:0; border-right:0; transform:rotate(-45deg) translate(1px,-1px);}
+.chk small{display:block; color:var(--muted); font-size:12.5px;}
+.out{border-radius:16px; padding:12px 14px; margin:10px 0; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body);}
+.out b.t{display:block; margin-bottom:4px; color:var(--ink); font-size:15px;}
+.out.ok{border-color:rgba(107,227,164,0.35); background:rgba(107,227,164,0.06);} .out.ok b.t{color:var(--ok);}
+.out.warn{border-color:rgba(255,197,107,0.4); background:rgba(255,197,107,0.06);} .out.warn b.t{color:var(--amber);}
+.out.bad{border-color:rgba(255,138,122,0.4); background:rgba(255,138,122,0.06);} .out.bad b.t{color:var(--warn);}
+.out.info{border-color:rgba(79,224,255,0.25); background:rgba(79,224,255,0.04);} .out.info b.t{color:var(--acc);}
+.out ul{margin:6px 0 0; padding-left:20px;} li{margin:3px 0;}
+.out b{color:var(--ink);}
+.dose{font-weight:600; color:var(--acc); white-space:nowrap;}
+.stepnav{display:flex; gap:8px; margin:16px 0 4px;}
+.stepnav button{flex:1; padding:11px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.04); color:var(--ink);}
+.stepnav button.main{flex:2; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.mbtns button{padding:10px 14px; border-radius:12px; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns button.alt{background:rgba(255,255,255,0.08); color:var(--ink); font-weight:500;}
+pre{white-space:pre-wrap; font:13.5px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; color:var(--ink); background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:14px; padding:12px; margin:8px 0;}
+a{color:var(--acc);}
+.foot{font-size:12px; color:var(--muted); margin:18px 0;}
+.seg3{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 2px;} .seg3 button{padding:8px 12px; border-radius:20px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--muted); font-size:13.5px;} .seg3 button.on{border-color:rgba(79,224,255,0.5); background:rgba(79,224,255,0.12); color:var(--ink);}
+.q{padding:10px 0; border-top:1px solid var(--line);} .q:first-of-type{border-top:0;} .q>b{display:block; color:var(--ink); font-weight:500;} .q small{color:var(--muted); font-size:12.5px;}
+.pts{display:inline-block; margin-left:6px; padding:1px 7px; border-radius:8px; background:rgba(255,197,107,0.12); color:var(--amber); font-size:11.5px; white-space:nowrap; vertical-align:1px;}
+input[type=email],input[type=text]{width:100%; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px;}
+table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padding:4px 4px;} table.oh input{margin:0; min-height:40px; padding:8px; text-align:center;}
+.copy{font-size:11.5px; color:var(--muted); line-height:1.45; margin:22px 0 6px; padding-top:12px; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="app">
+  <header><h1>Синкопе или приступ</h1><span>автор — В.&nbsp;Дорогов</span></header>
+  <div class="crumbs" id="crumbs"></div>
+
+<!-- ШАГ 1: ЭПИЗОД -->
+<section id="s1" class="on">
+  <div class="card">
+    <h2>Пациент</h2>
+    <div class="row">
+      <label class="f">Возраст, лет<input type="number" id="age" inputmode="numeric" min="0" max="110"></label>
+      <label class="f">Пол<select id="sex"><option value="m">Мужской</option><option value="f">Женский</option></select></label>
+    </div>
+    <label class="f" style="margin-top:10px">Метка для письма (палата, номер истории — без ФИО)<input type="text" id="tag" autocomplete="off"></label>
+    <label class="chk" style="margin-top:8px"><input type="checkbox" id="tloc" checked><span><b>Транзиторная потеря сознания</b><small>Внезапная, кратковременная, с потерей постурального тонуса и самопроизвольным полным восстановлением</small></span></label>
+    <label class="chk"><input type="checkbox" id="first"><span>Эпизод впервые</span></label>
+  </div>
+
+  <div class="card">
+    <h2>Обстоятельства</h2>
+    <label class="chk"><input type="checkbox" id="c_stand"><span>Долгое стояние или сидение <span class="pts">Калгари −2</span></span></label>
+    <label class="chk"><input type="checkbox" id="c_heat"><span>Духота, жара, толпа</span></label>
+    <label class="chk"><input type="checkbox" id="c_pain"><span>Боль, страх, вид крови, медицинская процедура</span></label>
+    <label class="chk"><input type="checkbox" id="c_sit"><span>Мочеиспускание, дефекация, кашель, глотание, смех</span></label>
+    <label class="chk"><input type="checkbox" id="c_neck"><span>Поворот головы, тугой воротник, бритьё</span></label>
+    <label class="chk"><input type="checkbox" id="c_up"><span>В первые минуты после вставания</span></label>
+    <label class="chk"><input type="checkbox" id="c_meal"><span>В течение часа после еды</span></label>
+    <label class="chk"><input type="checkbox" id="c_emo"><span>Эмоциональный стресс <span class="pts">Калгари +1</span></span></label>
+    <label class="chk"><input type="checkbox" id="c_ex"><span>Во время физической нагрузки<small>Признак высокого риска</small></span></label>
+    <label class="chk"><input type="checkbox" id="c_lie"><span>В положении лёжа<small>Признак высокого риска</small></span></label>
+    <label class="chk"><input type="checkbox" id="c_sleep"><span>Во сне или сразу после пробуждения</span></label>
+    <label class="chk"><input type="checkbox" id="c_prov"><span>Недосып, алкоголь или его отмена, мелькающий свет</span></label>
+  </div>
+
+  <div class="card">
+    <h2>Предвестники</h2>
+    <label class="chk"><input type="checkbox" id="p_sweat"><span>Потливость <span class="pts">Калгари −2</span></span></label>
+    <label class="chk"><input type="checkbox" id="p_pres"><span>Дурнота, предобморочное состояние <span class="pts">Калгари −2</span><small>Перед этим эпизодом или такие состояния бывали раньше</small></span></label>
+    <label class="chk"><input type="checkbox" id="p_naus"><span>Тошнота, дискомфорт в животе</span></label>
+    <label class="chk"><input type="checkbox" id="p_warm"><span>Жар</span></label>
+    <label class="chk"><input type="checkbox" id="p_dark"><span>Потемнение в глазах, шум в ушах</span></label>
+    <label class="chk"><input type="checkbox" id="p_deja"><span>Дежавю или жамевю <span class="pts">Калгари +1</span></span></label>
+    <label class="chk"><input type="checkbox" id="p_aura"><span>Восходящее ощущение в животе, запах, вкус; онемение или подёргивания в одной половине тела</span></label>
+    <label class="chk"><input type="checkbox" id="p_palp"><span>Сердцебиение перед потерей сознания<small>Признак высокого риска</small></span></label>
+    <label class="chk"><input type="checkbox" id="p_chest"><span>Боль в груди или одышка<small>Признак высокого риска</small></span></label>
+    <label class="chk"><input type="checkbox" id="p_none"><span>Без предвестников, внезапно</span></label>
+  </div>
+
+  <div class="card">
+    <h2>Со слов очевидцев</h2>
+    <div class="q"><b>Длительность потери сознания</b><div class="seg3" data-g="dur"><button data-v="lt1">&lt; 1 мин</button><button data-v="1to5">1–5 мин</button><button data-v="gt5">&gt; 5 мин</button><button data-v="unk">Нет очевидцев</button></div></div>
+    <div class="q"><b>Подёргивания</b><div class="seg3" data-g="jerk"><button data-v="no">Нет</button><button data-v="short">Несколько, &lt; 15 с, после падения</button><button data-v="long">Ритмичные, ≥ 30 с, с самого начала</button></div></div>
+    <div class="q"><b>Цвет лица</b><div class="seg3" data-g="face"><button data-v="pale">Бледное</button><button data-v="cyan">Синюшное</button><button data-v="unk">Не знаю</button></div></div>
+    <label class="chk"><input type="checkbox" id="w_unresp"><span>Не реагировал, необычная поза или подёргивания конечностей, либо сам не помнит эпизод <span class="pts">Калгари +1</span></span></label>
+    <label class="chk"><input type="checkbox" id="w_head"><span>Поворот головы в сторону <span class="pts">Калгари +1</span></span></label>
+    <label class="chk"><input type="checkbox" id="w_tonic"><span>Тоническое напряжение, крик в начале</span></label>
+    <label class="chk"><input type="checkbox" id="w_auto"><span>Автоматизмы: жевание, причмокивание, перебирание руками</span></label>
+    <label class="chk"><input type="checkbox" id="w_eyes"><span>Глаза закрыты весь эпизод, сопротивление при попытке открыть</span></label>
+  </div>
+
+  <div class="card">
+    <h2>После эпизода</h2>
+    <label class="chk"><input type="checkbox" id="a_tside"><span>Прикус боковой поверхности языка <span class="pts">Калгари +2</span></span></label>
+    <label class="chk"><input type="checkbox" id="a_ttip"><span>Прикус кончика языка <span class="pts">Калгари +2</span></span></label>
+    <label class="chk"><input type="checkbox" id="a_conf"><span>Спутанность после эпизода (со слов очевидцев) <span class="pts">Калгари +1</span></span></label>
+    <label class="chk"><input type="checkbox" id="a_fast"><span>Быстрое полное восстановление, в течение минуты</span></label>
+    <label class="chk"><input type="checkbox" id="a_sleepy"><span>Сонливость, головная боль, боль в мышцах после</span></label>
+    <label class="chk"><input type="checkbox" id="a_inc"><span>Недержание мочи<small>Бывает и при синкопе, не разделяет</small></span></label>
+    <label class="chk"><input type="checkbox" id="a_inj"><span>Травма при падении</span></label>
+  </div>
+
+  <div class="card">
+    <h2>Анамнез</h2>
+    <label class="chk"><input type="checkbox" id="h_rep"><span>Похожие эпизоды с молодости, годами, с теми же провокаторами</span></label>
+    <label class="chk"><input type="checkbox" id="h_heart"><span>Структурная болезнь сердца, ИБС, сердечная недостаточность<small>Признак высокого риска</small></span></label>
+    <label class="chk"><input type="checkbox" id="h_scd"><span>Внезапная смерть родственников в молодом возрасте<small>Признак высокого риска</small></span></label>
+    <label class="chk"><input type="checkbox" id="h_dev"><span>Кардиостимулятор или ИКД</span></label>
+    <label class="chk"><input type="checkbox" id="h_epi"><span>Эпилепсия в анамнезе, приём противоэпилептических</span></label>
+    <label class="chk"><input type="checkbox" id="h_drugs"><span>Гипотензивные, диуретики, α-блокаторы, нитраты, антидепрессанты</span></label>
+    <label class="chk"><input type="checkbox" id="h_qt"><span>Препараты, удлиняющие QT</span></label>
+    <label class="chk"><input type="checkbox" id="h_ans"><span>Паркинсонизм, диабетическая или иная вегетативная нейропатия</span></label>
+    <label class="chk"><input type="checkbox" id="h_psych"><span>Очень частые эпизоды, тревожное или диссоциативное расстройство, психотравма</span></label>
+  </div>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Далее</button></div>
+</section>
+
+<!-- ШАГ 2: ОСМОТР -->
+<section id="s2">
+  <div class="card">
+    <h2>Активная ортостатическая проба</h2>
+    <p class="muted">5 минут лёжа, затем встать; АД и ЧСС на 1-й и 3-й минуте стоя.</p>
+    <table class="oh">
+      <tr><td></td><td class="muted">Сист.</td><td class="muted">Диаст.</td><td class="muted">ЧСС</td></tr>
+      <tr><td class="muted">Лёжа</td><td><input type="number" id="s0" inputmode="numeric"></td><td><input type="number" id="d0" inputmode="numeric"></td><td><input type="number" id="h0" inputmode="numeric"></td></tr>
+      <tr><td class="muted">1 мин</td><td><input type="number" id="s1v" inputmode="numeric"></td><td><input type="number" id="d1" inputmode="numeric"></td><td><input type="number" id="h1" inputmode="numeric"></td></tr>
+      <tr><td class="muted">3 мин</td><td><input type="number" id="s3v" inputmode="numeric"></td><td><input type="number" id="d3" inputmode="numeric"></td><td><input type="number" id="h3" inputmode="numeric"></td></tr>
+    </table>
+    <label class="chk"><input type="checkbox" id="o_sym"><span>При вставании воспроизвелись знакомые симптомы</span></label>
+    <div id="ohout"></div>
+  </div>
+
+  <div class="card">
+    <h2>ЭКГ</h2>
+    <label class="chk"><input type="checkbox" id="e_done"><span><b>ЭКГ снята</b><small>Отметьте найденные изменения; если ничего не отмечено — считается нормой</small></span></label>
+    <label class="chk"><input type="checkbox" id="e_brady" class="ecg" data-l="синусовая брадикардия < 40 в минуту или паузы > 3 с"><span>Синусовая брадикардия &lt; 40 или паузы &gt; 3 с</span></label>
+    <label class="chk"><input type="checkbox" id="e_av" class="ecg" data-l="АВ-блокада II степени (Мобиц II) или III степени"><span>АВ-блокада II степени (Мобиц II) или III степени</span></label>
+    <label class="chk"><input type="checkbox" id="e_bbb" class="ecg" data-l="бифасцикулярная блокада или QRS ≥ 120 мс"><span>Бифасцикулярная блокада, QRS ≥ 120 мс</span></label>
+    <label class="chk"><input type="checkbox" id="e_qt" class="ecg" data-l="QTc > 460 мс или < 340 мс"><span>QTc &gt; 460 мс или &lt; 340 мс</span></label>
+    <label class="chk"><input type="checkbox" id="e_brug" class="ecg" data-l="паттерн Бругада"><span>Паттерн Бругада</span></label>
+    <label class="chk"><input type="checkbox" id="e_wpw" class="ecg" data-l="предвозбуждение желудочков"><span>Предвозбуждение (WPW)</span></label>
+    <label class="chk"><input type="checkbox" id="e_arvc" class="ecg" data-l="отрицательные T в V1–V3, эпсилон-волна"><span>Отрицательные T в V1–V3, эпсилон-волна</span></label>
+    <label class="chk"><input type="checkbox" id="e_hcm" class="ecg" data-l="патологические Q, выраженная гипертрофия ЛЖ"><span>Патологические Q, выраженная гипертрофия ЛЖ</span></label>
+    <label class="chk"><input type="checkbox" id="e_tachy" class="ecg" data-l="пароксизмальная тахиаритмия"><span>Фибрилляция предсердий с ЧСС &lt; 40 или пароксизм тахиаритмии</span></label>
+  </div>
+
+  <div class="card">
+    <h2>Осмотр</h2>
+    <label class="chk"><input type="checkbox" id="x_murmur"><span>Систолический шум (аортальный стеноз, ГКМП)</span></label>
+    <label class="chk"><input type="checkbox" id="x_focal"><span>Очаговая неврологическая симптоматика</span></label>
+    <label class="chk"><input type="checkbox" id="x_carotid"><span>Шум над сонными артериями</span></label>
+  </div>
+
+  <div class="card">
+    <h2>Анализы, если брали</h2>
+    <div class="row">
+      <label class="f">Лактат (≤ 2 ч)<select id="l_lac"><option value="">не брали</option><option value="n">норма</option><option value="h">повышен</option></select></label>
+      <label class="f">КФК (через 24–48 ч)<select id="l_ck"><option value="">не брали</option><option value="n">норма</option><option value="h">повышена</option></select></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label class="f">Пролактин (10–20 мин)<select id="l_prl"><option value="">не брали</option><option value="n">норма</option><option value="h">повышен</option></select></label>
+      <label class="f">Глюкоза<select id="l_glu"><option value="">не брали</option><option value="n">норма</option><option value="l">гипогликемия</option></select></label>
+    </div>
+    <p class="muted">Пролактин повышается и после синкопе, поэтому приступ от обморока не отличает; полезен против психогенного приступа. Лактат информативен в первые 2 ч после генерализованного судорожного приступа.</p>
+  </div>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Итог</button></div>
+</section>
+
+<!-- ШАГ 3: ИТОГ -->
+<section id="s3">
+  <div id="res"></div>
+  <div class="card">
+    <h2>Текст для истории болезни</h2>
+    <p class="muted">Проверьте и при необходимости поправьте перед вставкой.</p>
+    <pre id="sum"></pre>
+    <label class="f">Отправить на почту<input type="email" id="mail" autocomplete="email" inputmode="email"></label>
+    <div class="mbtns"><button id="send">Отправить на почту</button><button id="copy" class="alt">Скопировать</button><button id="reset" class="alt">Новый пациент</button></div>
+    <p class="muted" id="sendnote">Откроется почтовое приложение с готовым письмом — останется нажать «Отправить».</p>
+  </div>
+  <p class="foot">Помощник для врача, а не замена клиническому решению. Введённые данные никуда не отправляются и не сохраняются, пока вы сами не отправите письмо; после закрытия страницы они стираются. Не указывайте в письме ФИО пациента. Источники: Sheldon R. et al. Historical criteria that distinguish syncope from seizures. J Am Coll Cardiol 2002 (шкала Калгари: ≥ 1 балла — приступ; чувствительность и специфичность 94%); Brignole M. et al. 2018 ESC Guidelines for the diagnosis and management of syncope; Hoefnagels W. et al. 1991.</p><p class="copy">© 2026 Василий Дорогов, врач-невролог. Все права защищены. Копирование, переработка и распространение без письменного разрешения автора запрещены.</p>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">В начало</button></div>
+</section>
+</div>
+<nav class="tabs"><button data-s="s1" class="on">Эпизод</button><button data-s="s2">Осмотр и ЭКГ</button><button data-s="s3">Итог</button></nav>
+<script>
+const $=id=>document.getElementById(id);
+const v=id=>{const e=$(id);if(!e)return null;if(e.type==='checkbox')return e.checked;const x=e.value;return x===''?null:(e.type==='number'?Number(x):x)};
+const order=['s1','s2','s3']; let cur='s1'; const G={};
+function show(s){cur=s;document.querySelectorAll('section').forEach(e=>e.classList.toggle('on',e.id===s));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+  const N=['Эпизод','Осмотр и ЭКГ','Итог'];$('crumbs').innerHTML=N.map((x,i)=>`<span class="${order[i]===s?'on':''}">${i+1}. ${x}</span>`).join('');
+  document.querySelectorAll('section .prev').forEach(b=>b.style.visibility=s==='s1'?'hidden':'visible');window.scrollTo(0,0);render()}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll('section .prev').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);if(i>0)show(order[i-1])});
+document.querySelectorAll('section .next').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);show(order[(i+1)%order.length])});
+document.querySelectorAll('.seg3').forEach(g=>g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const k=g.dataset.g;G[k]=G[k]===b.dataset.v?null:b.dataset.v;
+  g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.v===G[k]));render()}));
+document.addEventListener('input',render);document.addEventListener('change',render);
+const box=(cls,title,items,extra)=>`<div class="out ${cls}">${title?`<b class="t">${title}</b>`:''}${extra||''}${items&&items.length?'<ul>'+items.map(x=>'<li>'+x+'</li>').join('')+'</ul>':''}</div>`;
+const lc=s=>/^[А-ЯЁA-Z][а-яёa-z]/.test(s)?s.charAt(0).toLowerCase()+s.slice(1):s;
+
+const CALG=[['a_tside','прикус языка',2],['a_ttip','прикус языка',2],['p_deja','дежавю/жамевю',1],['c_emo','эмоциональный стресс',1],['w_head','поворот головы',1],['w_unresp','не реагировал, необычная поза или подёргивания, амнезия эпизода',1],['a_conf','спутанность после',1],['p_pres','дурнота, предобморочные состояния',-2],['p_sweat','потливость перед эпизодом',-2],['c_stand','долгое стояние или сидение',-2]];
+function calgary(){let s=0;const it=[];let tongue=false;
+  CALG.forEach(([id,l,p])=>{if(!v(id))return;if(id.startsWith('a_t')){if(tongue)return;tongue=true;}s+=p;it.push(`${l} (${p>0?'+':'−'}${Math.abs(p)})`)});return {s,it}}
+
+function orth(){const s0=v('s0'),d0=v('d0'),h0=v('h0');if(s0==null)return null;const r={pts:[],oh:false,pots:false,txt:''};
+  [['1',v('s1v'),v('d1'),v('h1')],['3',v('s3v'),v('d3'),v('h3')]].forEach(([m,s,d,h])=>{if(s==null)return;const ds=s0-s,dd=(d0!=null&&d!=null)?d0-d:null,dh=(h0!=null&&h!=null)?h-h0:null;
+    const oh=ds>=20||(dd!=null&&dd>=10)||s<90;if(oh)r.oh=true;if(dh!=null&&(dh>=30||h>=120))r.pots=true;r.pts.push({m,s,d,h,ds,dd,dh})});
+  if(!r.pts.length)return null;if(r.oh)r.pots=false;return r}
+function orthText(o){return o.pts.map(p=>`${p.m} мин — ${p.s}${p.d!=null?'/'+p.d:''}${p.h!=null?', ЧСС '+p.h:''} (АД ${p.ds>=0?'−':'+'}${Math.abs(p.ds)}${p.dd!=null?'/'+(p.dd>=0?'−':'+')+Math.abs(p.dd):''}${p.dh!=null?', ЧСС '+(p.dh>=0?'+':'−')+Math.abs(p.dh):''})`).join('; ')}
+
+function ecgList(){return [...document.querySelectorAll('.ecg')].filter(x=>x.checked).map(x=>x.dataset.l)}
+function highRisk(){const r=[];
+  if(v('c_ex'))r.push('потеря сознания во время нагрузки');if(v('c_lie'))r.push('потеря сознания лёжа');if(v('p_palp'))r.push('сердцебиение перед потерей сознания');
+  if(v('p_chest'))r.push('боль в груди или одышка');if(v('h_heart'))r.push('структурная болезнь сердца или ИБС');if(v('h_scd'))r.push('внезапная смерть родственников в молодом возрасте');
+  if(v('x_murmur'))r.push('систолический шум');ecgList().forEach(x=>r.push('ЭКГ: '+x));
+  if(v('p_none')&&!v('c_sleep'))r.push('внезапное начало без предвестников');return r}
+
+function classify(){
+  const c=calgary(), o=orth(), S={refl:[],orth:[],card:[],epi:[],psy:[]}, add=(k,t)=>S[k].push(t);
+  ['c_stand','c_heat','c_pain','c_sit','c_neck'].forEach(id=>{if(v(id))add('refl',{c_stand:'долгое стояние',c_heat:'духота, жара',c_pain:'боль, страх, вид крови',c_sit:'ситуационный провокатор',c_neck:'раздражение каротидного синуса'}[id])});
+  if(v('p_sweat'))add('refl','потливость');if(v('p_naus'))add('refl','тошнота');if(v('p_warm'))add('refl','жар');if(v('p_dark'))add('refl','потемнение в глазах');if(v('p_pres'))add('refl','дурнота');
+  if(G.face==='pale'){add('refl','бледность');}if(v('a_fast'))add('refl','быстрое восстановление');if(v('h_rep'))add('refl','повторные эпизоды с молодости');if(G.jerk==='short')add('refl','короткие подёргивания после падения (судорожная синкопе)');
+  if(v('c_up'))add('orth','эпизод вскоре после вставания');if(v('c_meal'))add('orth','после еды');if(v('h_drugs'))add('orth','гипотензивные, диуретики и т. п.');if(v('h_ans'))add('orth','вегетативная недостаточность');
+  if(o&&o.oh){add('orth','ортостатическая гипотензия на пробе');add('orth','ортостатическая гипотензия на пробе (вес ×2)');}if(o&&o.oh&&v('o_sym'))add('orth','симптомы воспроизвелись');
+  highRisk().forEach(x=>add('card',x));if(v('h_dev'))add('card','кардиостимулятор/ИКД');if(v('h_qt'))add('card','препараты, удлиняющие QT');
+  if(c.s>=1){add('epi',`шкала Калгари +${c.s}`);add('epi','шкала Калгари (вес ×2)');}
+  if(v('a_tside'))add('epi','прикус боковой поверхности языка');if(v('w_head'))add('epi','поворот головы');if(v('w_auto'))add('epi','автоматизмы');if(v('w_tonic'))add('epi','тоническая фаза, крик');
+  if(G.face==='cyan')add('epi','цианоз');if(G.jerk==='long')add('epi','ритмичные судороги ≥ 30 с с начала');if(v('a_conf'))add('epi','спутанность после');if(v('a_sleepy'))add('epi','сонливость, мышечные боли');
+  if(v('p_deja'))add('epi','дежавю');if(v('p_aura'))add('epi','аура');if(v('c_sleep'))add('epi','во сне');if(v('c_prov'))add('epi','недосып, алкоголь, свет');if(v('h_epi'))add('epi','эпилепсия в анамнезе');
+  if(v('l_lac')==='h')add('epi','повышен лактат');if(v('l_ck')==='h')add('epi','повышена КФК');if(v('x_focal'))add('epi','очаговая симптоматика');
+  if(v('w_eyes'))add('psy','глаза закрыты, сопротивление открытию');if(G.dur==='gt5'&&G.face!=='cyan'&&!v('a_tside'))add('psy','длительная «потеря сознания» без цианоза и прикуса');if(v('h_psych'))add('psy','частые эпизоды, психиатрический фон');
+  if(v('l_prl')==='n'&&S.psy.length)add('psy','нормальный пролактин после эпизода');
+  const N={refl:'рефлекторная (вазовагальная, ситуационная) синкопе',orth:'синкопе вследствие ортостатической гипотензии',card:'кардиальная (аритмогенная или структурная) синкопе',epi:'эпилептический приступ',psy:'психогенная псевдосинкопе или психогенный неэпилептический приступ'};
+  const ranked=Object.keys(S).map(k=>({k,n:N[k],sc:S[k].length,why:S[k].filter(x=>!x.includes('(вес'))})).sort((a,b)=>b.sc-a.sc);
+  return {c,o,ranked,hr:highRisk()}}
+
+function plan(r){const P=[];const top=r.ranked[0];const has=k=>r.ranked.find(x=>x.k===k).sc>0;
+  if(!v('e_done'))P.push('ЭКГ в 12 отведениях — обязательно всем');
+  if(!r.o)P.push('Активная ортостатическая проба: 5 мин лёжа, АД и ЧСС на 1-й и 3-й минуте стоя');
+  P.push('Глюкоза крови; общий анализ крови при подозрении на кровопотерю');
+  if(r.hr.length){P.push('<b>Высокий риск: мониторирование ЭКГ, ЭхоКГ, консультация кардиолога; решить вопрос о госпитализации</b>');P.push('Холтеровское мониторирование, при редких эпизодах — имплантируемый регистратор ритма');}
+  if(has('refl')&&!r.hr.length&&(v('age')||0)>40&&!v('x_carotid'))P.push('Массаж каротидного синуса (возраст > 40 лет, рефлекторный механизм; нет шума на сонных и ТИА/инсульта за 3 мес)');
+  if(has('refl')&&!r.hr.length)P.push('При неясных повторных эпизодах — тилт-тест');
+  if(r.o&&r.o.pots)P.push('Прирост ЧСС ≥ 30 без гипотензии — оценить синдром постуральной тахикардии');
+  if(has('orth'))P.push('Пересмотреть гипотензивные и диуретики; при нейрогенной ортостатической гипотензии — оценка вегетативной функции');
+  if(has('epi')){P.push('ЭЭГ (лучше с депривацией сна или видео-ЭЭГ); МРТ головного мозга по эпилептологическому протоколу');P.push('После первого неспровоцированного приступа противоэпилептические обычно не начинают без эпилептиформной ЭЭГ или структурного очага');}
+  if(has('psy'))P.push('Видео-ЭЭГ с записью эпизода; тилт-тест с ЭЭГ при псевдосинкопе');
+  P.push('Обсудить ограничение вождения до уточнения причины');
+  return P}
+
+function yesList(ids){return ids.filter(([id])=>v(id)).map(([,l])=>l)}
+function summary(r){
+  const L=[];const a=v('age'),sx=v('sex')==='f'?'Пациентка':'Пациент';
+  L.push(`${sx}${a?', '+a+' '+(a%10===1&&a%100!==11?'год':(a%10>=2&&a%10<=4&&(a%100<10||a%100>=20))?'года':'лет'):''}. ${v('tloc')?'Транзиторная потеря сознания':'Эпизод нарушения сознания (полная потеря сознания не подтверждена)'}${v('first')?', впервые':''}.`);
+  const circ=yesList([['c_stand','долгое стояние'],['c_heat','духота'],['c_pain','боль/страх/вид крови'],['c_sit','ситуационный провокатор'],['c_neck','поворот головы/тугой воротник'],['c_up','вскоре после вставания'],['c_meal','после еды'],['c_emo','эмоциональный стресс'],['c_ex','во время физической нагрузки'],['c_lie','в положении лёжа'],['c_sleep','во сне/после пробуждения'],['c_prov','недосып/алкоголь/мелькающий свет']]);
+  L.push('Обстоятельства: '+(circ.length?circ.join(', '):'без явного провокатора')+'.');
+  const pro=yesList([['p_sweat','потливость'],['p_pres','дурнота'],['p_naus','тошнота'],['p_warm','жар'],['p_dark','потемнение в глазах'],['p_deja','дежавю/жамевю'],['p_aura','аура'],['p_palp','сердцебиение'],['p_chest','боль в груди/одышка']]);
+  L.push('Предвестники: '+(v('p_none')?'отсутствовали, начало внезапное':pro.length?pro.join(', '):'не описаны')+'.');
+  const W=[];const D={lt1:'менее 1 мин',['1to5']:'1–5 мин',gt5:'более 5 мин'};if(G.dur==='unk')W.push('очевидцев нет');else if(G.dur)W.push('длительность '+D[G.dur]);
+  if(G.jerk==='no')W.push('без подёргиваний');if(G.jerk==='short')W.push('единичные кратковременные подёргивания после падения');if(G.jerk==='long')W.push('ритмичные судороги ≥ 30 с с начала эпизода');
+  if(G.face==='pale')W.push('лицо бледное');if(G.face==='cyan')W.push('цианоз');
+  W.push(...yesList([['w_unresp','не реагировал, необычная поза/подёргивания или амнезия эпизода'],['w_head','поворот головы'],['w_tonic','тоническое напряжение, крик'],['w_auto','автоматизмы'],['w_eyes','глаза закрыты, сопротивление открытию']]));
+  if(W.length)L.push('Со слов очевидцев: '+W.join(', ')+'.');
+  const Af=yesList([['a_tside','прикус боковой поверхности языка'],['a_ttip','прикус кончика языка'],['a_conf','спутанность'],['a_fast','быстрое полное восстановление'],['a_sleepy','сонливость, головная/мышечная боль'],['a_inc','недержание мочи'],['a_inj','травма при падении']]);
+  if(Af.length)L.push('После эпизода: '+Af.join(', ')+'.');
+  const H=yesList([['h_rep','аналогичные эпизоды с молодости'],['h_heart','структурная болезнь сердца/ИБС'],['h_scd','внезапная смерть родственников в молодом возрасте'],['h_dev','кардиостимулятор/ИКД'],['h_epi','эпилепсия'],['h_drugs','гипотензивные/диуретики/вазодилататоры'],['h_qt','препараты, удлиняющие QT'],['h_ans','вегетативная недостаточность'],['h_psych','частые эпизоды, психиатрический фон']]);
+  if(H.length)L.push('Анамнез: '+H.join(', ')+'.');
+  L.push(`Шкала Калгари (Sheldon, 2002): ${r.c.s>0?'+':r.c.s<0?'−':''}${Math.abs(r.c.s)} ${Math.abs(r.c.s)%10===1&&Math.abs(r.c.s)%100!==11?'балл':(Math.abs(r.c.s)%10>=2&&Math.abs(r.c.s)%10<=4&&(Math.abs(r.c.s)%100<10||Math.abs(r.c.s)%100>=20))?'балла':'баллов'} — ${r.c.s>=1?'в пользу эпилептического приступа':'в пользу синкопе'}${r.c.it.length?' ('+r.c.it.join(', ')+')':''}.`);
+  if(r.o)L.push(`Активная ортостатическая проба: лёжа ${v('s0')}${v('d0')!=null?'/'+v('d0'):''}${v('h0')!=null?', ЧСС '+v('h0'):''}; ${orthText(r.o)} — ${r.o.oh?'ортостатическая гипотензия':r.o.pots?'прирост ЧСС ≥ 30 без гипотензии':'без ортостатической гипотензии'}${v('o_sym')?', симптомы воспроизвелись':''}.`);
+  if(v('e_done')){const e=ecgList();L.push('ЭКГ: '+(e.length?e.join('; '):'без признаков аритмогенной синкопе')+'.');}
+  const ex=yesList([['x_murmur','систолический шум'],['x_focal','очаговая неврологическая симптоматика'],['x_carotid','шум над сонными артериями']]);if(ex.length)L.push('Осмотр: '+ex.join(', ')+'.');
+  const lab=[];const LB={l_lac:'лактат',l_ck:'КФК',l_prl:'пролактин'};Object.keys(LB).forEach(k=>{const x=v(k);if(x)lab.push(LB[k]+' '+(x==='h'?'повышен':'в норме'))});if(v('l_glu'))lab.push(v('l_glu')==='l'?'гипогликемия':'глюкоза в норме');if(lab.length)L.push('Лабораторно: '+lab.join(', ')+'.');
+  const top=r.ranked.filter(x=>x.sc>0);
+  if(r.hr.length)L.push('Признаки высокого риска (ESC, 2018): '+r.hr.join(', ')+'.');
+  L.push('Заключение: '+(top.length?'наиболее вероятно — '+top[0].n+(top[1]&&top[1].sc>=Math.max(2,top[0].sc-1)?'; нельзя исключить: '+top.slice(1).filter(x=>x.sc>=2).map(x=>x.n).join('; '):''):'данных для дифференциации недостаточно')+(r.hr.length&&top.length&&top[0].k!=='card'?'. Кардиальная причина требует исключения':'')+'.');
+  L.push('План:\n'+plan(r).map(x=>'– '+x.replace(/<[^>]+>/g,'')).join('\n'));
+  return L.join('\n')}
+
+function render(){
+  const o=orth();
+  $('ohout').innerHTML=!o?'':o.oh?box('bad','Ортостатическая гипотензия',[orthText(o)],'<p>Снижение систолического АД ≥ 20, диастолического ≥ 10 мм рт. ст. или систолическое &lt; 90 мм рт. ст.</p>'):o.pots?box('warn','Прирост ЧСС ≥ 30 без гипотензии',[orthText(o)],'<p>Возможен синдром постуральной тахикардии, если симптомы воспроизводятся.</p>'):box('ok','Без ортостатической гипотензии',[orthText(o)]);
+  if(cur!=='s3')return;
+  const r=classify(); let h='';
+  if(!v('tloc'))h+=box('info','Полная потеря сознания не подтверждена',[],'<p>Если это было головокружение, падение без потери сознания или предобморочное состояние — алгоритм применим ограниченно.</p>');
+  if(r.hr.length)h+=box('bad','Признаки высокого риска — сначала исключить кардиальную причину',r.hr,'<p>Судорожная синкопе при аритмии может выглядеть как приступ. ЭКГ-мониторирование, ЭхоКГ, кардиолог.</p>');
+  const cs=r.c.s;h+=box(cs>=1?'warn':'ok',`Шкала Калгари: ${cs>0?'+':cs<0?'−':''}${Math.abs(cs)}`,r.c.it,`<p>${cs>=1?'≥ 1 балла — в пользу эпилептического приступа':'< 1 балла — в пользу синкопе'}. Чувствительность и специфичность 94% (Sheldon, 2002).</p>`);
+  const top=r.ranked.filter(x=>x.sc>0);
+  if(top.length){h+=box('info','Наиболее вероятно: '+top[0].n,top[0].why.slice(0,8));
+    top.slice(1).filter(x=>x.sc>=2).forEach(x=>h+=box('','Нельзя исключить: '+x.n,x.why.slice(0,6)));}
+  else h+=box('','Данных пока мало',[],'<p>Отметьте обстоятельства, предвестники и что видели очевидцы.</p>');
+  h+=box('','План обследования',plan(r));
+  $('res').innerHTML=h; $('sum').textContent=summary(r);
+}
+const MK='tlok-mail';try{$('mail').value=localStorage.getItem(MK)||'dorogovvn2@zdrav.mos.ru'}catch(e){$('mail').value='dorogovvn2@zdrav.mos.ru'}
+$('mail').addEventListener('change',()=>{try{localStorage.setItem(MK,$('mail').value.trim())}catch(e){}});
+$('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}
+  const t=v('tag'),sub='ТПС: синкопе или приступ'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
+  location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent($('sum').textContent.replace(/\n/g,'\r\n'))};
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('sum').textContent);$('copy').textContent='Скопировано'}catch(e){$('copy').textContent='Не удалось — выделите текст'}setTimeout(()=>$('copy').textContent='Скопировать',1800)};
+$('reset').onclick=()=>{document.querySelectorAll('input').forEach(i=>{if(i.id==='mail')return;if(i.type==='checkbox')i.checked=i.id==='tloc';else i.value=''});document.querySelectorAll('select').forEach(s=>s.selectedIndex=0);
+  Object.keys(G).forEach(k=>G[k]=null);document.querySelectorAll('.seg3 button').forEach(b=>b.classList.remove('on'));show('s1')};
+show('s1');
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('/tlok-k3v9qm-sw.js',{scope:'/tlok-k3v9qm'}).catch(()=>{});
+</script>
+</body>
+</html>
