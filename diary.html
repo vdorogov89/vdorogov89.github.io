@@ -369,7 +369,7 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
     </div>
     <p class="small">При приёме гормональных контрацептивов без перерыва или во время беременности анализ по циклу не имеет смысла — выключите его. Данные о цикле, как и все записи, хранятся только на этом устройстве.</p>
     <h2>Атмосферное давление</h2>
-    <p>Дневник может сам подтягивать давление в вашем городе за дни приступов. Через 2–3 месяца в сводке появится сравнение: как часто давление резко падало в дни с головной болью и в дни без неё.</p>
+    <p>Дневник может сам подтягивать давление в вашем городе за дни приступов. В сводке появится график давления с отметками дней боли, а через 2–3 месяца — сравнение: как часто давление резко падало или росло в день боли и за 1–2 дня до неё по сравнению с днями без боли.</p>
     <label class="switch"><input type="checkbox" id="wxOn"> Учитывать атмосферное давление</label>
     <div id="wxBox" hidden>
       <div class="wxrow"><input type="text" id="wxCity" placeholder="Ваш город, например Москва"><button type="button" class="btn-ghost" id="wxFind">Найти</button></div>
@@ -515,7 +515,7 @@ function wxText(pt,short){
 }
 function wxRange(){
   const t=today(); let start=dPlus(t,-2);
-  if(entries.length){const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); start=dPlus(first,-1);}
+  if(entries.length){const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); start=dPlus(first,-3);}
   const lim=dPlus(t,-400); if(start<lim) start=lim; return [start,t];
 }
 async function wxFetch(url){const r=await fetch(url); if(!r.ok) throw new Error(r.status); return r.json();}
@@ -552,27 +552,72 @@ async function wxFind(){
   }catch(e){$('wxRes').innerHTML='<span class="small">Не удалось связаться с сервисом погоды. Проверьте интернет.</span>';}
 }
 function wxUI(){ $('wxOn').checked=!!wx.on; $('wxBox').hidden=!wx.on; wxStat(); wxHintUpd(); }
+const LAGS=[[0,'в день боли'],[1,'за 1 день'],[2,'за 2 дня'],['w','любой из 3 дней']];
+function wxCh(d){const pt=wxPoint(d,12); return pt&&pt.d!=null?pt.d:null;}
+function pressStats(start,end,hd){
+  // для каждого дня: было ли резкое изменение (|Δ за сутки| ≥ DROP) в тот же день, накануне, за 2 дня; отдельно падение и подъём
+  const z=()=>({n:0,fall:{0:0,1:0,2:0,w:0},rise:{0:0,1:0,2:0,w:0},any:{0:0,1:0,2:0,w:0}}), H=z(), N=z();
+  for(let d=start; d<=end; d=dPlus(d,1)){
+    const c=[0,1,2].map(k=>wxCh(dPlus(d,-k))); if(c.some(x=>x==null)) continue;
+    const o=hd.has(d)?H:N; o.n++;
+    ['fall','rise','any'].forEach(dir=>{const f=x=>dir==='fall'?x<=-DROP:dir==='rise'?x>=DROP:Math.abs(x)>=DROP;
+      let w=false; c.forEach((x,k)=>{if(f(x)){o[dir][k]++; w=true;}}); if(w) o[dir].w++;});
+  }
+  return {H,N};
+}
+function pressChart(start,end,list,mode){
+  const pr=mode==='print', C=pr?{n:'#2a7fb8',f:'#d9534f',r:'#e08a00',h:'#7a4fd6',g:'#ddd',t:'#555'}:{n:'#4FE0FF',f:'#FF8A7A',r:'#FFC56B',h:'#B79BFF',g:'rgba(255,255,255,0.08)',t:'rgba(255,255,255,0.55)'};
+  const k=h=>h<10?'0'+h:''+h, s0=dPlus(start,-2), pts=[];
+  for(let d=s0; d<=end; d=dPlus(d,1)) WXH.forEach(h=>{const v=wxc.h[d+'T'+k(h)]; if(v==null) return; const q=wxc.h[dPlus(d,-1)+'T'+k(h)];
+    pts.push({d,h,p:v*MMHG,dl:q==null?0:(v-q)*MMHG});});
+  if(pts.length<4) return '';
+  const days=Math.round((Date.parse(end)-Date.parse(s0))/864e5)+1, W=Math.max(340,days*7), Ht=pr?150:180, pl=34, prr=8, pt=10, pb=22;
+  const tx=(d,h)=>pl+((Date.parse(d)-Date.parse(s0))/864e5+h/24)/days*(W-pl-prr);
+  let lo=Math.min(...pts.map(x=>x.p)), hi=Math.max(...pts.map(x=>x.p)); lo=Math.floor(lo-1); hi=Math.ceil(hi+1);
+  const ty=p=>pt+(hi-p)/(hi-lo)*(Ht-pt-pb);
+  let g=`<svg viewBox="0 0 ${W} ${Ht}" style="width:100%;min-width:${pr?0:Math.min(W,days*6)}px;height:auto" role="img" aria-label="Атмосферное давление и дни с головной болью">`;
+  [lo,Math.round((lo+hi)/2),hi].forEach(v=>{g+=`<line x1="${pl}" x2="${W-prr}" y1="${ty(v)}" y2="${ty(v)}" stroke="${C.g}"/><text x="${pl-4}" y="${ty(v)+4}" text-anchor="end" font-size="10" fill="${C.t}">${v}</text>`;});
+  for(let d=s0; d<=end; d=dPlus(d,1)){const dd=+d.slice(8); if(dd===1||(days<=45&&(dd%7===1&&dd<29))){const x=tx(d,0);
+    g+=`<line x1="${x}" x2="${x}" y1="${pt}" y2="${Ht-pb}" stroke="${C.g}"/><text x="${x+2}" y="${Ht-6}" font-size="10" fill="${C.t}">${dd===1?mName(d.slice(0,7)).split(' ')[0].slice(0,3).toLowerCase()+' 1':dd}</text>`;}}
+  // дни боли: вертикальная полоса за сутки + точки в час начала
+  const byDay={}; list.filter(e=>e.date>=start&&e.date<=end).forEach(e=>(byDay[e.date]=byDay[e.date]||[]).push(e));
+  Object.keys(byDay).forEach(d=>{const x0=tx(d,0), x1=tx(d,24); g+=`<rect x="${x0}" y="${pt}" width="${Math.max(1.5,x1-x0)}" height="${Ht-pt-pb}" fill="${C.h}" opacity="0.13"/>`;});
+  // линия давления: цвет по изменению за сутки
+  const col=x=>x.dl<=-DROP?C.f:x.dl>=DROP?C.r:C.n;
+  for(let i=1;i<pts.length;i++){const a=pts[i-1], b=pts[i]; if((Date.parse(b.d)-Date.parse(a.d))/864e5>1.5) continue; const c=col(b);
+    g+=`<line x1="${tx(a.d,a.h).toFixed(1)}" y1="${ty(a.p).toFixed(1)}" x2="${tx(b.d,b.h).toFixed(1)}" y2="${ty(b.p).toFixed(1)}" stroke="${c}" stroke-width="${c===C.n?1.6:2.6}" stroke-linecap="round"/>`;}
+  Object.keys(byDay).forEach(d=>byDay[d].forEach(e=>{const h=e.tod?TODH[e.tod]:12, ptv=wxPoint(d,h); if(!ptv) return;
+    g+=`<circle cx="${tx(d,h).toFixed(1)}" cy="${ty(ptv.p).toFixed(1)}" r="${e.intensity>=7?4.5:3.5}" fill="${C.h}" stroke="${pr?'#fff':'#08080D'}" stroke-width="1.2"/>`;}));
+  g+='</svg>';
+  const I='display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 5px 0 0;vertical-align:-1px;';
+  const lg=`<div class="legend" style="display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px"><span><i style="${I}background:${C.n}"></i>давление, мм рт. ст.</span><span><i style="${I}background:${C.f}"></i>резкое падение</span><span><i style="${I}background:${C.r}"></i>резкий подъём</span><span><i style="${I}background:${C.h};border-radius:50%"></i>приступ (полоса — весь день)</span></div>`;
+  return lg+`<div class="chartbox">${g}</div>`;
+}
 function pressureBlock(list,months,mode){
   if(!wx.on||!wx.lat) return '';
   const t=today(); let start=months[0]+'-01'; const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); if(first>start) start=first;
   const lastM=months[months.length-1]; let end=dPlus((lastM.slice(5)==='12'?(+lastM.slice(0,4)+1)+'-01':lastM.slice(0,5)+pad(+lastM.slice(5)+1))+'-01',-1); if(end>t) end=t;
-  const hd=new Set(list.map(e=>e.date)); let hN=0,hD=0,nN=0,nD=0;
-  for(let d=start; d<=end; d=dPlus(d,1)){const pt=wxPoint(d,12); if(!pt||pt.d==null) continue; const drop=pt.d<=-DROP;
-    if(hd.has(d)){hN++; if(drop)hD++;} else {nN++; if(drop)nD++;}}
-  const title='<h2>Атмосферное давление</h2>';
+  const hd=new Set(list.map(e=>e.date)), {H,N}=pressStats(start,end,hd), hN=H.n, nN=N.n;
+  const chart=pressChart(start,end,list,mode);
+  const title='<h2>Атмосферное давление</h2>', expl=`<p class="small">Резким считается изменение на ${DROP} мм рт. ст. и больше за сутки. Полоса — день с головной болью, точка — время начала приступа. Сравните, что было с линией в день боли и за 1–2 дня до него.</p>`;
   if(hN<8||nN<20){
     const need=[hN<8?`ещё ${8-hN} ${plural(8-hN,'день','дня','дней')} с болью`:null, nN<20?`ещё ${20-nN} ${plural(20-nN,'день','дня','дней')} без боли`:null].filter(Boolean).join(' и ');
-    const msg=`Для сравнения нужно хотя бы 8 дней с болью и 20 дней без боли, по которым известно давление. Сейчас: с болью — ${hN}, без боли — ${nN}. Осталось набрать ${need}.`;
-    return mode==='print'?'':title+`<p class="small">${msg}</p>`;
+    const msg=`Для подсчёта нужно хотя бы 8 дней с болью и 20 дней без боли, по которым известно давление. Сейчас: с болью — ${hN}, без боли — ${nN}. Осталось набрать ${need}.`;
+    return mode==='print'?(chart?`<h2>Атмосферное давление (${esc(wx.name)})</h2>`+chart:''):title+chart+expl+`<p class="small">${msg}</p>`;
   }
-  const A=Math.round(hD/hN*100), B=Math.round(nD/nN*100);
-  const verdict=(A>=B*1.5&&A-B>=10)?'В дни с головной болью резкое падение давления бывало заметно чаще. Возможно, вы чувствительны к перемене погоды — это стоит обсудить с врачом.'
-    :(Math.abs(A-B)<10?'Заметной разницы нет: судя по вашим записям, давление вряд ли главный провокатор боли.':'Разница небольшая, делать выводы пока рано.');
-  const line=`Резкое падение давления (на ${DROP} мм рт. ст. и больше за сутки) было в ${A}% дней с головной болью (${hD} из ${hN}) и в ${B}% дней без боли (${nD} из ${nN}).`;
-  if(mode==='print') return `<p><b>Атмосферное давление</b> (${esc(wx.name)}): ${line}</p>`;
-  const mx=Math.max(A,B,1);
-  return title+`<div class="bars"><div class="row"><span>Дни с болью</span><div class="track"><div class="fill" style="width:${A/mx*100}%"></div></div><span>${A}%</span></div><div class="row"><span>Дни без боли</span><div class="track"><div class="fill" style="width:${B/mx*100}%"></div></div><span>${B}%</span></div></div>
-    <p class="small">${line} ${verdict} Это совпадения по времени, а не доказательство причины. Данные: Open-Meteo, ${esc(wx.name)}.</p>`;
+  const P=(o,dir,k)=>Math.round(o[dir][k]/o.n*100);
+  const DIRL={fall:'резкое падение',rise:'резкий подъём',any:'резкое изменение'};
+  let best=null;
+  ['fall','rise','any'].forEach(dir=>LAGS.forEach(([k])=>{const A=P(H,dir,k), B=P(N,dir,k);
+    if(H[dir][k]>=4&&A>=B*1.5&&A-B>=10&&(!best||A-B>best.A-best.B)) best={dir,k,A,B};}));
+  const lagTxt={0:'в тот же день',1:'накануне',2:'за 2 дня до боли',w:'в течение 2 дней до боли или в тот же день'};
+  const verdict=best?`Чаще всего с болью совпадал${best.dir==='rise'?'':'о'} ${DIRL[best.dir]} давления ${lagTxt[best.k]}: ${best.A}% дней с болью против ${best.B}% дней без боли. Возможно, вы чувствительны к перемене погоды — это стоит обсудить с врачом.`
+    :'Ни падение, ни подъём давления — ни в день боли, ни за 1–2 дня до неё — не встречались заметно чаще, чем в дни без боли. Судя по записям, давление вряд ли главный провокатор.';
+  const NW=' style="white-space:nowrap"', rows=LAGS.map(([k,l])=>`<tr><td>${l}</td><td${NW}>${P(H,'fall',k)}% / ${P(N,'fall',k)}%</td><td${NW}>${P(H,'rise',k)}% / ${P(N,'rise',k)}%</td></tr>`).join('');
+  const tbl=`<table><tr><th>Когда</th><th>Падение</th><th>Подъём</th></tr>${rows}</table>`;
+  const note=`Дней с болью: ${hN}, без боли: ${nN}. В ячейках: доля дней с болью / доля дней без боли. Проверяется сразу несколько вариантов, поэтому одно совпадение может быть случайным — надёжнее, если картина повторится через несколько месяцев. Это совпадения по времени, а не доказательство причины. Данные: Open-Meteo, ${esc(wx.name)}.`;
+  if(mode==='print') return `<h2>Атмосферное давление (${esc(wx.name)})</h2>${chart}${tbl}<p>${verdict}</p><p class="pnote">${note}</p>`;
+  return title+chart+expl+`<div class="mtable">${tbl}</div><p>${verdict}</p><p class="small">${note}</p>`;
 }
 
 // аура
