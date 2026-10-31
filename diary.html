@@ -158,13 +158,14 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
 #editBanner{margin-top:0;}
 :focus-visible{outline:2px solid var(--grad1); outline-offset:3px;}
 #pzView{position:fixed; inset:0; z-index:100; background:#08080D; display:flex; flex-direction:column; padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
-#pzView[hidden]{display:none;}
+#pzView[hidden]{display:none;} #pzView{-webkit-user-select:none; user-select:none;} .pzbar,.pzfoot,#pzAxis,#pzXAxis{touch-action:none;}
+#pzClr{float:right; margin:0 0 4px 10px; padding:5px 10px; border-radius:10px; border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--muted); font-size:13px; touch-action:manipulation;}
 .pzbar{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--line);}
 .pzbar b{flex:1; font-size:15px;} .pzbar span{color:var(--muted); font-size:13px; min-width:34px; text-align:right;}
-.pzbar button{width:40px; height:40px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--ink); font-size:20px; line-height:1;}
+.pzbar button{touch-action:manipulation; -webkit-user-select:none; user-select:none; width:40px; height:40px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--ink); font-size:20px; line-height:1;}
 #pzWrap{flex:1; position:relative; min-height:0;} #pzAxis{position:absolute; left:0; top:0; bottom:0; width:40px; overflow:hidden; pointer-events:none; background:linear-gradient(90deg,#08080D 78%,rgba(8,8,13,0));} #pzAxisIn{position:relative;} #pzAxis span{position:absolute; left:4px; font-size:12px; line-height:16px; color:rgba(255,255,255,0.6);}
 #pzYv{display:none; position:absolute; left:0; font:600 11.5px/18px Inter,sans-serif; padding:0 3px; border-radius:5px; background:#fff; color:#08080D;}
-#pzXAxis{position:absolute; left:0; right:0; bottom:0; height:24px; overflow:hidden; pointer-events:none; background:linear-gradient(0deg,#08080D 70%,rgba(8,8,13,0));} #pzXIn{position:relative; height:24px;} #pzXAxis span{position:absolute; bottom:5px; font-size:12px; color:rgba(255,255,255,0.6); white-space:nowrap;}
+#pzXAxis{position:absolute; left:40px; right:0; bottom:0; height:24px; overflow:hidden; pointer-events:none; background:linear-gradient(0deg,#08080D 70%,rgba(8,8,13,0));} #pzXIn{position:relative; height:24px;} #pzXAxis span{position:absolute; bottom:5px; font-size:12px; color:rgba(255,255,255,0.6); white-space:nowrap;}
 #pzScroll{height:100%; box-sizing:border-box; overflow:auto; -webkit-overflow-scrolling:touch; touch-action:pan-x pan-y; overscroll-behavior:contain;}
 .pzfoot{padding:10px 14px 14px; border-top:1px solid var(--line);} #pzInfo{font-size:14.5px; min-height:40px; margin-bottom:6px;}
 .pchart{cursor:zoom-in;}
@@ -615,7 +616,7 @@ function pzRender(keep,anchor){
   const sc=$('pzScroll'); if(!pzArgs||!sc) return; const mx=(sc.scrollLeft+sc.clientWidth/2)/(sc.scrollWidth||1), my=(sc.scrollTop+sc.clientHeight/2)/(sc.scrollHeight||1);
   const h=Math.max(150,sc.clientHeight); sc.innerHTML=pressChart(pzArgs.start,pzArgs.end,pzArgs.list,'screen',{w:pzBaseW,z:pzZ,h,zy:pzZy});
   const D=pzData; $('pzAxisIn').innerHTML=D?D.yt.map(([v,y])=>`<span style="top:${y-8}px">${v}</span>`).join('')+'<b id="pzYv"></b>':'';
-  $('pzXIn').innerHTML=D?D.xt.map(([l,x])=>`<span style="left:${x+2}px">${l}</span>`).join(''):'';
+  $('pzXIn').innerHTML=D?D.xt.map(([l,x])=>`<span style="left:${x+2-40}px">${l}</span>`).join(''):'';
   pzLvl();
   if(anchor){sc.scrollLeft=anchor.rx*sc.scrollWidth-anchor.px; sc.scrollTop=anchor.ry*sc.scrollHeight-anchor.py;}
   else if(keep){sc.scrollLeft=mx*sc.scrollWidth-sc.clientWidth/2; sc.scrollTop=my*sc.scrollHeight-sc.clientHeight/2;}
@@ -638,21 +639,27 @@ function pzMark(best){
   dt.setAttribute('cx',cx); dt.setAttribute('cy',cy); dt.setAttribute('visibility','visible');
   const yv=$('pzYv'); if(yv){yv.textContent=(Math.round(best.p*10)/10).toString().replace('.',','); yv.style.top=(cy-9)+'px'; yv.style.display='block';}
 }
+function pzUnmark(){pzSel=null; ['pzCross','pzCrossH','pzDot'].forEach(id=>{const el=$(id); if(el) el.setAttribute('visibility','hidden');}); const yv=$('pzYv'); if(yv) yv.style.display='none';
+  $('pzInfo').textContent='Коснитесь линии, чтобы увидеть давление и изменение за сутки.';}
 function pzTap(clientX){
   const sc=$('pzScroll'), svg=sc.querySelector('svg'); if(!svg||!pzData) return; const r=svg.getBoundingClientRect(), x=clientX-r.left;
   const D=pzData; let best=null, bd=1e9; D.pts.forEach(p=>{const dx=Math.abs(D.tx(p.d,p.h)-x); if(dx<bd){bd=dx; best=p;}}); if(!best) return;
+  if(pzSel&&Math.abs(D.tx(pzSel.d,pzSel.h)-x)<16){pzUnmark(); return;}
   pzSel=best; pzMark(best);
   const dl=Math.round(best.dl), ch=dl<=-DROP?' — резкое падение':dl>=DROP?' — резкий подъём':'';
   const att=(D.byDay[best.d]||[]).map(e=>`приступ ${e.intensity}/10${e.tod?' ('+TODSHORT[e.tod]+')':''}`).join(', ');
   const nx=[1,2].filter(n=>D.byDay[dPlus(best.d,n)]).map(n=>n===1?'на следующий день':'через 2 дня'); const lagT=nx.length?'<br><span style="color:#B79BFF">Головная боль '+nx.join(' и ')+'</span>':'';
-  $('pzInfo').innerHTML=`<b>${fmtDate(best.d)}, ${pad(best.h)}:00</b> · ${Math.round(best.p)} мм рт. ст. · за сутки ${dl>0?'+':''}${dl}${ch}${att?'<br>'+att:''}${lagT}`;
+  $('pzInfo').innerHTML=`<button type="button" id="pzClr" aria-label="Убрать отметку">Убрать ✕</button><b>${fmtDate(best.d)}, ${pad(best.h)}:00</b> · ${Math.round(best.p)} мм рт. ст. · за сутки ${dl>0?'+':''}${dl}${ch}${att?'<br>'+att:''}${lagT}`;
 }
 (function pzInit(){
   const v=document.createElement('div'); v.id='pzView'; v.hidden=true;
   v.innerHTML=`<div class="pzbar"><b>Атмосферное давление</b><span id="pzLvl">×1</span><button type="button" id="pzOut" aria-label="Уменьшить">−</button><button type="button" id="pzIn" aria-label="Увеличить">+</button><button type="button" id="pzX" aria-label="Закрыть">✕</button></div>
-    <div id="pzWrap"><div id="pzScroll"></div><div id="pzAxis"><div id="pzAxisIn"></div></div><div id="pzXAxis"><div id="pzXIn"></div></div></div><div class="pzfoot"><div id="pzInfo"></div><div class="small">Разведите пальцы по горизонтали — растянуть по дням, по вертикали — по давлению. «+»/«−» — масштаб по дням, двойное касание — сбросить. Поверните телефон — график станет шире.</div></div>`;
+    <div id="pzWrap"><div id="pzScroll"></div><div id="pzAxis"><div id="pzAxisIn"></div></div><div id="pzXAxis"><div id="pzXIn"></div></div></div><div class="pzfoot"><div id="pzInfo"></div><div class="small">Разведите пальцы по горизонтали — растянуть по дням, по вертикали — по давлению. «+»/«−» — масштаб по дням, двойное касание — сбросить. Отметку убирает повторное касание рядом с ней или кнопка «Убрать». Поверните телефон — график станет шире.</div></div>`;
   document.body.appendChild(v);
+  $('pzInfo').addEventListener('click',e=>{if(e.target.closest('#pzClr')) pzUnmark();});
   $('pzX').onclick=()=>pzClose(false); $('pzIn').onclick=()=>pzZoom(pzZ*1.5); $('pzOut').onclick=()=>pzZoom(pzZ/1.5,true,null,pzZ/1.5<=1?1:null);
+  ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>{if(!$('pzView').hidden) e.preventDefault();},{passive:false}));
+  v.addEventListener('touchmove',e=>{if(e.touches.length>1&&!e.target.closest('#pzScroll')) e.preventDefault();},{passive:false});
   window.addEventListener('popstate',()=>pzClose(true));
   document.addEventListener('keydown',e=>{if(e.key==='Escape') pzClose(false);});
   // поворот: сразу убрать старую картинку (иначе iOS масштабирует страницу под неё), перерисовать после того, как экран уляжется
