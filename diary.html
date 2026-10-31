@@ -157,6 +157,15 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
 .mtable td.amber{color:var(--amber); font-weight:600;}
 #editBanner{margin-top:0;}
 :focus-visible{outline:2px solid var(--grad1); outline-offset:3px;}
+#pzView{position:fixed; inset:0; z-index:100; background:#08080D; display:flex; flex-direction:column; padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+#pzView[hidden]{display:none;}
+.pzbar{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--line);}
+.pzbar b{flex:1; font-size:15px;} .pzbar span{color:var(--muted); font-size:13px; min-width:34px; text-align:right;}
+.pzbar button{width:40px; height:40px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--ink); font-size:20px; line-height:1;}
+#pzWrap{flex:1; position:relative; min-height:0;} #pzAxis{position:absolute; left:0; top:0; bottom:0; width:38px; pointer-events:none; background:linear-gradient(90deg,#08080D 75%,rgba(8,8,13,0));} #pzAxis span{position:absolute; left:4px; font-size:12px; color:rgba(255,255,255,0.6);}
+#pzScroll{height:100%; box-sizing:border-box; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; touch-action:pan-x; padding:8px 0;}
+.pzfoot{padding:10px 14px 14px; border-top:1px solid var(--line);} #pzInfo{font-size:14.5px; min-height:40px; margin-bottom:6px;}
+.pchart{cursor:zoom-in;}
 @media (max-width:600px){
   .intro h1{font-size:32px;}
   .panel{padding:18px;}
@@ -565,20 +574,20 @@ function pressStats(start,end,hd){
   }
   return {H,N};
 }
-function pressChart(start,end,list,mode){
+function pressChart(start,end,list,mode,big){
   const pr=mode==='print', C=pr?{n:'#2a7fb8',f:'#d9534f',r:'#e08a00',h:'#7a4fd6',g:'#ddd',t:'#555'}:{n:'#4FE0FF',f:'#FF8A7A',r:'#FFC56B',h:'#B79BFF',g:'rgba(255,255,255,0.08)',t:'rgba(255,255,255,0.55)'};
   const k=h=>h<10?'0'+h:''+h, s0=dPlus(start,-2), pts=[];
   for(let d=s0; d<=end; d=dPlus(d,1)) WXH.forEach(h=>{const v=wxc.h[d+'T'+k(h)]; if(v==null) return; const q=wxc.h[dPlus(d,-1)+'T'+k(h)];
     pts.push({d,h,p:v*MMHG,dl:q==null?0:(v-q)*MMHG});});
   if(pts.length<4) return '';
-  const days=Math.round((Date.parse(end)-Date.parse(s0))/864e5)+1, W=Math.max(340,days*7), Ht=pr?150:180, pl=34, prr=8, pt=10, pb=22;
+  const days=Math.round((Date.parse(end)-Date.parse(s0))/864e5)+1, W=big?Math.round(big.w*big.z):Math.max(340,days*7), Ht=big?big.h:pr?150:180, pl=34, prr=big?14:8, pt=10, pb=22, fs=big?12:10;
   const tx=(d,h)=>pl+((Date.parse(d)-Date.parse(s0))/864e5+h/24)/days*(W-pl-prr);
   let lo=Math.min(...pts.map(x=>x.p)), hi=Math.max(...pts.map(x=>x.p)); lo=Math.floor(lo-1); hi=Math.ceil(hi+1);
-  const ty=p=>pt+(hi-p)/(hi-lo)*(Ht-pt-pb);
-  let g=`<svg viewBox="0 0 ${W} ${Ht}" style="width:100%;min-width:${pr?0:Math.min(W,days*6)}px;height:auto" role="img" aria-label="Атмосферное давление и дни с головной болью">`;
-  [lo,Math.round((lo+hi)/2),hi].forEach(v=>{g+=`<line x1="${pl}" x2="${W-prr}" y1="${ty(v)}" y2="${ty(v)}" stroke="${C.g}"/><text x="${pl-4}" y="${ty(v)+4}" text-anchor="end" font-size="10" fill="${C.t}">${v}</text>`;});
-  for(let d=s0; d<=end; d=dPlus(d,1)){const dd=+d.slice(8); if(dd===1||(days<=45&&(dd%7===1&&dd<29))){const x=tx(d,0);
-    g+=`<line x1="${x}" x2="${x}" y1="${pt}" y2="${Ht-pb}" stroke="${C.g}"/><text x="${x+2}" y="${Ht-6}" font-size="10" fill="${C.t}">${dd===1?mName(d.slice(0,7)).split(' ')[0].slice(0,3).toLowerCase()+' 1':dd}</text>`;}}
+  const ty=p=>pt+(hi-p)/(hi-lo)*(Ht-pt-pb), yt=[];
+  let g=`<svg viewBox="0 0 ${W} ${Ht}" style="${big?`width:${W}px;height:${Ht}px;display:block`:`width:100%;min-width:${pr?0:Math.min(W,days*6)}px;height:auto`}" role="img" aria-label="Атмосферное давление и дни с головной болью">`;
+  (big?Array.from({length:Math.floor((hi-lo)/2)+1},(_,i)=>lo+i*2):[lo,Math.round((lo+hi)/2),hi]).forEach(v=>{g+=`<line x1="${big?0:pl}" x2="${W-prr}" y1="${ty(v)}" y2="${ty(v)}" stroke="${C.g}"/>`+(big?'':`<text x="${pl-4}" y="${ty(v)+4}" text-anchor="end" font-size="${fs}" fill="${C.t}">${v}</text>`); if(big) yt.push([v,ty(v)]);});
+  for(let d=s0; d<=end; d=dPlus(d,1)){const dd=+d.slice(8), pxd=(W-pl-prr)/days, every=big?(pxd>=34?1:pxd>=16?2:pxd>=8?7:0):0; if(dd===1||(big?every&&(every===7?dd%7===1&&dd<29:dd%every===0&&dd<30):(days<=45&&(dd%7===1&&dd<29)))){const x=tx(d,0);
+    g+=`<line x1="${x}" x2="${x}" y1="${pt}" y2="${Ht-pb}" stroke="${C.g}"/><text x="${x+2}" y="${Ht-6}" font-size="${fs}" fill="${C.t}">${dd===1?mName(d.slice(0,7)).split(' ')[0].slice(0,3).toLowerCase()+' 1':dd}</text>`;}}
   // дни боли: вертикальная полоса за сутки + точки в час начала
   const byDay={}; list.filter(e=>e.date>=start&&e.date<=end).forEach(e=>(byDay[e.date]=byDay[e.date]||[]).push(e));
   Object.keys(byDay).forEach(d=>{const x0=tx(d,0), x1=tx(d,24); g+=`<rect x="${x0}" y="${pt}" width="${Math.max(1.5,x1-x0)}" height="${Ht-pt-pb}" fill="${C.h}" opacity="0.13"/>`;});
@@ -588,11 +597,58 @@ function pressChart(start,end,list,mode){
     g+=`<line x1="${tx(a.d,a.h).toFixed(1)}" y1="${ty(a.p).toFixed(1)}" x2="${tx(b.d,b.h).toFixed(1)}" y2="${ty(b.p).toFixed(1)}" stroke="${c}" stroke-width="${c===C.n?1.6:2.6}" stroke-linecap="round"/>`;}
   Object.keys(byDay).forEach(d=>byDay[d].forEach(e=>{const h=e.tod?TODH[e.tod]:12, ptv=wxPoint(d,h); if(!ptv) return;
     g+=`<circle cx="${tx(d,h).toFixed(1)}" cy="${ty(ptv.p).toFixed(1)}" r="${e.intensity>=7?4.5:3.5}" fill="${C.h}" stroke="${pr?'#fff':'#08080D'}" stroke-width="1.2"/>`;}));
+  if(big) g+=`<line id="pzCross" x1="0" x2="0" y1="${pt}" y2="${Ht-pb}" stroke="#fff" stroke-opacity="0.6" stroke-dasharray="3 3" visibility="hidden"/><circle id="pzDot" r="5" fill="none" stroke="#fff" stroke-width="2" visibility="hidden"/>`;
   g+='</svg>';
+  if(big){pzData={pts,byDay,s0,days,pl,prr,W,tx,ty,yt}; return g;}
   const I='display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 5px 0 0;vertical-align:-1px;';
   const lg=`<div class="legend" style="display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px"><span><i style="${I}background:${C.n}"></i>давление, мм рт. ст.</span><span><i style="${I}background:${C.f}"></i>резкое падение</span><span><i style="${I}background:${C.r}"></i>резкий подъём</span><span><i style="${I}background:${C.h};border-radius:50%"></i>приступ (полоса — весь день)</span></div>`;
-  return lg+`<div class="chartbox">${g}</div>`;
+  if(pr) return lg+`<div class="chartbox">${g}</div>`;
+  pzArgs={start,end,list}; return lg+`<div class="chartbox pchart" title="Открыть во весь экран">${g}</div><p class="small" style="margin-top:-10px">Нажмите на график, чтобы открыть его во весь экран и увеличить.</p>`;
 }
+let pzArgs=null, pzData=null, pzZ=1, pzBaseW=0;
+function pzRender(keep){
+  const sc=$('pzScroll'); if(!pzArgs||!sc) return; const old=sc.scrollWidth||1, mid=(sc.scrollLeft+sc.clientWidth/2)/old;
+  const h=Math.max(220,sc.clientHeight-20); sc.innerHTML=pressChart(pzArgs.start,pzArgs.end,pzArgs.list,'screen',{w:pzBaseW,z:pzZ,h});
+  $('pzAxis').innerHTML=(pzData?pzData.yt:[]).map(([v,y])=>`<span style="top:${y+8-8}px">${v}</span>`).join('');
+  $('pzLvl').textContent='×'+(Math.round(pzZ*10)/10);
+  sc.scrollLeft=keep?mid*sc.scrollWidth-sc.clientWidth/2:sc.scrollWidth;
+}
+function pzOpen(){
+  if(!pzArgs) return; $('pzView').hidden=false; document.body.style.overflow='hidden';
+  const sc=$('pzScroll'); pzBaseW=Math.max(sc.clientWidth-2,320); pzZ=1; $('pzInfo').textContent='Коснитесь линии, чтобы увидеть давление и изменение за сутки.'; pzRender(false);
+  try{history.pushState({pz:1},'');}catch(e){}
+}
+function pzClose(fromPop){ if($('pzView').hidden) return; $('pzView').hidden=true; document.body.style.overflow=''; if(!fromPop){try{if(history.state&&history.state.pz) history.back();}catch(e){}} }
+function pzZoom(z,keep){pzZ=Math.min(12,Math.max(1,z)); pzRender(keep!==false);}
+function pzTap(clientX){
+  const sc=$('pzScroll'), svg=sc.querySelector('svg'); if(!svg||!pzData) return; const r=svg.getBoundingClientRect(), x=clientX-r.left;
+  const D=pzData; let best=null, bd=1e9; D.pts.forEach(p=>{const dx=Math.abs(D.tx(p.d,p.h)-x); if(dx<bd){bd=dx; best=p;}}); if(!best) return;
+  const cx=D.tx(best.d,best.h), cy=D.ty(best.p), cr=$('pzCross'), dt=$('pzDot');
+  cr.setAttribute('x1',cx); cr.setAttribute('x2',cx); cr.setAttribute('visibility','visible'); dt.setAttribute('cx',cx); dt.setAttribute('cy',cy); dt.setAttribute('visibility','visible');
+  const dl=Math.round(best.dl), ch=dl<=-DROP?' — резкое падение':dl>=DROP?' — резкий подъём':'';
+  const att=(D.byDay[best.d]||[]).map(e=>`приступ ${e.intensity}/10${e.tod?' ('+TODSHORT[e.tod]+')':''}`).join(', ');
+  const nx=[1,2].filter(n=>D.byDay[dPlus(best.d,n)]).map(n=>n===1?'на следующий день':'через 2 дня'); const lagT=nx.length?'<br><span style="color:#B79BFF">Головная боль '+nx.join(' и ')+'</span>':'';
+  $('pzInfo').innerHTML=`<b>${fmtDate(best.d)}, ${pad(best.h)}:00</b> · ${Math.round(best.p)} мм рт. ст. · за сутки ${dl>0?'+':''}${dl}${ch}${att?'<br>'+att:''}${lagT}`;
+}
+(function pzInit(){
+  const v=document.createElement('div'); v.id='pzView'; v.hidden=true;
+  v.innerHTML=`<div class="pzbar"><b>Атмосферное давление</b><span id="pzLvl">×1</span><button type="button" id="pzOut" aria-label="Уменьшить">−</button><button type="button" id="pzIn" aria-label="Увеличить">+</button><button type="button" id="pzX" aria-label="Закрыть">✕</button></div>
+    <div id="pzWrap"><div id="pzScroll"></div><div id="pzAxis"></div></div><div class="pzfoot"><div id="pzInfo"></div><div class="small">Разведите два пальца или нажмите «+», чтобы увеличить; двойное касание — увеличить вдвое. Листайте по горизонтали. Поверните телефон — график станет шире.</div></div>`;
+  document.body.appendChild(v);
+  $('pzX').onclick=()=>pzClose(false); $('pzIn').onclick=()=>pzZoom(pzZ*1.5); $('pzOut').onclick=()=>pzZoom(pzZ/1.5);
+  window.addEventListener('popstate',()=>pzClose(true));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape') pzClose(false);});
+  window.addEventListener('resize',()=>{if(!$('pzView').hidden){pzBaseW=Math.max($('pzScroll').clientWidth-2,320); pzRender(true);}});
+  document.addEventListener('click',e=>{const b=e.target.closest('.pchart'); if(b) pzOpen();});
+  const sc=$('pzScroll'); let d0=0,z0=1,raf=0,moved=false,sx=0,lastTap=0;
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  sc.addEventListener('touchstart',e=>{if(e.touches.length===2){d0=dist(e.touches); z0=pzZ; e.preventDefault();} else {moved=false; sx=e.touches[0].clientX;}},{passive:false});
+  sc.addEventListener('touchmove',e=>{if(e.touches.length===2&&d0){e.preventDefault(); const z=z0*dist(e.touches)/d0; if(!raf) raf=requestAnimationFrame(()=>{raf=0; pzZoom(z);});} else if(Math.abs(e.touches[0].clientX-sx)>8) moved=true;},{passive:false});
+  sc.addEventListener('touchend',e=>{if(d0&&e.touches.length<2){d0=0; return;} if(!moved&&e.changedTouches.length===1){const now=Date.now(), x=e.changedTouches[0].clientX;
+    if(now-lastTap<300){pzZoom(pzZ>=6?1:pzZ*2); lastTap=0;} else {lastTap=now; pzTap(x);} e.preventDefault();}},{passive:false});
+  sc.addEventListener('click',e=>pzTap(e.clientX));
+  sc.addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault(); pzZoom(pzZ*(e.deltaY<0?1.1:1/1.1));}},{passive:false});
+})();
 function pressureBlock(list,months,mode){
   if(!wx.on||!wx.lat) return '';
   const t=today(); let start=months[0]+'-01'; const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); if(first>start) start=first;
@@ -606,16 +662,16 @@ function pressureBlock(list,months,mode){
     return mode==='print'?(chart?`<h2>Атмосферное давление (${esc(wx.name)})</h2>`+chart:''):title+chart+expl+`<p class="small">${msg}</p>`;
   }
   const P=(o,dir,k)=>Math.round(o[dir][k]/o.n*100);
-  const DIRL={fall:'резкое падение',rise:'резкий подъём',any:'резкое изменение'};
+  const DIRL={fall:'резкое падение',rise:'резкий подъём',any:'резкое изменение (падение или подъём)'};
   let best=null;
   ['fall','rise','any'].forEach(dir=>LAGS.forEach(([k])=>{const A=P(H,dir,k), B=P(N,dir,k);
     if(H[dir][k]>=4&&A>=B*1.5&&A-B>=10&&(!best||A-B>best.A-best.B)) best={dir,k,A,B};}));
   const lagTxt={0:'в тот же день',1:'накануне',2:'за 2 дня до боли',w:'в течение 2 дней до боли или в тот же день'};
   const verdict=best?`Чаще всего с болью совпадал${best.dir==='rise'?'':'о'} ${DIRL[best.dir]} давления ${lagTxt[best.k]}: ${best.A}% дней с болью против ${best.B}% дней без боли. Возможно, вы чувствительны к перемене погоды — это стоит обсудить с врачом.`
     :'Ни падение, ни подъём давления — ни в день боли, ни за 1–2 дня до неё — не встречались заметно чаще, чем в дни без боли. Судя по записям, давление вряд ли главный провокатор.';
-  const NW=' style="white-space:nowrap"', rows=LAGS.map(([k,l])=>`<tr><td>${l}</td><td${NW}>${P(H,'fall',k)}% / ${P(N,'fall',k)}%</td><td${NW}>${P(H,'rise',k)}% / ${P(N,'rise',k)}%</td></tr>`).join('');
-  const tbl=`<table><tr><th>Когда</th><th>Падение</th><th>Подъём</th></tr>${rows}</table>`;
-  const note=`Дней с болью: ${hN}, без боли: ${nN}. В ячейках: доля дней с болью / доля дней без боли. Проверяется сразу несколько вариантов, поэтому одно совпадение может быть случайным — надёжнее, если картина повторится через несколько месяцев. Это совпадения по времени, а не доказательство причины. Данные: Open-Meteo, ${esc(wx.name)}.`;
+  const NW=' style="white-space:nowrap"', cell=(dir,k)=>`<td${NW}${best&&best.dir===dir&&best.k===k?' class="amber"':''}>${P(H,dir,k)} / ${P(N,dir,k)}</td>`, rows=LAGS.map(([k,l])=>`<tr><td>${l}</td>${cell('fall',k)}${cell('rise',k)}${cell('any',k)}</tr>`).join('');
+  const tbl=`<table><tr><th>Когда</th><th>Падение</th><th>Подъём</th><th>Любое</th></tr>${rows}</table>`;
+  const note=`Дней с болью: ${hN}, без боли: ${nN}. В ячейках: % дней с болью / % дней без боли, у которых было резкое изменение давления (полдень к полудню предыдущих суток) в указанный день. «Любое» — падение или подъём вместе. ${best?`Выделено сочетание из вывода: ${best.dir==='any'?H.any[best.k]:H[best.dir][best.k]} из ${hN} дней с болью против ${N[best.dir][best.k]} из ${nN} дней без боли. `:''}Проверяется сразу несколько вариантов, поэтому одно совпадение может быть случайным — надёжнее, если картина повторится через несколько месяцев. Это совпадения по времени, а не доказательство причины. Данные: Open-Meteo, ${esc(wx.name)}.`;
   if(mode==='print') return `<h2>Атмосферное давление (${esc(wx.name)})</h2>${chart}${tbl}<p>${verdict}</p><p class="pnote">${note}</p>`;
   return title+chart+expl+`<div class="mtable">${tbl}</div><p>${verdict}</p><p class="small">${note}</p>`;
 }
