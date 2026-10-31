@@ -162,8 +162,10 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
 .pzbar{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--line);}
 .pzbar b{flex:1; font-size:15px;} .pzbar span{color:var(--muted); font-size:13px; min-width:34px; text-align:right;}
 .pzbar button{width:40px; height:40px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--ink); font-size:20px; line-height:1;}
-#pzWrap{flex:1; position:relative; min-height:0;} #pzAxis{position:absolute; left:0; top:0; bottom:0; width:38px; pointer-events:none; background:linear-gradient(90deg,#08080D 75%,rgba(8,8,13,0));} #pzAxis span{position:absolute; left:4px; font-size:12px; color:rgba(255,255,255,0.6);}
-#pzScroll{height:100%; box-sizing:border-box; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; touch-action:pan-x; padding:8px 0;}
+#pzWrap{flex:1; position:relative; min-height:0;} #pzAxis{position:absolute; left:0; top:0; bottom:0; width:40px; overflow:hidden; pointer-events:none; background:linear-gradient(90deg,#08080D 78%,rgba(8,8,13,0));} #pzAxisIn{position:relative;} #pzAxis span{position:absolute; left:4px; font-size:12px; line-height:16px; color:rgba(255,255,255,0.6);}
+#pzYv{display:none; position:absolute; left:0; font:600 11.5px/18px Inter,sans-serif; padding:0 3px; border-radius:5px; background:#fff; color:#08080D;}
+#pzXAxis{position:absolute; left:0; right:0; bottom:0; height:24px; overflow:hidden; pointer-events:none; background:linear-gradient(0deg,#08080D 70%,rgba(8,8,13,0));} #pzXIn{position:relative; height:24px;} #pzXAxis span{position:absolute; bottom:5px; font-size:12px; color:rgba(255,255,255,0.6); white-space:nowrap;}
+#pzScroll{height:100%; box-sizing:border-box; overflow:auto; -webkit-overflow-scrolling:touch; touch-action:pan-x pan-y; overscroll-behavior:contain;}
 .pzfoot{padding:10px 14px 14px; border-top:1px solid var(--line);} #pzInfo{font-size:14.5px; min-height:40px; margin-bottom:6px;}
 .pchart{cursor:zoom-in;}
 @media (orientation:landscape) and (max-height:520px){.pzfoot .small{display:none;} .pzfoot{padding:4px 12px 6px;} #pzInfo{min-height:0; margin:0; font-size:13px;} .pzbar{padding:4px 10px;} .pzbar button{width:34px; height:34px; font-size:17px;}}
@@ -581,14 +583,15 @@ function pressChart(start,end,list,mode,big){
   for(let d=s0; d<=end; d=dPlus(d,1)) WXH.forEach(h=>{const v=wxc.h[d+'T'+k(h)]; if(v==null) return; const q=wxc.h[dPlus(d,-1)+'T'+k(h)];
     pts.push({d,h,p:v*MMHG,dl:q==null?0:(v-q)*MMHG});});
   if(pts.length<4) return '';
-  const days=Math.round((Date.parse(end)-Date.parse(s0))/864e5)+1, W=big?Math.round(big.w*big.z):Math.max(340,days*7), Ht=big?big.h:pr?150:180, pl=34, prr=big?14:8, pt=10, pb=22, fs=big?12:10;
+  const days=Math.round((Date.parse(end)-Date.parse(s0))/864e5)+1, W=big?Math.round(big.w*big.z):Math.max(340,days*7), Ht=big?Math.round(big.h*big.zy):pr?150:180, pl=big?40:34, prr=big?14:8, pt=10, pb=big?28:22, fs=big?12:10, xt=[];
   const tx=(d,h)=>pl+((Date.parse(d)-Date.parse(s0))/864e5+h/24)/days*(W-pl-prr);
   let lo=Math.min(...pts.map(x=>x.p)), hi=Math.max(...pts.map(x=>x.p)); lo=Math.floor(lo-1); hi=Math.ceil(hi+1);
   const ty=p=>pt+(hi-p)/(hi-lo)*(Ht-pt-pb), yt=[];
   let g=`<svg viewBox="0 0 ${W} ${Ht}" style="${big?`width:${W}px;height:${Ht}px;display:block`:`width:100%;min-width:${pr?0:Math.min(W,days*6)}px;height:auto`}" role="img" aria-label="Атмосферное давление и дни с головной болью">`;
-  (big?Array.from({length:Math.floor((hi-lo)/2)+1},(_,i)=>lo+i*2):[lo,Math.round((lo+hi)/2),hi]).forEach(v=>{g+=`<line x1="${big?0:pl}" x2="${W-prr}" y1="${ty(v)}" y2="${ty(v)}" stroke="${C.g}"/>`+(big?'':`<text x="${pl-4}" y="${ty(v)+4}" text-anchor="end" font-size="${fs}" fill="${C.t}">${v}</text>`); if(big) yt.push([v,ty(v)]);});
+  const ystep=big?((Ht-pt-pb)/(hi-lo)>=22?1:(Ht-pt-pb)/(hi-lo)>=9?2:5):0;
+  (big?Array.from({length:Math.floor((hi-lo)/ystep)+1},(_,i)=>lo+i*ystep):[lo,Math.round((lo+hi)/2),hi]).forEach(v=>{g+=`<line x1="${big?0:pl}" x2="${W-prr}" y1="${ty(v)}" y2="${ty(v)}" stroke="${C.g}"/>`+(big?'':`<text x="${pl-4}" y="${ty(v)+4}" text-anchor="end" font-size="${fs}" fill="${C.t}">${v}</text>`); if(big) yt.push([v,ty(v)]);});
   for(let d=s0; d<=end; d=dPlus(d,1)){const dd=+d.slice(8), pxd=(W-pl-prr)/days, every=big?(pxd>=34?1:pxd>=16?2:pxd>=8?7:0):0; if(dd===1||(big?every&&(every===7?dd%7===1&&dd<29:dd%every===0&&dd<30&&!(every===2&&dd===2)):(days<=45&&(dd%7===1&&dd<29)))){const x=tx(d,0);
-    g+=`<line x1="${x}" x2="${x}" y1="${pt}" y2="${Ht-pb}" stroke="${C.g}"/><text x="${x+2}" y="${Ht-6}" font-size="${fs}" fill="${C.t}">${dd===1?mName(d.slice(0,7)).split(' ')[0].slice(0,3).toLowerCase()+' 1':dd}</text>`;}}
+    const lbl=dd===1?mName(d.slice(0,7)).split(' ')[0].slice(0,3).toLowerCase()+' 1':dd; g+=`<line x1="${x}" x2="${x}" y1="${pt}" y2="${Ht-pb}" stroke="${C.g}"/>`+(big?'':`<text x="${x+2}" y="${Ht-6}" font-size="${fs}" fill="${C.t}">${lbl}</text>`); if(big) xt.push([lbl,x]);}}
   // дни боли: вертикальная полоса за сутки + точки в час начала
   const byDay={}; list.filter(e=>e.date>=start&&e.date<=end).forEach(e=>(byDay[e.date]=byDay[e.date]||[]).push(e));
   Object.keys(byDay).forEach(d=>{const x0=tx(d,0), x1=tx(d,24); g+=`<rect x="${x0}" y="${pt}" width="${Math.max(1.5,x1-x0)}" height="${Ht-pt-pb}" fill="${C.h}" opacity="0.13"/>`;});
@@ -598,34 +601,47 @@ function pressChart(start,end,list,mode,big){
     g+=`<line x1="${tx(a.d,a.h).toFixed(1)}" y1="${ty(a.p).toFixed(1)}" x2="${tx(b.d,b.h).toFixed(1)}" y2="${ty(b.p).toFixed(1)}" stroke="${c}" stroke-width="${c===C.n?1.6:2.6}" stroke-linecap="round"/>`;}
   Object.keys(byDay).forEach(d=>byDay[d].forEach(e=>{const h=e.tod?TODH[e.tod]:12, ptv=wxPoint(d,h); if(!ptv) return;
     g+=`<circle cx="${tx(d,h).toFixed(1)}" cy="${ty(ptv.p).toFixed(1)}" r="${e.intensity>=7?4.5:3.5}" fill="${C.h}" stroke="${pr?'#fff':'#08080D'}" stroke-width="1.2"/>`;}));
-  if(big) g+=`<line id="pzCross" x1="0" x2="0" y1="${pt}" y2="${Ht-pb}" stroke="#fff" stroke-opacity="0.6" stroke-dasharray="3 3" visibility="hidden"/><circle id="pzDot" r="5" fill="none" stroke="#fff" stroke-width="2" visibility="hidden"/>`;
+  if(big) g+=`<line id="pzCrossH" x1="0" x2="${W}" y1="0" y2="0" stroke="#fff" stroke-opacity="0.6" stroke-dasharray="3 3" visibility="hidden"/><line id="pzCross" x1="0" x2="0" y1="${pt}" y2="${Ht-pb}" stroke="#fff" stroke-opacity="0.6" stroke-dasharray="3 3" visibility="hidden"/><circle id="pzDot" r="5" fill="none" stroke="#fff" stroke-width="2" visibility="hidden"/>`;
   g+='</svg>';
-  if(big){pzData={pts,byDay,s0,days,pl,prr,W,tx,ty,yt}; return g;}
+  if(big){pzData={pts,byDay,s0,days,pl,prr,W,Ht,tx,ty,yt,xt}; return g;}
   const I='display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 5px 0 0;vertical-align:-1px;';
   const lg=`<div class="legend" style="display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px"><span><i style="${I}background:${C.n}"></i>давление, мм рт. ст.</span><span><i style="${I}background:${C.f}"></i>резкое падение</span><span><i style="${I}background:${C.r}"></i>резкий подъём</span><span><i style="${I}background:${C.h};border-radius:50%"></i>приступ (полоса — весь день)</span></div>`;
   if(pr) return lg+`<div class="chartbox">${g}</div>`;
   pzArgs={start,end,list}; return lg+`<div class="chartbox pchart" title="Открыть во весь экран">${g}</div><p class="small" style="margin-top:-10px">Нажмите на график, чтобы открыть его во весь экран и увеличить.</p>`;
 }
-let pzArgs=null, pzData=null, pzZ=1, pzBaseW=0;
+let pzArgs=null, pzData=null, pzZ=1, pzZy=1, pzBaseW=0, pzSel=null;
+function pzSync(){const sc=$('pzScroll'); $('pzAxisIn').style.transform=`translateY(${-sc.scrollTop}px)`; $('pzXIn').style.transform=`translateX(${-sc.scrollLeft}px)`;}
 function pzRender(keep,anchor){
-  const sc=$('pzScroll'); if(!pzArgs||!sc) return; const old=sc.scrollWidth||1, mid=(sc.scrollLeft+sc.clientWidth/2)/old;
-  const h=Math.max(160,sc.clientHeight-30); sc.innerHTML=pressChart(pzArgs.start,pzArgs.end,pzArgs.list,'screen',{w:pzBaseW,z:pzZ,h});
-  $('pzAxis').innerHTML=(pzData?pzData.yt:[]).map(([v,y])=>`<span style="top:${y+8-8}px">${v}</span>`).join('');
-  $('pzLvl').textContent='×'+(Math.round(pzZ*10)/10);
-  sc.scrollLeft=anchor?anchor.r*sc.scrollWidth-anchor.px:keep?mid*sc.scrollWidth-sc.clientWidth/2:sc.scrollWidth;
+  const sc=$('pzScroll'); if(!pzArgs||!sc) return; const mx=(sc.scrollLeft+sc.clientWidth/2)/(sc.scrollWidth||1), my=(sc.scrollTop+sc.clientHeight/2)/(sc.scrollHeight||1);
+  const h=Math.max(150,sc.clientHeight); sc.innerHTML=pressChart(pzArgs.start,pzArgs.end,pzArgs.list,'screen',{w:pzBaseW,z:pzZ,h,zy:pzZy});
+  const D=pzData; $('pzAxisIn').innerHTML=D?D.yt.map(([v,y])=>`<span style="top:${y-8}px">${v}</span>`).join('')+'<b id="pzYv"></b>':'';
+  $('pzXIn').innerHTML=D?D.xt.map(([l,x])=>`<span style="left:${x+2}px">${l}</span>`).join(''):'';
+  pzLvl();
+  if(anchor){sc.scrollLeft=anchor.rx*sc.scrollWidth-anchor.px; sc.scrollTop=anchor.ry*sc.scrollHeight-anchor.py;}
+  else if(keep){sc.scrollLeft=mx*sc.scrollWidth-sc.clientWidth/2; sc.scrollTop=my*sc.scrollHeight-sc.clientHeight/2;}
+  else {sc.scrollLeft=sc.scrollWidth; sc.scrollTop=0;}
+  pzSync(); if(pzSel) pzMark(pzSel);
 }
+function pzLvl(zx,zy){zx=zx||pzZ; zy=zy||pzZy; $('pzLvl').textContent='×'+(Math.round(zx*10)/10)+(zy>1.05?' ↕'+(Math.round(zy*10)/10):'');}
+function pzFit(){const sc=$('pzScroll'); sc.innerHTML=''; pzBaseW=Math.max(sc.clientWidth-2,300);}
 function pzOpen(){
   if(!pzArgs) return; $('pzView').hidden=false; document.body.style.overflow='hidden';
-  const sc=$('pzScroll'); pzBaseW=Math.max(sc.clientWidth-2,320); pzZ=1; $('pzInfo').textContent='Коснитесь линии, чтобы увидеть давление и изменение за сутки.'; pzRender(false);
+  pzZ=1; pzZy=1; pzSel=null; pzFit(); $('pzInfo').textContent='Коснитесь линии, чтобы увидеть давление и изменение за сутки.'; pzRender(false);
   try{history.pushState({pz:1},'');}catch(e){}
 }
 function pzClose(fromPop){ if($('pzView').hidden) return; $('pzView').hidden=true; document.body.style.overflow=''; if(!fromPop){try{if(history.state&&history.state.pz) history.back();}catch(e){}} }
-function pzZoom(z,keep,anchor){pzZ=Math.min(12,Math.max(1,z)); pzRender(keep!==false,anchor);}
+function pzZoom(z,keep,anchor,zy){pzZ=Math.min(12,Math.max(1,z)); if(zy!=null) pzZy=Math.min(8,Math.max(1,zy)); pzRender(keep!==false,anchor);}
+function pzMark(best){
+  const D=pzData; if(!D) return; const cx=D.tx(best.d,best.h), cy=D.ty(best.p), cr=$('pzCross'), crh=$('pzCrossH'), dt=$('pzDot'); if(!cr) return;
+  cr.setAttribute('x1',cx); cr.setAttribute('x2',cx); cr.setAttribute('visibility','visible');
+  crh.setAttribute('y1',cy); crh.setAttribute('y2',cy); crh.setAttribute('visibility','visible');
+  dt.setAttribute('cx',cx); dt.setAttribute('cy',cy); dt.setAttribute('visibility','visible');
+  const yv=$('pzYv'); if(yv){yv.textContent=(Math.round(best.p*10)/10).toString().replace('.',','); yv.style.top=(cy-9)+'px'; yv.style.display='block';}
+}
 function pzTap(clientX){
   const sc=$('pzScroll'), svg=sc.querySelector('svg'); if(!svg||!pzData) return; const r=svg.getBoundingClientRect(), x=clientX-r.left;
   const D=pzData; let best=null, bd=1e9; D.pts.forEach(p=>{const dx=Math.abs(D.tx(p.d,p.h)-x); if(dx<bd){bd=dx; best=p;}}); if(!best) return;
-  const cx=D.tx(best.d,best.h), cy=D.ty(best.p), cr=$('pzCross'), dt=$('pzDot');
-  cr.setAttribute('x1',cx); cr.setAttribute('x2',cx); cr.setAttribute('visibility','visible'); dt.setAttribute('cx',cx); dt.setAttribute('cy',cy); dt.setAttribute('visibility','visible');
+  pzSel=best; pzMark(best);
   const dl=Math.round(best.dl), ch=dl<=-DROP?' — резкое падение':dl>=DROP?' — резкий подъём':'';
   const att=(D.byDay[best.d]||[]).map(e=>`приступ ${e.intensity}/10${e.tod?' ('+TODSHORT[e.tod]+')':''}`).join(', ');
   const nx=[1,2].filter(n=>D.byDay[dPlus(best.d,n)]).map(n=>n===1?'на следующий день':'через 2 дня'); const lagT=nx.length?'<br><span style="color:#B79BFF">Головная боль '+nx.join(' и ')+'</span>':'';
@@ -634,31 +650,37 @@ function pzTap(clientX){
 (function pzInit(){
   const v=document.createElement('div'); v.id='pzView'; v.hidden=true;
   v.innerHTML=`<div class="pzbar"><b>Атмосферное давление</b><span id="pzLvl">×1</span><button type="button" id="pzOut" aria-label="Уменьшить">−</button><button type="button" id="pzIn" aria-label="Увеличить">+</button><button type="button" id="pzX" aria-label="Закрыть">✕</button></div>
-    <div id="pzWrap"><div id="pzScroll"></div><div id="pzAxis"></div></div><div class="pzfoot"><div id="pzInfo"></div><div class="small">Разведите два пальца или нажмите «+», чтобы увеличить; двойное касание — увеличить вдвое. Листайте по горизонтали. Поверните телефон — график станет шире.</div></div>`;
+    <div id="pzWrap"><div id="pzScroll"></div><div id="pzAxis"><div id="pzAxisIn"></div></div><div id="pzXAxis"><div id="pzXIn"></div></div></div><div class="pzfoot"><div id="pzInfo"></div><div class="small">Разведите пальцы по горизонтали — растянуть по дням, по вертикали — по давлению. «+»/«−» — масштаб по дням, двойное касание — сбросить. Поверните телефон — график станет шире.</div></div>`;
   document.body.appendChild(v);
-  $('pzX').onclick=()=>pzClose(false); $('pzIn').onclick=()=>pzZoom(pzZ*1.5); $('pzOut').onclick=()=>pzZoom(pzZ/1.5);
+  $('pzX').onclick=()=>pzClose(false); $('pzIn').onclick=()=>pzZoom(pzZ*1.5); $('pzOut').onclick=()=>pzZoom(pzZ/1.5,true,null,pzZ/1.5<=1?1:null);
   window.addEventListener('popstate',()=>pzClose(true));
   document.addEventListener('keydown',e=>{if(e.key==='Escape') pzClose(false);});
-  window.addEventListener('resize',()=>{if(!$('pzView').hidden){pzBaseW=Math.max($('pzScroll').clientWidth-2,320); pzRender(true);}});
+  // поворот: сразу убрать старую картинку (иначе iOS масштабирует страницу под неё), перерисовать после того, как экран уляжется
+  let rz=0; const onRz=()=>{if($('pzView').hidden) return; pzFit(); clearTimeout(rz); rz=setTimeout(()=>requestAnimationFrame(()=>{pzFit(); pzRender(true);}),350);};
+  window.addEventListener('resize',onRz); window.addEventListener('orientationchange',onRz); if(window.visualViewport) visualViewport.addEventListener('resize',onRz);
   document.addEventListener('click',e=>{const b=e.target.closest('.pchart'); if(b) pzOpen();});
-  const sc=$('pzScroll'); let d0=0,z0=1,raf=0,moved=false,sx=0,lastTap=0;
-  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
-  // щипок: во время жеста растягиваем картинку (без перерисовки — иначе iOS теряет касание), по окончании перерисовываем в новом масштабе
-  let pin=null;
-  const pinZ=t=>Math.min(12,Math.max(1,pin.z0*dist(t)/pin.d0));
+  const sc=$('pzScroll'); let moved=false,sx=0,sy=0,lastTap=0,pin=null;
+  sc.addEventListener('scroll',pzSync,{passive:true});
+  const sp=t=>({x:Math.abs(t[0].clientX-t[1].clientX), y:Math.abs(t[0].clientY-t[1].clientY)});
+  // щипок: во время жеста растягиваем картинку (без перерисовки — иначе iOS теряет касание), по окончании перерисовываем
   sc.addEventListener('touchstart',e=>{
-    if(e.touches.length===2){e.preventDefault(); const r=sc.getBoundingClientRect(), mx=(e.touches[0].clientX+e.touches[1].clientX)/2-r.left, fx=sc.scrollLeft+mx;
-      pin={d0:dist(e.touches), z0:pzZ, mx, fx, r:fx/sc.scrollWidth, sl:sc.scrollLeft, z:pzZ}; const svg=sc.querySelector('svg'); if(svg){svg.style.transformOrigin=fx+'px 0'; svg.style.willChange='transform';}}
-    else if(!pin){moved=false; sx=e.touches[0].clientX;}},{passive:false});
+    if(e.touches.length===2){e.preventDefault(); const r=sc.getBoundingClientRect(), mx=(e.touches[0].clientX+e.touches[1].clientX)/2-r.left, my=(e.touches[0].clientY+e.touches[1].clientY)/2-r.top;
+      const fx=sc.scrollLeft+mx, fy=sc.scrollTop+my, s0=sp(e.touches);
+      pin={s0, zx0:pzZ, zy0:pzZy, zx:pzZ, zy:pzZy, mx, my, rx:fx/sc.scrollWidth, ry:fy/sc.scrollHeight, ux:s0.x>=40, uy:s0.y>=40};
+      if(!pin.ux&&!pin.uy){pin.ux=true;}
+      const svg=sc.querySelector('svg'); if(svg){svg.style.transformOrigin=fx+'px '+fy+'px'; svg.style.willChange='transform';}}
+    else if(!pin){moved=false; sx=e.touches[0].clientX; sy=e.touches[0].clientY;}},{passive:false});
   sc.addEventListener('touchmove',e=>{
-    if(pin&&e.touches.length===2){e.preventDefault(); pin.z=pinZ(e.touches); const svg=sc.querySelector('svg'); if(svg) svg.style.transform=`scaleX(${pin.z/pin.z0})`;
-      $('pzLvl').textContent='×'+(Math.round(pin.z*10)/10);}
-    else if(!pin&&Math.abs(e.touches[0].clientX-sx)>8) moved=true;},{passive:false});
-  const pinEnd=()=>{const p=pin; pin=null; const svg=sc.querySelector('svg'); if(svg){svg.style.transform=''; svg.style.willChange='';} pzZoom(p.z,true,{r:p.r,px:p.mx}); moved=true;};
+    if(pin&&e.touches.length===2){e.preventDefault(); const s1=sp(e.touches);
+      if(pin.ux) pin.zx=Math.min(12,Math.max(1,pin.zx0*Math.max(s1.x,20)/Math.max(pin.s0.x,20)));
+      if(pin.uy) pin.zy=Math.min(8,Math.max(1,pin.zy0*Math.max(s1.y,20)/Math.max(pin.s0.y,20)));
+      const svg=sc.querySelector('svg'); if(svg) svg.style.transform=`scale(${pin.zx/pin.zx0},${pin.zy/pin.zy0})`; pzLvl(pin.zx,pin.zy);}
+    else if(!pin&&(Math.abs(e.touches[0].clientX-sx)>8||Math.abs(e.touches[0].clientY-sy)>8)) moved=true;},{passive:false});
+  const pinEnd=()=>{const p=pin; pin=null; const svg=sc.querySelector('svg'); if(svg){svg.style.transform=''; svg.style.willChange='';} pzZoom(p.zx,true,{rx:p.rx,ry:p.ry,px:p.mx,py:p.my},p.zy); moved=true;};
   sc.addEventListener('touchend',e=>{
     if(pin){if(e.touches.length<2) pinEnd(); e.preventDefault(); return;}
     if(!moved&&e.changedTouches.length===1){const now=Date.now(), x=e.changedTouches[0].clientX;
-      if(now-lastTap<300){pzZoom(pzZ>=6?1:pzZ*2); lastTap=0;} else {lastTap=now; pzTap(x);} e.preventDefault();}},{passive:false});
+      if(now-lastTap<300){lastTap=0; if(pzZ>1.05||pzZy>1.05) pzZoom(1,false,null,1); else pzZoom(2);} else {lastTap=now; pzTap(x);} e.preventDefault();}},{passive:false});
   sc.addEventListener('touchcancel',()=>{if(pin) pinEnd();});
   sc.addEventListener('click',e=>pzTap(e.clientX));
   sc.addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault(); pzZoom(pzZ*(e.deltaY<0?1.1:1/1.1));}},{passive:false});
