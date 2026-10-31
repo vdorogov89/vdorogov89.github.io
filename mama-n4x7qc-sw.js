@@ -1,4 +1,4 @@
-const CACHE='mama-n4x7qc-v9';
+const CACHE='mama-n4x7qc-v10';
 const CORE=['/mama-n4x7qc.html','/mama-n4x7qc.webmanifest','/mama-icon-192.png','/mama-icon-512.png','/mama-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('mama-n4x7qc-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
