@@ -254,6 +254,7 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
 
   <!-- ENTRY -->
   <section class="panel" id="tab-entry">
+    <div class="callout amber" id="wxRisk" hidden></div>
     <div class="cyccard" id="cycCard" hidden></div>
     <form id="entryForm" onsubmit="return false">
       <div id="editBanner" class="callout amber" hidden></div>
@@ -388,6 +389,8 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
       <div class="wxrow"><input type="text" id="wxCity" placeholder="Ваш город, например Москва"><button type="button" class="btn-ghost" id="wxFind">Найти</button></div>
       <div class="wxres" id="wxRes"></div>
       <p class="small" id="wxStatus"></p>
+      <label class="switch"><input type="checkbox" id="wxAlert"> Предупреждать о днях повышенного риска</label>
+      <p class="small">Появится на экране записи, только если в вашем дневнике связь боли с перепадами давления прошла проверку на случайность. Используется прогноз давления на 3 дня.</p>
     </div>
     <p class="small">Для этого в погодный сервис Open-Meteo отправляются только координаты выбранного города с точностью около 10 км. Записи дневника никуда не передаются. Данные о погоде: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>.</p>
     <h2>Удаление</h2>
@@ -543,7 +546,7 @@ async function wxSync(force){
   const needRecent=force||Date.now()-wxc.t>3*3600e3||miss.some(d=>d>=recent&&d<end);
   if(!needRecent&&!oldMiss.length) return;
   wxBusy=true; let fail=false; const base=`latitude=${wx.lat}&longitude=${wx.lon}&hourly=surface_pressure&timezone=auto`;
-  try{ if(needRecent){ wxMerge(await wxFetch(`https://api.open-meteo.com/v1/forecast?${base}&past_days=92&forecast_days=1`)); wxc.t=Date.now(); } }catch(e){fail=true;}
+  try{ if(needRecent){ wxMerge(await wxFetch(`https://api.open-meteo.com/v1/forecast?${base}&past_days=92&forecast_days=4`)); wxc.t=Date.now(); } }catch(e){fail=true;}
   try{ if(oldMiss.length){ const s2=oldMiss[0], e2=oldMiss[oldMiss.length-1]<archEnd?oldMiss[oldMiss.length-1]:archEnd;
     if(s2<=e2) wxMerge(await wxFetch(`https://archive-api.open-meteo.com/v1/archive?${base}&start_date=${s2}&end_date=${e2}`)); } }catch(e){fail=true;}
   Object.keys(wxc.h).forEach(k=>{if(k.slice(0,10)<dPlus(start,-1)) delete wxc.h[k];});
@@ -564,7 +567,7 @@ async function wxFind(){
       wxSave(); $('wxRes').innerHTML=''; $('wxCity').value=''; wxStat('Загружаю давление…'); wxSync(true); goal('diary_wx_on');};
   }catch(e){$('wxRes').innerHTML='<span class="small">Не удалось связаться с сервисом погоды. Проверьте интернет.</span>';}
 }
-function wxUI(){ $('wxOn').checked=!!wx.on; $('wxBox').hidden=!wx.on; wxStat(); wxHintUpd(); }
+function wxUI(){ $('wxOn').checked=!!wx.on; $('wxBox').hidden=!wx.on; $('wxAlert').checked=wx.alert!==false; wxStat(); wxHintUpd(); }
 const LAGS=[[0,'в день боли'],[1,'за 1 день'],[2,'за 2 дня'],['w','любой из 3 дней']];
 function wxCh(d){const pt=wxPoint(d,12); return pt&&pt.d!=null?pt.d:null;}
 function pressStats(start,end,hd){
@@ -692,6 +695,59 @@ function pzTap(clientX){
   sc.addEventListener('click',e=>pzTap(e.clientX));
   sc.addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault(); pzZoom(pzZ*(e.deltaY<0?1.1:1/1.1));}},{passive:false});
 })();
+// проверка на случайность: сдвигаем весь дневник относительно погоды на k дней (серии боли и погодные волны сохраняются)
+// и смотрим, как часто наибольшая разница среди всех 12 вариантов получается не меньше настоящей
+function pressPerm(start,end,hd){
+  const days=[]; for(let d=start; d<=end; d=dPlus(d,1)) days.push(d); const L=days.length;
+  const C=days.map(d=>{const c=[0,1,2].map(k=>wxCh(dPlus(d,-k))); return c.some(x=>x==null)?null:c;});
+  const F=[]; ['fall','rise','any'].forEach(dir=>{const f=x=>dir==='fall'?x<=-DROP:dir==='rise'?x>=DROP:Math.abs(x)>=DROP;
+    [0,1,2,'w'].forEach(k=>F.push(C.map(c=>c==null?null:(k==='w'?c.some(f):f(c[k]))?1:0)));});
+  const pain=days.map(d=>hd.has(d)?1:0);
+  const T=sh=>{let best=-1e9; for(const fl of F){let hn=0,hy=0,nn=0,ny=0; for(let i=0;i<L;i++){const v=fl[i]; if(v==null) continue; if(pain[(i+sh)%L]){hn++; hy+=v;} else {nn++; ny+=v;}}
+    if(hn<4||nn<10) continue; const dlt=hy/hn-ny/nn; if(dlt>best) best=dlt;} return best;};
+  const t0=T(0); let n=0,ge=0; const gap=3;
+  for(let sh=gap; sh<=L-gap; sh++){const t=T(sh); if(t<=-1e8) continue; n++; if(t>=t0-1e-9) ge++;}
+  return n>=20?{n,ge,p:(ge+1)/(n+1)}:null;
+}
+// персональная закономерность за последние полгода: какое изменение давления и с каким лагом чаще совпадает с болью
+function wxPattern(){
+  if(!wx.on||!wx.lat||!entries.length) return null;
+  const t=today(); let start=dPlus(t,-183); const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); if(first>start) start=first;
+  const hd=new Set(entries.map(e=>e.date)), {H,N}=pressStats(start,t,hd); if(H.n<8||N.n<20) return null;
+  const P=(o,dir,k)=>Math.round(o[dir][k]/o.n*100); let best=null;
+  ['fall','rise','any'].forEach(dir=>LAGS.forEach(([k])=>{const A=P(H,dir,k), B=P(N,dir,k);
+    if(H[dir][k]>=4&&A>=B*1.5&&A-B>=10&&(!best||A-B>best.A-best.B)) best={dir,k,A,B};}));
+  if(!best) return null; const pm=pressPerm(start,t,hd); if(!pm||pm.p>0.15) return null;
+  return Object.assign(best,{p:pm.p,ge:pm.ge,n:pm.n});
+}
+function wxRiskRender(){
+  const box=$('wxRisk'); if(!box) return; box.hidden=true;
+  if(!wx.on||!wx.lat||wx.alert===false) return;
+  const pt=wxPattern(); if(!pt) return;
+  const t=today(), lags=pt.k==='w'?[0,1,2]:[pt.k], f=x=>pt.dir==='fall'?x<=-DROP:pt.dir==='rise'?x>=DROP:Math.abs(x)>=DROP;
+  const risk={}; // дата риска → изменения, которые к ней ведут
+  for(let i=-2;i<=3;i++){const d=dPlus(t,i), c=wxCh(d); if(c==null||!f(c)) continue;
+    lags.forEach(k=>{const r=dPlus(d,k); if(r>=t&&r<=dPlus(t,3)) (risk[r]=risk[r]||[]).push({d,c});});}
+  const dates=Object.keys(risk).sort(); if(!dates.length) return;
+  let dis=''; try{dis=localStorage.getItem('hd_wx_dis')||'';}catch(e){} if(dis===dates.join(',')) return;
+  const rel=d=>d===t?'сегодня':d===dPlus(t,1)?'завтра':d===dPlus(t,2)?'послезавтра':d===dPlus(t,-1)?'вчера':d===dPlus(t,-2)?'позавчера':'';
+  const dd=d=>{const x=fmtDate(d).replace(/ \d{4}$/,''); const r=rel(d); return r?`${r} (${x})`:x;};
+  const src=[]; dates.forEach(r=>risk[r].forEach(o=>{if(!src.some(z=>z.d===o.d)) src.push(o);}));
+  const why=src.map(o=>{const v=Math.round(o.c), w=v<0?'падение':'подъём'; return `${o.d>t?'по прогнозу '+dd(o.d)+' ожидается':o.d===t?'сегодня':dd(o.d)+' было'} резкое ${w} давления (${v>0?'+':'−'}${Math.abs(v)} мм рт. ст. за сутки)`;}).join('; ');
+  const lagW={0:'в тот же день',1:'на следующий день',2:'через 2 дня',w:'в течение 2 дней'}[pt.k], dirW={fall:'резкого падения',rise:'резкого подъёма',any:'резкого перепада'}[pt.dir];
+  box.innerHTML=`<p><b>Повышенный риск головной боли: ${dates.map(dd).join(', ')}</b></p>
+    <p class="small" style="margin-top:6px">${why[0].toUpperCase()+why.slice(1)}. По вашим записям боль чаще бывает ${lagW} после ${dirW} (${pt.A}% дней с болью против ${pt.B}% без боли; случайно такая разница получилась ${pt.ge?`в ${pt.ge} из ${pt.n} сдвигов`:`ни в одном из ${pt.n} сдвигов`}${pt.p>0.05?' — связь пока на грани достоверности':''}).</p>
+    <ul class="small" style="margin:8px 0 0 18px; padding:0">
+      <li>Сон в обычном режиме, без недосыпа и долгого сна.</li>
+      <li>Не пропускать еду, пить достаточно воды.</li>
+      <li>Кофеин и алкоголь — не больше обычного.</li>
+      <li>Лекарство при себе: принять при первых признаках, пока боль слабая.</li></ul>
+    <p class="small" style="margin-top:6px">Обезболивающие заранее, «на погоду», не принимайте: перепады бывают часто, и так легко прийти к головной боли от лекарств. Если таких приступов много, обсудите с врачом постоянную профилактику.</p>
+    <p style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap"><button type="button" class="btn-ghost" id="wxRiskGo">График давления</button><button type="button" class="btn-ghost" id="wxRiskHide">Скрыть</button></p>`;
+  box.hidden=false;
+  $('wxRiskHide').onclick=()=>{try{localStorage.setItem('hd_wx_dis',dates.join(','));}catch(e){} box.hidden=true;};
+  $('wxRiskGo').onclick=()=>{showTab('summary'); setTimeout(()=>{const h=[...document.querySelectorAll('#tab-summary h2')].find(x=>x.textContent==='Атмосферное давление'); if(h) h.scrollIntoView({behavior:'smooth',block:'start'});},50);};
+}
 function pressureBlock(list,months,mode){
   if(!wx.on||!wx.lat) return '';
   const t=today(); let start=months[0]+'-01'; const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); if(first>start) start=first;
@@ -710,11 +766,17 @@ function pressureBlock(list,months,mode){
   ['fall','rise','any'].forEach(dir=>LAGS.forEach(([k])=>{const A=P(H,dir,k), B=P(N,dir,k);
     if(H[dir][k]>=4&&A>=B*1.5&&A-B>=10&&(!best||A-B>best.A-best.B)) best={dir,k,A,B};}));
   const lagTxt={0:'в тот же день',1:'накануне',2:'за 2 дня до боли',w:'в течение 2 дней до боли или в тот же день'};
-  const verdict=best?`Чаще всего с болью совпадал${best.dir==='rise'?'':'о'} ${DIRL[best.dir]} давления ${lagTxt[best.k]}: ${best.A}% дней с болью против ${best.B}% дней без боли. Возможно, вы чувствительны к перемене погоды — это стоит обсудить с врачом.`
-    :'Ни падение, ни подъём давления — ни в день боли, ни за 1–2 дня до неё — не встречались заметно чаще, чем в дни без боли. Судя по записям, давление вряд ли главный провокатор.';
+  const pm=best?pressPerm(start,end,hd):null;
+  const permTxt=pm?`Проверка на случайность: если сдвигать дневник относительно погоды на разное число дней, такая же или большая разница получилась ${pm.ge?`в ${pm.ge} из ${pm.n} сдвигов`:`ни в одном из ${pm.n} сдвигов`}.`:'';
+  const head=best?`Чаще всего с болью совпадал${best.dir==='rise'?'':'о'} ${DIRL[best.dir]} давления ${lagTxt[best.k]}: ${best.A}% дней с болью против ${best.B}% дней без боли.`:'';
+  const verdict=!best?'Ни падение, ни подъём давления — ни в день боли, ни за 1–2 дня до неё — не встречались заметно чаще, чем в дни без боли. Судя по записям, давление вряд ли главный провокатор.'
+    :!pm?head+' Данных пока мало, чтобы проверить, не случайность ли это. Возможно, вы чувствительны к перемене погоды — понаблюдайте ещё.'
+    :pm.p<=0.05?head+' '+permTxt+' Случайно такое бывает редко — похоже, вы действительно чувствительны к перемене погоды. Это стоит обсудить с врачом.'
+    :pm.p<=0.15?head+' '+permTxt+' Это на грани: связь возможна, но может быть и совпадением. Понаблюдайте ещё 1–2 месяца.'
+    :head+' '+permTxt+' Значит, такая разница нередко получается и случайно — делать вывод о чувствительности к погоде рано.';
   const NW=' style="white-space:nowrap"', cell=(dir,k)=>`<td${NW}${best&&best.dir===dir&&best.k===k?' class="amber"':''}>${P(H,dir,k)} / ${P(N,dir,k)}</td>`, rows=LAGS.map(([k,l])=>`<tr><td>${l}</td>${cell('fall',k)}${cell('rise',k)}${cell('any',k)}</tr>`).join('');
   const tbl=`<table><tr><th>Когда</th><th>Падение</th><th>Подъём</th><th>Любое</th></tr>${rows}</table>`;
-  const note=`Дней с болью: ${hN}, без боли: ${nN}. В ячейках: % дней с болью / % дней без боли, у которых было резкое изменение давления (полдень к полудню предыдущих суток) в указанный день. «Любое» — падение или подъём вместе. ${best?`Выделено сочетание из вывода: ${best.dir==='any'?H.any[best.k]:H[best.dir][best.k]} из ${hN} дней с болью против ${N[best.dir][best.k]} из ${nN} дней без боли. `:''}Проверяется сразу несколько вариантов, поэтому одно совпадение может быть случайным — надёжнее, если картина повторится через несколько месяцев. Это совпадения по времени, а не доказательство причины. Данные: Open-Meteo, ${esc(wx.name)}.`;
+  const note=`Дней с болью: ${hN}, без боли: ${nN}. В ячейках: % дней с болью / % дней без боли, у которых было резкое изменение давления (полдень к полудню предыдущих суток) в указанный день. «Любое» — падение или подъём вместе. ${best?`Выделено сочетание из вывода: ${best.dir==='any'?H.any[best.k]:H[best.dir][best.k]} из ${hN} дней с болью против ${N[best.dir][best.k]} из ${nN} дней без боли. `:''}${pm?'Проверка на случайность сохраняет серии боли и погодные волны и учитывает, что сравнивается сразу 12 вариантов. ':''}Чем больше месяцев записей, тем надёжнее вывод. Это совпадения по времени, а не доказательство причины. Данные: Open-Meteo, ${esc(wx.name)}.`;
   if(mode==='print') return `<h2>Атмосферное давление (${esc(wx.name)})</h2>${chart}${tbl}<p>${verdict}</p><p class="pnote">${note}</p>`;
   return title+chart+expl+`<div class="mtable">${tbl}</div><p>${verdict}</p><p class="small">${note}</p>`;
 }
@@ -1053,7 +1115,7 @@ function renderHistory(){
 }
 function renderData(){$('dataInfo').textContent=entries.length?`Сейчас в дневнике ${entries.length} ${plural(entries.length,'запись','записи','записей')}.`:'Дневник пока пуст.';}
 function plural(n,a,b,c){const m10=n%10,m100=n%100; return m10===1&&m100!==11?a:m10>=2&&m10<=4&&(m100<10||m100>=20)?b:c;}
-function renderAll(){renderSummary(); renderHistory(); renderData();}
+function renderAll(){renderSummary(); renderHistory(); renderData(); wxRiskRender();}
 
 function showTab(t){
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
@@ -1133,6 +1195,7 @@ $('clearBtn').addEventListener('click',()=>{if(!entries.length)return; if(confir
   window.addEventListener('appinstalled',()=>{box.hidden=true;});
   $('installClose').addEventListener('click',()=>{box.hidden=true; try{localStorage.setItem('hd_install_hide','1');}catch(e){}});
 })();
+$('wxAlert').addEventListener('change',e=>{wx.alert=e.target.checked; wxSave(); wxRiskRender();});
 $('wxOn').addEventListener('change',e=>{wx.on=e.target.checked; wxSave(); wxUI(); renderAll(); if(wx.on&&!wx.lat) $('wxCity').focus(); else wxSync(true);});
 $('wxFind').addEventListener('click',wxFind);
 $('cycOn').addEventListener('change',e=>{cyc.on=e.target.checked; cycSave(); cycUI(); renderAll(); cycHintUpd(); if(cyc.on&&!cyc.starts.length) $('cycStart').focus();});
