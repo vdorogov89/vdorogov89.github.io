@@ -166,6 +166,7 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
 #pzScroll{height:100%; box-sizing:border-box; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; touch-action:pan-x; padding:8px 0;}
 .pzfoot{padding:10px 14px 14px; border-top:1px solid var(--line);} #pzInfo{font-size:14.5px; min-height:40px; margin-bottom:6px;}
 .pchart{cursor:zoom-in;}
+@media (orientation:landscape) and (max-height:520px){.pzfoot .small{display:none;} .pzfoot{padding:4px 12px 6px;} #pzInfo{min-height:0; margin:0; font-size:13px;} .pzbar{padding:4px 10px;} .pzbar button{width:34px; height:34px; font-size:17px;}}
 @media (max-width:600px){
   .intro h1{font-size:32px;}
   .panel{padding:18px;}
@@ -586,7 +587,7 @@ function pressChart(start,end,list,mode,big){
   const ty=p=>pt+(hi-p)/(hi-lo)*(Ht-pt-pb), yt=[];
   let g=`<svg viewBox="0 0 ${W} ${Ht}" style="${big?`width:${W}px;height:${Ht}px;display:block`:`width:100%;min-width:${pr?0:Math.min(W,days*6)}px;height:auto`}" role="img" aria-label="Атмосферное давление и дни с головной болью">`;
   (big?Array.from({length:Math.floor((hi-lo)/2)+1},(_,i)=>lo+i*2):[lo,Math.round((lo+hi)/2),hi]).forEach(v=>{g+=`<line x1="${big?0:pl}" x2="${W-prr}" y1="${ty(v)}" y2="${ty(v)}" stroke="${C.g}"/>`+(big?'':`<text x="${pl-4}" y="${ty(v)+4}" text-anchor="end" font-size="${fs}" fill="${C.t}">${v}</text>`); if(big) yt.push([v,ty(v)]);});
-  for(let d=s0; d<=end; d=dPlus(d,1)){const dd=+d.slice(8), pxd=(W-pl-prr)/days, every=big?(pxd>=34?1:pxd>=16?2:pxd>=8?7:0):0; if(dd===1||(big?every&&(every===7?dd%7===1&&dd<29:dd%every===0&&dd<30):(days<=45&&(dd%7===1&&dd<29)))){const x=tx(d,0);
+  for(let d=s0; d<=end; d=dPlus(d,1)){const dd=+d.slice(8), pxd=(W-pl-prr)/days, every=big?(pxd>=34?1:pxd>=16?2:pxd>=8?7:0):0; if(dd===1||(big?every&&(every===7?dd%7===1&&dd<29:dd%every===0&&dd<30&&!(every===2&&dd===2)):(days<=45&&(dd%7===1&&dd<29)))){const x=tx(d,0);
     g+=`<line x1="${x}" x2="${x}" y1="${pt}" y2="${Ht-pb}" stroke="${C.g}"/><text x="${x+2}" y="${Ht-6}" font-size="${fs}" fill="${C.t}">${dd===1?mName(d.slice(0,7)).split(' ')[0].slice(0,3).toLowerCase()+' 1':dd}</text>`;}}
   // дни боли: вертикальная полоса за сутки + точки в час начала
   const byDay={}; list.filter(e=>e.date>=start&&e.date<=end).forEach(e=>(byDay[e.date]=byDay[e.date]||[]).push(e));
@@ -606,12 +607,12 @@ function pressChart(start,end,list,mode,big){
   pzArgs={start,end,list}; return lg+`<div class="chartbox pchart" title="Открыть во весь экран">${g}</div><p class="small" style="margin-top:-10px">Нажмите на график, чтобы открыть его во весь экран и увеличить.</p>`;
 }
 let pzArgs=null, pzData=null, pzZ=1, pzBaseW=0;
-function pzRender(keep){
+function pzRender(keep,anchor){
   const sc=$('pzScroll'); if(!pzArgs||!sc) return; const old=sc.scrollWidth||1, mid=(sc.scrollLeft+sc.clientWidth/2)/old;
-  const h=Math.max(220,sc.clientHeight-20); sc.innerHTML=pressChart(pzArgs.start,pzArgs.end,pzArgs.list,'screen',{w:pzBaseW,z:pzZ,h});
+  const h=Math.max(160,sc.clientHeight-30); sc.innerHTML=pressChart(pzArgs.start,pzArgs.end,pzArgs.list,'screen',{w:pzBaseW,z:pzZ,h});
   $('pzAxis').innerHTML=(pzData?pzData.yt:[]).map(([v,y])=>`<span style="top:${y+8-8}px">${v}</span>`).join('');
   $('pzLvl').textContent='×'+(Math.round(pzZ*10)/10);
-  sc.scrollLeft=keep?mid*sc.scrollWidth-sc.clientWidth/2:sc.scrollWidth;
+  sc.scrollLeft=anchor?anchor.r*sc.scrollWidth-anchor.px:keep?mid*sc.scrollWidth-sc.clientWidth/2:sc.scrollWidth;
 }
 function pzOpen(){
   if(!pzArgs) return; $('pzView').hidden=false; document.body.style.overflow='hidden';
@@ -619,7 +620,7 @@ function pzOpen(){
   try{history.pushState({pz:1},'');}catch(e){}
 }
 function pzClose(fromPop){ if($('pzView').hidden) return; $('pzView').hidden=true; document.body.style.overflow=''; if(!fromPop){try{if(history.state&&history.state.pz) history.back();}catch(e){}} }
-function pzZoom(z,keep){pzZ=Math.min(12,Math.max(1,z)); pzRender(keep!==false);}
+function pzZoom(z,keep,anchor){pzZ=Math.min(12,Math.max(1,z)); pzRender(keep!==false,anchor);}
 function pzTap(clientX){
   const sc=$('pzScroll'), svg=sc.querySelector('svg'); if(!svg||!pzData) return; const r=svg.getBoundingClientRect(), x=clientX-r.left;
   const D=pzData; let best=null, bd=1e9; D.pts.forEach(p=>{const dx=Math.abs(D.tx(p.d,p.h)-x); if(dx<bd){bd=dx; best=p;}}); if(!best) return;
@@ -642,10 +643,23 @@ function pzTap(clientX){
   document.addEventListener('click',e=>{const b=e.target.closest('.pchart'); if(b) pzOpen();});
   const sc=$('pzScroll'); let d0=0,z0=1,raf=0,moved=false,sx=0,lastTap=0;
   const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
-  sc.addEventListener('touchstart',e=>{if(e.touches.length===2){d0=dist(e.touches); z0=pzZ; e.preventDefault();} else {moved=false; sx=e.touches[0].clientX;}},{passive:false});
-  sc.addEventListener('touchmove',e=>{if(e.touches.length===2&&d0){e.preventDefault(); const z=z0*dist(e.touches)/d0; if(!raf) raf=requestAnimationFrame(()=>{raf=0; pzZoom(z);});} else if(Math.abs(e.touches[0].clientX-sx)>8) moved=true;},{passive:false});
-  sc.addEventListener('touchend',e=>{if(d0&&e.touches.length<2){d0=0; return;} if(!moved&&e.changedTouches.length===1){const now=Date.now(), x=e.changedTouches[0].clientX;
-    if(now-lastTap<300){pzZoom(pzZ>=6?1:pzZ*2); lastTap=0;} else {lastTap=now; pzTap(x);} e.preventDefault();}},{passive:false});
+  // щипок: во время жеста растягиваем картинку (без перерисовки — иначе iOS теряет касание), по окончании перерисовываем в новом масштабе
+  let pin=null;
+  const pinZ=t=>Math.min(12,Math.max(1,pin.z0*dist(t)/pin.d0));
+  sc.addEventListener('touchstart',e=>{
+    if(e.touches.length===2){e.preventDefault(); const r=sc.getBoundingClientRect(), mx=(e.touches[0].clientX+e.touches[1].clientX)/2-r.left, fx=sc.scrollLeft+mx;
+      pin={d0:dist(e.touches), z0:pzZ, mx, fx, r:fx/sc.scrollWidth, sl:sc.scrollLeft, z:pzZ}; const svg=sc.querySelector('svg'); if(svg){svg.style.transformOrigin=fx+'px 0'; svg.style.willChange='transform';}}
+    else if(!pin){moved=false; sx=e.touches[0].clientX;}},{passive:false});
+  sc.addEventListener('touchmove',e=>{
+    if(pin&&e.touches.length===2){e.preventDefault(); pin.z=pinZ(e.touches); const svg=sc.querySelector('svg'); if(svg) svg.style.transform=`scaleX(${pin.z/pin.z0})`;
+      $('pzLvl').textContent='×'+(Math.round(pin.z*10)/10);}
+    else if(!pin&&Math.abs(e.touches[0].clientX-sx)>8) moved=true;},{passive:false});
+  const pinEnd=()=>{const p=pin; pin=null; const svg=sc.querySelector('svg'); if(svg){svg.style.transform=''; svg.style.willChange='';} pzZoom(p.z,true,{r:p.r,px:p.mx}); moved=true;};
+  sc.addEventListener('touchend',e=>{
+    if(pin){if(e.touches.length<2) pinEnd(); e.preventDefault(); return;}
+    if(!moved&&e.changedTouches.length===1){const now=Date.now(), x=e.changedTouches[0].clientX;
+      if(now-lastTap<300){pzZoom(pzZ>=6?1:pzZ*2); lastTap=0;} else {lastTap=now; pzTap(x);} e.preventDefault();}},{passive:false});
+  sc.addEventListener('touchcancel',()=>{if(pin) pinEnd();});
   sc.addEventListener('click',e=>pzTap(e.clientX));
   sc.addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault(); pzZoom(pzZ*(e.deltaY<0?1.1:1/1.1));}},{passive:false});
 })();
