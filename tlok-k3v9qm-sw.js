@@ -1,4 +1,4 @@
-const CACHE='tlok-k3v9qm-v1';
+const CACHE='tlok-k3v9qm-v2';
 const CORE=['/tlok-k3v9qm.html','/tlok-k3v9qm.webmanifest','/tlok-icon-192.png','/tlok-icon-512.png','/tlok-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('tlok-k3v9qm-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});

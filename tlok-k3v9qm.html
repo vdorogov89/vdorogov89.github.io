@@ -151,7 +151,7 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
     <label class="chk"><input type="checkbox" id="h_rep"><span>Похожие эпизоды с молодости, годами, с теми же провокаторами</span></label>
     <label class="chk"><input type="checkbox" id="h_heart"><span>Структурная болезнь сердца, ИБС, сердечная недостаточность<small>Признак высокого риска</small></span></label>
     <label class="chk"><input type="checkbox" id="h_scd"><span>Внезапная смерть родственников в молодом возрасте<small>Признак высокого риска</small></span></label>
-    <label class="chk"><input type="checkbox" id="h_dev"><span>Кардиостимулятор или ИКД</span></label>
+    <label class="chk"><input type="checkbox" id="h_dev"><span>Кардиостимулятор или имплантируемый кардиовертер-дефибриллятор (ИКД)</span></label>
     <label class="chk"><input type="checkbox" id="h_epi"><span>Эпилепсия в анамнезе, приём противоэпилептических</span></label>
     <label class="chk"><input type="checkbox" id="h_drugs"><span>Гипотензивные, диуретики, α-блокаторы, нитраты, антидепрессанты</span></label>
     <label class="chk"><input type="checkbox" id="h_qt"><span>Препараты, удлиняющие QT</span></label>
@@ -165,7 +165,7 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
 <section id="s2">
   <div class="card">
     <h2>Активная ортостатическая проба</h2>
-    <p class="muted">5 минут лёжа, затем встать; АД и ЧСС на 1-й и 3-й минуте стоя.</p>
+    <p class="muted">5 минут лёжа, затем встать; артериальное давление (АД) и частота сердечных сокращений (ЧСС) на 1-й и 3-й минуте стоя.</p>
     <table class="oh">
       <tr><td></td><td class="muted">Сист.</td><td class="muted">Диаст.</td><td class="muted">ЧСС</td></tr>
       <tr><td class="muted">Лёжа</td><td><input type="number" id="s0" inputmode="numeric"></td><td><input type="number" id="d0" inputmode="numeric"></td><td><input type="number" id="h0" inputmode="numeric"></td></tr>
@@ -181,18 +181,18 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
     <label class="chk"><input type="checkbox" id="e_done"><span><b>ЭКГ снята</b><small>Отметьте найденные изменения; если ничего не отмечено — считается нормой</small></span></label>
     <label class="chk"><input type="checkbox" id="e_brady" class="ecg" data-l="синусовая брадикардия < 40 в минуту или паузы > 3 с"><span>Синусовая брадикардия &lt; 40 или паузы &gt; 3 с</span></label>
     <label class="chk"><input type="checkbox" id="e_av" class="ecg" data-l="АВ-блокада II степени (Мобиц II) или III степени"><span>АВ-блокада II степени (Мобиц II) или III степени</span></label>
-    <label class="chk"><input type="checkbox" id="e_bbb" class="ecg" data-l="бифасцикулярная блокада или QRS ≥ 120 мс"><span>Бифасцикулярная блокада, QRS ≥ 120 мс</span></label>
-    <label class="chk"><input type="checkbox" id="e_qt" class="ecg" data-l="QTc > 460 мс или < 340 мс"><span>QTc &gt; 460 мс или &lt; 340 мс</span></label>
+    <label class="chk"><input type="checkbox" id="e_bbb" class="ecg" data-l="бифасцикулярная блокада или QRS ≥ 120 мс"><span>Бифасцикулярная блокада, комплекс QRS ≥ 120 мс</span></label>
+    <label class="chk"><input type="checkbox" id="e_qt" class="ecg" data-l="QTc (корригированный интервал QT) > 460 мс или < 340 мс"><span>QTc (корригированный интервал QT) &gt; 460 мс или &lt; 340 мс</span></label>
     <label class="chk"><input type="checkbox" id="e_brug" class="ecg" data-l="паттерн Бругада"><span>Паттерн Бругада</span></label>
-    <label class="chk"><input type="checkbox" id="e_wpw" class="ecg" data-l="предвозбуждение желудочков"><span>Предвозбуждение (WPW)</span></label>
+    <label class="chk"><input type="checkbox" id="e_wpw" class="ecg" data-l="предвозбуждение желудочков"><span>Предвозбуждение желудочков (синдром Вольфа–Паркинсона–Уайта, WPW)</span></label>
     <label class="chk"><input type="checkbox" id="e_arvc" class="ecg" data-l="отрицательные T в V1–V3, эпсилон-волна"><span>Отрицательные T в V1–V3, эпсилон-волна</span></label>
-    <label class="chk"><input type="checkbox" id="e_hcm" class="ecg" data-l="патологические Q, выраженная гипертрофия ЛЖ"><span>Патологические Q, выраженная гипертрофия ЛЖ</span></label>
-    <label class="chk"><input type="checkbox" id="e_tachy" class="ecg" data-l="пароксизмальная тахиаритмия"><span>Фибрилляция предсердий с ЧСС &lt; 40 или пароксизм тахиаритмии</span></label>
+    <label class="chk"><input type="checkbox" id="e_hcm" class="ecg" data-l="патологические Q, выраженная гипертрофия левого желудочка"><span>Патологические Q, выраженная гипертрофия левого желудочка</span></label>
+    <label class="chk"><input type="checkbox" id="e_tachy" class="ecg" data-l="пароксизмальная тахиаритмия"><span>Фибрилляция предсердий с частотой сердечных сокращений &lt; 40 или пароксизм тахиаритмии</span></label>
   </div>
 
   <div class="card">
     <h2>Осмотр</h2>
-    <label class="chk"><input type="checkbox" id="x_murmur"><span>Систолический шум (аортальный стеноз, ГКМП)</span></label>
+    <label class="chk"><input type="checkbox" id="x_murmur"><span>Систолический шум (аортальный стеноз, гипертрофическая кардиомиопатия)</span></label>
     <label class="chk"><input type="checkbox" id="x_focal"><span>Очаговая неврологическая симптоматика</span></label>
     <label class="chk"><input type="checkbox" id="x_carotid"><span>Шум над сонными артериями</span></label>
   </div>
@@ -223,7 +223,7 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
     <div class="mbtns"><button id="send">Отправить на почту</button><button id="copy" class="alt">Скопировать</button><button id="reset" class="alt">Новый пациент</button></div>
     <p class="muted" id="sendnote">Откроется почтовое приложение с готовым письмом — останется нажать «Отправить».</p>
   </div>
-  <p class="foot">Помощник для врача, а не замена клиническому решению. Введённые данные никуда не отправляются и не сохраняются, пока вы сами не отправите письмо; после закрытия страницы они стираются. Не указывайте в письме ФИО пациента. Источники: Sheldon R. et al. Historical criteria that distinguish syncope from seizures. J Am Coll Cardiol 2002 (шкала Калгари: ≥ 1 балла — приступ; чувствительность и специфичность 94%); Brignole M. et al. 2018 ESC Guidelines for the diagnosis and management of syncope; Hoefnagels W. et al. 1991.</p><p class="copy">© 2026 Василий Дорогов, врач-невролог. Все права защищены. Копирование, переработка и распространение без письменного разрешения автора запрещены.</p>
+  <p class="foot">Помощник для врача, а не замена клиническому решению. Введённые данные никуда не отправляются и не сохраняются, пока вы сами не отправите письмо; после закрытия страницы они стираются. Не указывайте в письме ФИО пациента. Источники: Sheldon R. et al. Historical criteria that distinguish syncope from seizures. J Am Coll Cardiol 2002 (шкала Калгари: ≥ 1 балла — приступ; чувствительность и специфичность 94%); Brignole M. et al. 2018 ESC (Европейское общество кардиологов) Guidelines for the diagnosis and management of syncope; Hoefnagels W. et al. 1991.</p><p class="copy">© 2026 Василий Дорогов, врач-невролог. Все права защищены. Копирование, переработка и распространение без письменного разрешения автора запрещены.</p>
 <div class="stepnav"><button class="prev">Назад</button><button class="next main">В начало</button></div>
 </section>
 </div>
@@ -268,7 +268,7 @@ function classify(){
   if(G.face==='pale'){add('refl','бледность');}if(v('a_fast'))add('refl','быстрое восстановление');if(v('h_rep'))add('refl','повторные эпизоды с молодости');if(G.jerk==='short')add('refl','короткие подёргивания после падения (судорожная синкопе)');
   if(v('c_up'))add('orth','эпизод вскоре после вставания');if(v('c_meal'))add('orth','после еды');if(v('h_drugs'))add('orth','гипотензивные, диуретики и т. п.');if(v('h_ans'))add('orth','вегетативная недостаточность');
   if(o&&o.oh){add('orth','ортостатическая гипотензия на пробе');add('orth','ортостатическая гипотензия на пробе (вес ×2)');}if(o&&o.oh&&v('o_sym'))add('orth','симптомы воспроизвелись');
-  highRisk().forEach(x=>add('card',x));if(v('h_dev'))add('card','кардиостимулятор/ИКД');if(v('h_qt'))add('card','препараты, удлиняющие QT');
+  highRisk().forEach(x=>add('card',x));if(v('h_dev'))add('card','кардиостимулятор или имплантируемый кардиовертер-дефибриллятор');if(v('h_qt'))add('card','препараты, удлиняющие QT');
   if(c.s>=1){add('epi',`шкала Калгари +${c.s}`);add('epi','шкала Калгари (вес ×2)');}
   if(v('a_tside'))add('epi','прикус боковой поверхности языка');if(v('w_head'))add('epi','поворот головы');if(v('w_auto'))add('epi','автоматизмы');if(v('w_tonic'))add('epi','тоническая фаза, крик');
   if(G.face==='cyan')add('epi','цианоз');if(G.jerk==='long')add('epi','ритмичные судороги ≥ 30 с с начала');if(v('a_conf'))add('epi','спутанность после');if(v('a_sleepy'))add('epi','сонливость, мышечные боли');
@@ -284,8 +284,8 @@ function plan(r){const P=[];const top=r.ranked[0];const has=k=>r.ranked.find(x=>
   if(!v('e_done'))P.push('ЭКГ в 12 отведениях — обязательно всем');
   if(!r.o)P.push('Активная ортостатическая проба: 5 мин лёжа, АД и ЧСС на 1-й и 3-й минуте стоя');
   P.push('Глюкоза крови; общий анализ крови при подозрении на кровопотерю');
-  if(r.hr.length){P.push('<b>Высокий риск: мониторирование ЭКГ, ЭхоКГ, консультация кардиолога; решить вопрос о госпитализации</b>');P.push('Холтеровское мониторирование, при редких эпизодах — имплантируемый регистратор ритма');}
-  if(has('refl')&&!r.hr.length&&(v('age')||0)>40&&!v('x_carotid'))P.push('Массаж каротидного синуса (возраст > 40 лет, рефлекторный механизм; нет шума на сонных и ТИА/инсульта за 3 мес)');
+  if(r.hr.length){P.push('<b>Высокий риск: мониторирование ЭКГ, эхокардиография, консультация кардиолога; решить вопрос о госпитализации</b>');P.push('Холтеровское мониторирование, при редких эпизодах — имплантируемый регистратор ритма');}
+  if(has('refl')&&!r.hr.length&&(v('age')||0)>40&&!v('x_carotid'))P.push('Массаж каротидного синуса (возраст > 40 лет, рефлекторный механизм; нет шума на сонных артериях, транзиторной ишемической атаки или инсульта за 3 мес)');
   if(has('refl')&&!r.hr.length)P.push('При неясных повторных эпизодах — тилт-тест');
   if(r.o&&r.o.pots)P.push('Прирост ЧСС ≥ 30 без гипотензии — оценить синдром постуральной тахикардии');
   if(has('orth'))P.push('Пересмотреть гипотензивные и диуретики; при нейрогенной ортостатической гипотензии — оценка вегетативной функции');
@@ -309,7 +309,7 @@ function summary(r){
   if(W.length)L.push('Со слов очевидцев: '+W.join(', ')+'.');
   const Af=yesList([['a_tside','прикус боковой поверхности языка'],['a_ttip','прикус кончика языка'],['a_conf','спутанность'],['a_fast','быстрое полное восстановление'],['a_sleepy','сонливость, головная/мышечная боль'],['a_inc','недержание мочи'],['a_inj','травма при падении']]);
   if(Af.length)L.push('После эпизода: '+Af.join(', ')+'.');
-  const H=yesList([['h_rep','аналогичные эпизоды с молодости'],['h_heart','структурная болезнь сердца/ИБС'],['h_scd','внезапная смерть родственников в молодом возрасте'],['h_dev','кардиостимулятор/ИКД'],['h_epi','эпилепсия'],['h_drugs','гипотензивные/диуретики/вазодилататоры'],['h_qt','препараты, удлиняющие QT'],['h_ans','вегетативная недостаточность'],['h_psych','частые эпизоды, психиатрический фон']]);
+  const H=yesList([['h_rep','аналогичные эпизоды с молодости'],['h_heart','структурная болезнь сердца/ИБС'],['h_scd','внезапная смерть родственников в молодом возрасте'],['h_dev','кардиостимулятор или имплантируемый кардиовертер-дефибриллятор'],['h_epi','эпилепсия'],['h_drugs','гипотензивные/диуретики/вазодилататоры'],['h_qt','препараты, удлиняющие QT'],['h_ans','вегетативная недостаточность'],['h_psych','частые эпизоды, психиатрический фон']]);
   if(H.length)L.push('Анамнез: '+H.join(', ')+'.');
   L.push(`Шкала Калгари (Sheldon, 2002): ${r.c.s>0?'+':r.c.s<0?'−':''}${Math.abs(r.c.s)} ${Math.abs(r.c.s)%10===1&&Math.abs(r.c.s)%100!==11?'балл':(Math.abs(r.c.s)%10>=2&&Math.abs(r.c.s)%10<=4&&(Math.abs(r.c.s)%100<10||Math.abs(r.c.s)%100>=20))?'балла':'баллов'} — ${r.c.s>=1?'в пользу эпилептического приступа':'в пользу синкопе'}${r.c.it.length?' ('+r.c.it.join(', ')+')':''}.`);
   if(r.o)L.push(`Активная ортостатическая проба: лёжа ${v('s0')}${v('d0')!=null?'/'+v('d0'):''}${v('h0')!=null?', ЧСС '+v('h0'):''}; ${orthText(r.o)} — ${r.o.oh?'ортостатическая гипотензия':r.o.pots?'прирост ЧСС ≥ 30 без гипотензии':'без ортостатической гипотензии'}${v('o_sym')?', симптомы воспроизвелись':''}.`);
@@ -317,7 +317,7 @@ function summary(r){
   const ex=yesList([['x_murmur','систолический шум'],['x_focal','очаговая неврологическая симптоматика'],['x_carotid','шум над сонными артериями']]);if(ex.length)L.push('Осмотр: '+ex.join(', ')+'.');
   const lab=[];const LB={l_lac:'лактат',l_ck:'КФК',l_prl:'пролактин'};Object.keys(LB).forEach(k=>{const x=v(k);if(x)lab.push(LB[k]+' '+(x==='h'?'повышен':'в норме'))});if(v('l_glu'))lab.push(v('l_glu')==='l'?'гипогликемия':'глюкоза в норме');if(lab.length)L.push('Лабораторно: '+lab.join(', ')+'.');
   const top=r.ranked.filter(x=>x.sc>0);
-  if(r.hr.length)L.push('Признаки высокого риска (ESC, 2018): '+r.hr.join(', ')+'.');
+  if(r.hr.length)L.push('Признаки высокого риска (ESC — Европейское общество кардиологов, 2018): '+r.hr.join(', ')+'.');
   L.push('Заключение: '+(top.length?'наиболее вероятно — '+top[0].n+(top[1]&&top[1].sc>=Math.max(2,top[0].sc-1)?'; нельзя исключить: '+top.slice(1).filter(x=>x.sc>=2).map(x=>x.n).join('; '):''):'данных для дифференциации недостаточно')+(r.hr.length&&top.length&&top[0].k!=='card'?'. Кардиальная причина требует исключения':'')+'.');
   L.push('План:\n'+plan(r).map(x=>'– '+x.replace(/<[^>]+>/g,'')).join('\n'));
   return L.join('\n')}
@@ -328,7 +328,7 @@ function render(){
   if(cur!=='s3')return;
   const r=classify(); let h='';
   if(!v('tloc'))h+=box('info','Полная потеря сознания не подтверждена',[],'<p>Если это было головокружение, падение без потери сознания или предобморочное состояние — алгоритм применим ограниченно.</p>');
-  if(r.hr.length)h+=box('bad','Признаки высокого риска — сначала исключить кардиальную причину',r.hr,'<p>Судорожная синкопе при аритмии может выглядеть как приступ. ЭКГ-мониторирование, ЭхоКГ, кардиолог.</p>');
+  if(r.hr.length)h+=box('bad','Признаки высокого риска — сначала исключить кардиальную причину',r.hr,'<p>Судорожная синкопе при аритмии может выглядеть как приступ. ЭКГ-мониторирование, эхокардиография, кардиолог.</p>');
   const cs=r.c.s;h+=box(cs>=1?'warn':'ok',`Шкала Калгари: ${cs>0?'+':cs<0?'−':''}${Math.abs(cs)}`,r.c.it,`<p>${cs>=1?'≥ 1 балла — в пользу эпилептического приступа':'< 1 балла — в пользу синкопе'}. Чувствительность и специфичность 94% (Sheldon, 2002).</p>`);
   const top=r.ranked.filter(x=>x.sc>0);
   if(top.length){h+=box('info','Наиболее вероятно: '+top[0].n,top[0].why.slice(0,8));
@@ -340,7 +340,7 @@ function render(){
 const MK='tlok-mail';try{$('mail').value=localStorage.getItem(MK)||'dorogovvn2@zdrav.mos.ru'}catch(e){$('mail').value='dorogovvn2@zdrav.mos.ru'}
 $('mail').addEventListener('change',()=>{try{localStorage.setItem(MK,$('mail').value.trim())}catch(e){}});
 $('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}
-  const t=v('tag'),sub='ТПС: синкопе или приступ'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
+  const t=v('tag'),sub='Транзиторная потеря сознания: синкопе или приступ'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
   location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent($('sum').textContent.replace(/\n/g,'\r\n'))};
 $('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('sum').textContent);$('copy').textContent='Скопировано'}catch(e){$('copy').textContent='Не удалось — выделите текст'}setTimeout(()=>$('copy').textContent='Скопировать',1800)};
 $('reset').onclick=()=>{document.querySelectorAll('input').forEach(i=>{if(i.id==='mail')return;if(i.type==='checkbox')i.checked=i.id==='tloc';else i.value=''});document.querySelectorAll('select').forEach(s=>s.selectedIndex=0);
