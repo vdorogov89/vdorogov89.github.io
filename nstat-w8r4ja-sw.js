@@ -1,4 +1,4 @@
-const CACHE='nstat-w8r4ja-v1';
+const CACHE='nstat-w8r4ja-v3';
 const CORE=['/nstat-w8r4ja.html','/nstat-w8r4ja.webmanifest','/nstat-icon-192.png','/nstat-icon-512.png','/nstat-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('nstat-w8r4ja-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
