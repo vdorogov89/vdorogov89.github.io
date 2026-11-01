@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Энцефалопатия Вернике</title>
+<meta name="theme-color" content="#08080D">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="wern-p5c2tz.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="wern-icon-192.png">
+<link rel="apple-touch-icon" href="wern-apple-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Вернике">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="author" content="Василий Дорогов">
+<meta name="copyright" content="© 2026 Василий Дорогов">
+<style>
+:root{--bg:#08080D; --ink:#F2F2F5; --body:#C9C9D3; --muted:#8B8B98; --line:rgba(255,255,255,0.09); --glass:rgba(255,255,255,0.045); --acc:#4FE0FF; --acc2:#8A5CFF; --warn:#FF8A7A; --amber:#FFC56B; --ok:#6BE3A4;}
+*{box-sizing:border-box;}
+html,body{margin:0; background:var(--bg); color:var(--body); font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif; -webkit-font-smoothing:antialiased;}
+button{font:inherit; color:inherit; cursor:pointer;}
+.app{max-width:560px; margin:0 auto; padding:0 16px calc(84px + env(safe-area-inset-bottom));}
+header{padding:calc(16px + env(safe-area-inset-top)) 0 10px; display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+header h1{margin:0; font-size:20px; color:var(--ink); letter-spacing:-0.01em;}
+header span{font-size:12.5px; color:var(--muted); white-space:nowrap;}
+nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center; gap:4px; padding:10px 8px calc(10px + env(safe-area-inset-bottom)); background:rgba(10,10,16,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--line);}
+nav.tabs button{flex:1; max-width:120px; padding:9px 2px; border-radius:12px; border:0; background:transparent; color:var(--muted); font-size:12.5px;}
+nav.tabs button.on{background:rgba(79,224,255,0.12); color:var(--ink);}
+section{display:none;} section.on{display:block;}
+.card{background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:16px; margin:12px 0;}
+h2{font-size:17px; color:var(--ink); margin:4px 0 8px;}
+h3{font-size:15px; color:var(--ink); margin:14px 0 6px;}
+p{margin:6px 0;}
+.muted{color:var(--muted); font-size:13px;}
+.crumbs{display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 4px;}
+.crumbs span{font-size:12px; padding:3px 9px; border-radius:20px; background:rgba(255,255,255,0.06); color:var(--muted);}
+.crumbs span.on{background:rgba(79,224,255,0.14); color:var(--ink);}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+label.f{display:block; font-size:12.5px; color:var(--muted);}
+input[type=number],input[type=date],select{width:100%; min-width:0; max-width:100%; -webkit-appearance:none; appearance:none; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px; display:block;}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%; background-size:5px 5px; background-repeat:no-repeat; padding-right:32px;}
+select option{background:#16171f; color:var(--ink);}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.8);}
+input:focus,select:focus{outline:none; border-color:rgba(79,224,255,0.6);}
+.chk{display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); color:var(--ink);}
+.chk:first-of-type{border-top:0;}
+.chk input{-webkit-appearance:none; appearance:none; width:22px; height:22px; flex:0 0 22px; margin:1px 0 0; border-radius:7px; border:1.5px solid rgba(255,255,255,0.25); background:transparent; display:grid; place-content:center;}
+.chk input:checked{background:linear-gradient(120deg,var(--acc),var(--acc2)); border-color:transparent;}
+.chk input:checked::after{content:''; width:10px; height:6px; border:2.5px solid #08080D; border-top:0; border-right:0; transform:rotate(-45deg) translate(1px,-1px);}
+.chk small{display:block; color:var(--muted); font-size:12.5px;}
+.out{border-radius:16px; padding:12px 14px; margin:10px 0; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body);}
+.out b.t{display:block; margin-bottom:4px; color:var(--ink); font-size:15px;}
+.out.ok{border-color:rgba(107,227,164,0.35); background:rgba(107,227,164,0.06);} .out.ok b.t{color:var(--ok);}
+.out.warn{border-color:rgba(255,197,107,0.4); background:rgba(255,197,107,0.06);} .out.warn b.t{color:var(--amber);}
+.out.bad{border-color:rgba(255,138,122,0.4); background:rgba(255,138,122,0.06);} .out.bad b.t{color:var(--warn);}
+.out.info{border-color:rgba(79,224,255,0.25); background:rgba(79,224,255,0.04);} .out.info b.t{color:var(--acc);}
+.out ul{margin:6px 0 0; padding-left:20px;} li{margin:3px 0;}
+.out b{color:var(--ink);}
+.dose{font-weight:600; color:var(--acc); white-space:nowrap;}
+.stepnav{display:flex; gap:8px; margin:16px 0 4px;}
+.stepnav button{flex:1; padding:11px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.04); color:var(--ink);}
+.stepnav button.main{flex:2; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.mbtns button{padding:10px 14px; border-radius:12px; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns button.alt{background:rgba(255,255,255,0.08); color:var(--ink); font-weight:500;}
+pre{white-space:pre-wrap; font:13.5px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; color:var(--ink); background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:14px; padding:12px; margin:8px 0;}
+a{color:var(--acc);}
+.foot{font-size:12px; color:var(--muted); margin:18px 0;}
+.seg3{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 2px;} .seg3 button{padding:8px 12px; border-radius:20px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--muted); font-size:13.5px;} .seg3 button.on{border-color:rgba(79,224,255,0.5); background:rgba(79,224,255,0.12); color:var(--ink);}
+.q{padding:10px 0; border-top:1px solid var(--line);} .q:first-of-type{border-top:0;} .q>b{display:block; color:var(--ink); font-weight:500;} .q small{color:var(--muted); font-size:12.5px;}
+.pts{float:right; font-size:12px; color:var(--muted);}
+input[type=email],input[type=text]{width:100%; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px;}
+table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padding:4px 4px;} table.oh input{margin:0; min-height:40px; padding:8px; text-align:center;}
+.copy{font-size:11.5px; color:var(--muted); line-height:1.45; margin:22px 0 6px; padding-top:12px; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="app">
+  <header><h1>Энцефалопатия Вернике</h1><span>автор — В.&nbsp;Дорогов</span></header>
+  <div class="crumbs" id="crumbs"></div>
+
+<section id="s1" class="on">
+  <div class="card">
+    <h2>Пациент</h2>
+    <div class="row">
+      <label class="f">Возраст, лет<input type="number" id="age" inputmode="numeric" min="14" max="110"></label>
+      <label class="f">Пол<select id="sex"><option value="m">Мужской</option><option value="f">Женский</option></select></label>
+    </div>
+    <label class="f" style="margin-top:10px">Метка для письма (палата, номер истории — без ФИО)<input type="text" id="tag" autocomplete="off"></label>
+  </div>
+  <div class="card">
+    <h2>Группа риска</h2>
+    <label class="chk"><input type="checkbox" class="rk" id="r_alc" data-l="злоупотребление алкоголем"><span>Алкоголь: зависимость, абстиненция, запой с плохим питанием</span></label>
+    <label class="chk"><input type="checkbox" class="rk" id="r_starv" data-l="голодание, истощение"><span>Голодание, истощение, анорексия, онкология</span></label>
+    <label class="chk"><input type="checkbox" class="rk" id="r_vom" data-l="длительная рвота"><span>Длительная рвота: непроходимость, химиотерапия</span></label>
+    <label class="chk"><input type="checkbox" class="rk" id="r_hg" data-l="рвота беременных"><span>Рвота беременных</span></label>
+    <label class="chk"><input type="checkbox" class="rk" id="r_bar" data-l="бариатрическая операция"><span>После бариатрической операции</span></label>
+    <label class="chk"><input type="checkbox" class="rk" id="r_meta" data-l="повышенная потребность (сепсис, диализ, тиреотоксикоз, болезнь печени)"><span>Сепсис, диализ, тиреотоксикоз, тяжёлая болезнь печени</span></label>
+    <label class="chk"><input type="checkbox" class="rk" id="r_refeed" data-l="возобновление питания или инфузии глюкозы без тиамина"><span>Возобновление питания, длительные инфузии глюкозы без тиамина</span></label>
+  </div>
+  <div class="card">
+    <h2>Критерии Caine</h2>
+    <p class="muted">Достаточно 2 из 4. Полная триада бывает у меньшинства.</p>
+    <label class="chk"><input type="checkbox" class="cn" id="k_diet" data-l="дефицит питания"><span>Дефицит питания<small>Отмечается автоматически, если выбрана группа риска</small></span></label>
+    <label class="chk"><input type="checkbox" class="cn" id="k_eye" data-l="глазодвигательные нарушения"><span>Глазодвигательные нарушения: нистагм, офтальмоплегия, парез взора</span></label>
+    <label class="chk"><input type="checkbox" class="cn" id="k_cer" data-l="мозжечковая дисфункция"><span>Мозжечковая дисфункция: атаксия, шаткость</span></label>
+    <label class="chk"><input type="checkbox" class="cn" id="k_men" data-l="изменение психического статуса или памяти"><span>Спутанность, сонливость, нарушение памяти</span></label>
+    <div id="caine"></div>
+  </div>
+  <div class="card">
+    <h2>Сейчас</h2>
+    <label class="chk"><input type="checkbox" id="hypo"><span>Гипогликемия</span></label>
+    <label class="chk"><input type="checkbox" id="glu_iv"><span>Планируются инфузии глюкозы или питание</span></label>
+    <label class="chk"><input type="checkbox" id="preg"><span>Беременность</span></label>
+  </div>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Дозы</button></div>
+</section>
+
+<section id="s2">
+  <div id="verdict"></div>
+  <div class="card">
+    <h2>Схема</h2>
+    <label class="f">Режим<select id="reg">
+      <option value="efns">Лечение 200 мг × 3 (EFNS)</option>
+      <option value="uk">Лечение 500 мг × 3 (NHS)</option>
+      <option value="uk300">Лечение 300 мг × 3 (NHS)</option>
+      <option value="pro">Профилактика 200 мг × 1</option>
+      <option value="pro300">Профилактика 300 мг × 1</option>
+    </select></label>
+    <p class="muted">EFNS — Европейская федерация неврологических обществ (European Federation of Neurological Societies), рекомендации 2010 г. NHS — Национальная служба здравоохранения Великобритании (National Health Service).</p>
+    <div class="row" style="margin-top:10px">
+      <label class="f">Путь<select id="route"><option value="im">В/м</option><option value="iv">В/в (вне инстр.)</option></select></label>
+      <label class="f">Ампулы<select id="amp"><option value="50">50 мг/мл (5%)</option><option value="25">25 мг/мл (2,5%)</option></select></label>
+    </div>
+    <div id="dose"></div>
+  </div>
+  <div class="card">
+    <h2>Одновременно</h2>
+    <label class="chk"><input type="checkbox" id="t_blood"><span>Кровь на тиамин взята до введения (результата не ждать)</span></label>
+    <label class="chk"><input type="checkbox" id="t_glu"><span>Глюкоза крови</span></label>
+    <label class="chk"><input type="checkbox" id="t_mg"><span>Магний; при дефиците — восполнить</span></label>
+    <label class="chk"><input type="checkbox" id="t_kp"><span>Калий, фосфор (синдром возобновления питания)</span></label>
+    <label class="chk"><input type="checkbox" id="t_mri"><span>МРТ головного мозга (норма не исключает диагноз)</span></label>
+    <label class="chk"><input type="checkbox" id="t_wd"><span>Оценка алкогольной абстиненции</span></label>
+    <label class="chk"><input type="checkbox" id="t_daily"><span>Ежедневная оценка: глазодвигательные, атаксия, сознание</span></label>
+  </div>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Итог</button></div>
+</section>
+
+<section id="s3">
+  <div class="card">
+    <h2>Текст для истории болезни</h2>
+    <p class="muted">Проверьте и при необходимости поправьте перед вставкой.</p>
+    <pre id="sum"></pre>
+    <label class="f">Отправить на почту<input type="email" id="mail" autocomplete="email" inputmode="email"></label>
+    <div class="mbtns"><button id="send">Отправить на почту</button><button id="copy" class="alt">Скопировать</button><button id="reset" class="alt">Новый пациент</button></div>
+    <p class="muted">Откроется почтовое приложение с готовым письмом — останется нажать «Отправить».</p>
+  </div>
+  <p class="foot">Помощник для врача, а не замена клиническому решению. Введённые данные не сохраняются и никуда не отправляются, пока вы сами не отправите письмо; не указывайте ФИО пациента. Все растворы тиамина, зарегистрированные в РФ, — для внутримышечного введения; внутривенное введение — вне инструкции, закрепите его локальным протоколом или решением врачебной комиссии. Источники: Galvin R. et al. EFNS (Европейская федерация неврологических обществ) guidelines for diagnosis, therapy and prevention of Wernicke encephalopathy, 2010; NHS Specialist Pharmacy Service (фармацевтическая служба Национальной службы здравоохранения Великобритании) — IV thiamine in place of Pabrinex; NICE CG100 (Национальный институт здравоохранения и совершенствования медицинской помощи Великобритании, рекомендация по расстройствам, связанным с алкоголем); Caine D. et al., 1997 (критерии Caine); Ambrose M.L. et al., 2001; Schabelman E., Kuo D., 2012; RCOG GTG 69 (Королевская коллегия акушеров-гинекологов, рекомендация № 69 по рвоте беременных).</p><p class="copy">© 2026 Василий Дорогов, врач-невролог. Все права защищены. Копирование, переработка и распространение без письменного разрешения автора запрещены.</p>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">В начало</button></div>
+</section>
+</div>
+<nav class="tabs"><button data-s="s1" class="on">Подозрение</button><button data-s="s2">Дозы</button><button data-s="s3">Итог</button></nav>
+<script>
+const $=id=>document.getElementById(id);
+const v=id=>{const e=$(id);if(!e)return null;if(e.type==='checkbox')return e.checked;const x=e.value;return x===''?null:(e.type==='number'?Number(x):x)};
+const order=['s1','s2','s3']; let cur='s1', regTouched=false;
+function show(s){cur=s;document.querySelectorAll('section').forEach(e=>e.classList.toggle('on',e.id===s));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+  const N=['Подозрение','Дозы','Итог'];$('crumbs').innerHTML=N.map((x,i)=>`<span class="${order[i]===s?'on':''}">${i+1}. ${x}</span>`).join('');
+  document.querySelectorAll('section .prev').forEach(b=>b.style.visibility=s==='s1'?'hidden':'visible');window.scrollTo(0,0);render()}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll('section .prev').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);if(i>0)show(order[i-1])});
+document.querySelectorAll('section .next').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);show(order[(i+1)%order.length])});
+document.addEventListener('input',e=>{if(e.target.id==='reg')regTouched=true; render()});document.addEventListener('change',e=>{if(e.target.id==='reg')regTouched=true; if(e.target.classList.contains('rk')&&e.target.checked)$('k_diet').checked=true; render()});
+const box=(cls,title,items,extra)=>`<div class="out ${cls}">${title?`<b class="t">${title}</b>`:''}${extra||''}${items&&items.length?'<ul>'+items.map(x=>'<li>'+x+'</li>').join('')+'</ul>':''}</div>`;
+const list=c=>[...document.querySelectorAll('.'+c)].filter(x=>x.checked).map(x=>x.dataset.l);
+const REG={efns:{mg:200,n:3,days:'до прекращения клинического улучшения',t:'лечебная'},uk:{mg:500,n:3,days:'3–5 дней, далее при продолжающемся улучшении 500 мг 1 раз в сутки ещё 3–5 дней',t:'лечебная'},
+  uk300:{mg:300,n:3,days:'3–5 дней, далее при продолжающемся улучшении 300 мг 1 раз в сутки ещё 3–5 дней',t:'лечебная'},pro:{mg:200,n:1,days:'3–5 дней',t:'профилактическая'},pro300:{mg:300,n:1,days:'3–5 дней',t:'профилактическая'}};
+function state(){const rk=list('rk'),cn=list('cn'),c=cn.length,neuro=['k_eye','k_cer','k_men'].filter(v).length;
+  let lvl='none'; if(c>=2||(neuro>=1&&rk.length))lvl='treat'; else if(rk.length||v('hypo'))lvl='pro'; return {rk,cn,c,neuro,lvl}}
+const pl=(n,a,b,c)=>{n=Math.abs(n)%100;const n1=n%10;return n>10&&n<20?c:n1>1&&n1<5?b:n1===1?a:c};
+function doseCalc(){const R=REG[v('reg')],conc=+v('amp'),ml=R.mg/conc,route=v('route');
+  // ампулы: 5% — 1 мл (50 мг) и 2 мл (100 мг); 2,5% — 1 мл (25 мг) и 2 мл (50 мг)
+  const big=conc===50?100:50,nBig=Math.floor(R.mg/big),rest=R.mg-nBig*big,nSmall=Math.ceil(rest/(conc));
+  const ampTxt=[nBig?`${nBig} амп. по 2 мл`:'',nSmall?`${nSmall} амп. по 1 мл`:''].filter(Boolean).join(' + ');
+  return {R,ml,ampTxt,route,day:R.mg*R.n,sites:route==='im'?Math.ceil(ml/5):1}}
+function render(){
+  const s=state();
+  $('caine').innerHTML=s.c>=2?box('bad',`Критерии Caine: ${s.c} из 4 — лечить как энцефалопатию Вернике`,[],'<p>Начать лечебные дозы сразу, не дожидаясь МРТ и анализов.</p>'):
+    s.lvl==='treat'?box('warn',`Критерии Caine: ${s.c} из 4`,[],'<p>Неврологический симптом в группе риска — разумно лечить лечебными дозами.</p>'):s.c?box('',`Критерии Caine: ${s.c} из 4`,[]):'';
+  if(!regTouched){$('reg').value=s.lvl==='treat'?'efns':'pro';}
+  const vd=[];
+  if(s.lvl==='treat')vd.push(box('bad','Лечебные дозы тиамина — сейчас',['Первая доза — до или вместе с любой глюкозой','Не ждать МРТ и уровня тиамина','Оценка эффекта ежедневно: глазодвигательные нарушения уходят первыми (часы–дни), атаксия и память — медленнее']));
+  else if(s.lvl==='pro')vd.push(box('warn','Профилактика тиамином',['Группа риска без неврологических симптомов','При появлении спутанности, атаксии или глазодвигательных нарушений — перейти на лечебные дозы']));
+  else vd.push(box('info','Нет группы риска и симптомов',[],'<p>Отметьте группу риска и симптомы на первом шаге.</p>'));
+  if(v('hypo'))vd.push(box('bad','Гипогликемия: глюкозу — немедленно',[],'<p>Не откладывать глюкозу ради тиамина: тиамин — одновременно или сразу после. Данных, что однократная глюкоза провоцирует энцефалопатию, нет (Schabelman, 2012).</p>'));
+  else if(v('glu_iv'))vd.push(box('warn','Перед инфузиями глюкозы или питанием',[],'<p>Сначала тиамин; длительные инфузии глюкозы без тиамина у пациента из группы риска недопустимы.</p>'));
+  if(v('preg')||v('r_hg'))vd.push(box('info','Беременность',[],'<p>Тиамин безопасен при беременности. При рвоте беременных — тиамин до инфузий с декстрозой (RCOG — Королевская коллегия акушеров-гинекологов Великобритании); при неврологических симптомах — лечебные дозы.</p>'));
+  $('verdict').innerHTML=vd.join('');
+  const d=doseCalc();
+  let h=box('info',`${d.R.mg} мг ${d.R.n===1?'1 раз':d.R.n+' раза'} в сутки (${d.day} мг/сут)`,[`Объём на введение: <span class="dose">${d.ml} мл</span> — ${d.ampTxt}`,`Длительность: ${d.R.days}`,'Затем — внутрь 100 мг 3 раза в сутки (NICE — Национальный институт здравоохранения и совершенствования медицинской помощи Великобритании, рекомендация CG100; BNF — Британский национальный формуляр)']);
+  if(d.route==='im')h+=d.ml>5?box('warn',`В/м ${d.ml} мл на одно введение`,[],`<p>Разделить минимум на ${d.sites} ${pl(d.sites,'точку','точки','точек')} (не больше 5 мл в одну мышцу). Болезненно; при лечебных дозах обсудите в/в путь по локальному протоколу или решению врачебной комиссии.</p>`):'';
+  else h+=box('warn','В/в — вне инструкции',['Растворы тиамина в РФ зарегистрированы только для в/м введения — нужен локальный протокол или решение врачебной комиссии',`По EFNS (Европейская федерация неврологических обществ): развести в 100 мл 0,9% NaCl или 5% глюкозы, вводить 30 мин`,'Анафилаксия редка, но процедурный кабинет должен быть готов']);
+  $('dose').innerHTML=h;
+  $('sum').textContent=summary(s,d);
+}
+function summary(s,d){const L=[];const a=v('age');
+  L.push(`${v('sex')==='f'?'Пациентка':'Пациент'}${a?', '+a+' '+pl(a,'год','года','лет'):''}.`);
+  L.push('Группа риска по дефициту тиамина: '+(s.rk.length?s.rk.join(', '):'не выявлена')+'.');
+  L.push(`Критерии Caine: ${s.c} из 4${s.cn.length?' ('+s.cn.join(', ')+')':''}.`);
+  if(v('hypo'))L.push('Гипогликемия — глюкоза введена без задержки, тиамин одновременно.');
+  L.push('Заключение: '+(s.lvl==='treat'?'клиническое подозрение на энцефалопатию Вернике, начата лечебная терапия тиамином':s.lvl==='pro'?'группа риска энцефалопатии Вернике без неврологических симптомов, профилактика тиамином':'показаний к тиамину не выявлено')+'.');
+  if(s.lvl!=='none'){L.push(`Назначено: тиамин ${d.R.mg} мг ${d.route==='im'?'в/м':'в/в капельно в 100 мл 0,9% NaCl за 30 мин'} ${d.R.n===1?'1 раз':d.R.n+' раза'} в сутки (${d.day} мг/сут), ${d.R.days}; затем 100 мг внутрь 3 раза в сутки.`+(d.route==='iv'?' Внутривенное введение — вне инструкции, по решению врачебной комиссии.':''));
+    const T=[['t_blood','кровь на тиамин до введения'],['t_glu','глюкоза крови'],['t_mg','магний'],['t_kp','калий, фосфор'],['t_mri','МРТ головного мозга'],['t_wd','оценка алкогольной абстиненции'],['t_daily','ежедневная оценка неврологического статуса']].filter(([id])=>v(id)).map(([,l])=>l);
+    L.push('Дополнительно: '+(T.length?T.join(', '):'магний, калий, фосфор, глюкоза; ежедневная оценка неврологического статуса')+'.');}
+  return L.join('\n')}
+const MK='wern-mail';try{$('mail').value=localStorage.getItem(MK)||'dorogovvn2@zdrav.mos.ru'}catch(e){$('mail').value='dorogovvn2@zdrav.mos.ru'}
+$('mail').addEventListener('change',()=>{try{localStorage.setItem(MK,$('mail').value.trim())}catch(e){}});
+$('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}const t=v('tag'),sub='Вернике: тиамин'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
+  location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent($('sum').textContent.replace(/\n/g,'\r\n'))};
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('sum').textContent);$('copy').textContent='Скопировано'}catch(e){$('copy').textContent='Не удалось — выделите текст'}setTimeout(()=>$('copy').textContent='Скопировать',1800)};
+$('reset').onclick=()=>{document.querySelectorAll('input').forEach(i=>{if(i.id==='mail')return;if(i.type==='checkbox')i.checked=false;else i.value=''});document.querySelectorAll('select').forEach(s=>s.selectedIndex=0);regTouched=false;show('s1')};
+show('s1');
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('/wern-p5c2tz-sw.js',{scope:'/wern-p5c2tz'}).catch(()=>{});
+</script>
+</body>
+</html>

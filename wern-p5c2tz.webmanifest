@@ -1,0 +1,31 @@
+{
+ "id": "/wern-p5c2tz.html",
+ "name": "Энцефалопатия Вернике",
+ "short_name": "Вернике",
+ "lang": "ru",
+ "start_url": "/wern-p5c2tz.html",
+ "scope": "/wern-p5c2tz",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/wern-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/wern-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/wern-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
