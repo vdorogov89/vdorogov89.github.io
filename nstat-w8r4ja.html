@@ -982,14 +982,16 @@ function renderPow(P,PN){const d={};['ra','la','rl','ll'].forEach(l=>{if(!P[l].l
  if(pn.length)t+=(t?' ':'')+pn.join(' ')+(out.length?'':' В остальных мышечных группах сила 5 баллов.');
  return t||null}
 const RW=['отсутствуют','снижены','живые','оживлены','высокие, с расширением рефлексогенных зон'];
+const RW1=['отсутствует','снижен','живой','оживлён','высокий, с расширением рефлексогенной зоны'];
 function renderRefl(RF){if(!Object.keys(RF).length)return null;const g=(r,s)=>RF[r]&&RF[r][s]?RF[r][s].v:2;
  const pr=r=>[g(r,'r'),g(r,'l')];const eq=(a,b)=>a[0]===b[0]&&a[1]===b[1];
- const tx=([R,L])=>R===L?(R===0?'отсутствуют с двух сторон':RW[R]+', D=S'):`справа ${RW[R]}, слева ${RW[L]} (${R>L?'D>S':'S>D'})`;
+ const tx=([R,L],one)=>{const W=one?RW1:RW;return R===L?(R===0?'отсутствуют с двух сторон':RW[R]+', D=S'):`справа ${W[R]}, слева ${W[L]} (${R>L?'D>S':'S>D'})`};
+ const one=(r,pr)=>pr[0]===pr[1]?NM[r]+' '+tx(pr):NM1[r]+' '+tx(pr,true);
  const A=['bic','tri','car'].map(pr),Lg=['kn','ach'].map(pr);
  if(A.every(x=>eq(x,A[0]))&&Lg.every(x=>eq(x,A[0])))return `Сухожильные рефлексы с рук и ног ${tx(A[0])}.`;
- const p=[];const NM={bic:'с двуглавой мышцы',tri:'с трёхглавой мышцы',car:'карпорадиальные',kn:'коленные',ach:'ахилловы'};
- if(A.every(x=>eq(x,A[0])))p.push('с рук '+tx(A[0]));else ['bic','tri','car'].forEach((r,i)=>p.push(NM[r]+' '+tx(A[i])));
- if(eq(Lg[0],Lg[1]))p.push('с ног '+tx(Lg[0]));else ['kn','ach'].forEach((r,i)=>p.push(NM[r]+' '+tx(Lg[i])));
+ const p=[];const NM={bic:'с двуглавой мышцы',tri:'с трёхглавой мышцы',car:'карпорадиальные',kn:'коленные',ach:'ахилловы'};const NM1={bic:'рефлекс с двуглавой мышцы',tri:'рефлекс с трёхглавой мышцы',car:'карпорадиальный рефлекс',kn:'коленный рефлекс',ach:'ахиллов рефлекс'};
+ if(A.every(x=>eq(x,A[0])))p.push('с рук '+tx(A[0]));else ['bic','tri','car'].forEach((r,i)=>p.push(one(r,A[i])));
+ if(eq(Lg[0],Lg[1]))p.push('с ног '+tx(Lg[0]));else ['kn','ach'].forEach((r,i)=>p.push(one(r,Lg[i])));
  return 'Сухожильные рефлексы: '+p.join('; ')+'.'}
 function renderPath(PT){const k=Object.keys(PT);if(!k.length)return null;
  return cap(k.map(n=>'симптом '+n+' '+(PT[n].r&&PT[n].l?'с двух сторон':PT[n].r?'справа':'слева')).join(', '))+'.'}
