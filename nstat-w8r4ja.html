@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Неврологический статус</title>
+<meta name="theme-color" content="#08080D">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="nstat-w8r4ja.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="nstat-icon-192.png">
+<link rel="apple-touch-icon" href="nstat-apple-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Невростатус">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="author" content="Василий Дорогов">
+<meta name="copyright" content="© 2026 Василий Дорогов">
+<style>
+:root{--bg:#08080D; --ink:#F2F2F5; --body:#C9C9D3; --muted:#8B8B98; --line:rgba(255,255,255,0.09); --glass:rgba(255,255,255,0.045); --acc:#4FE0FF; --acc2:#8A5CFF; --warn:#FF8A7A; --amber:#FFC56B; --ok:#6BE3A4;}
+*{box-sizing:border-box;}
+html,body{margin:0; background:var(--bg); color:var(--body); font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif; -webkit-font-smoothing:antialiased;}
+button{font:inherit; color:inherit; cursor:pointer;}
+.app{max-width:560px; margin:0 auto; padding:0 16px calc(84px + env(safe-area-inset-bottom));}
+header{padding:calc(16px + env(safe-area-inset-top)) 0 10px; display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+header h1{margin:0; font-size:20px; color:var(--ink); letter-spacing:-0.01em;}
+header span{font-size:12.5px; color:var(--muted); white-space:nowrap;}
+nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center; gap:4px; padding:10px 8px calc(10px + env(safe-area-inset-bottom)); background:rgba(10,10,16,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--line);}
+nav.tabs button{flex:1; max-width:120px; padding:9px 2px; border-radius:12px; border:0; background:transparent; color:var(--muted); font-size:12.5px;}
+nav.tabs button.on{background:rgba(79,224,255,0.12); color:var(--ink);}
+section{display:none;} section.on{display:block;}
+.card{background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:16px; margin:12px 0;}
+h2{font-size:17px; color:var(--ink); margin:4px 0 8px;}
+h3{font-size:15px; color:var(--ink); margin:14px 0 6px;}
+p{margin:6px 0;}
+.muted{color:var(--muted); font-size:13px;}
+.crumbs{display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 4px;}
+.crumbs span{font-size:12px; padding:3px 9px; border-radius:20px; background:rgba(255,255,255,0.06); color:var(--muted);}
+.crumbs span.on{background:rgba(79,224,255,0.14); color:var(--ink);}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+label.f{display:block; font-size:12.5px; color:var(--muted);}
+input[type=number],input[type=date],select{width:100%; min-width:0; max-width:100%; -webkit-appearance:none; appearance:none; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px; display:block;}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%; background-size:5px 5px; background-repeat:no-repeat; padding-right:32px;}
+select option{background:#16171f; color:var(--ink);}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.8);}
+input:focus,select:focus{outline:none; border-color:rgba(79,224,255,0.6);}
+.chk{display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); color:var(--ink);}
+.chk:first-of-type{border-top:0;}
+.chk input{-webkit-appearance:none; appearance:none; width:22px; height:22px; flex:0 0 22px; margin:1px 0 0; border-radius:7px; border:1.5px solid rgba(255,255,255,0.25); background:transparent; display:grid; place-content:center;}
+.chk input:checked{background:linear-gradient(120deg,var(--acc),var(--acc2)); border-color:transparent;}
+.chk input:checked::after{content:''; width:10px; height:6px; border:2.5px solid #08080D; border-top:0; border-right:0; transform:rotate(-45deg) translate(1px,-1px);}
+.chk small{display:block; color:var(--muted); font-size:12.5px;}
+.out{border-radius:16px; padding:12px 14px; margin:10px 0; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body);}
+.out b.t{display:block; margin-bottom:4px; color:var(--ink); font-size:15px;}
+.out.ok{border-color:rgba(107,227,164,0.35); background:rgba(107,227,164,0.06);} .out.ok b.t{color:var(--ok);}
+.out.warn{border-color:rgba(255,197,107,0.4); background:rgba(255,197,107,0.06);} .out.warn b.t{color:var(--amber);}
+.out.bad{border-color:rgba(255,138,122,0.4); background:rgba(255,138,122,0.06);} .out.bad b.t{color:var(--warn);}
+.out.info{border-color:rgba(79,224,255,0.25); background:rgba(79,224,255,0.04);} .out.info b.t{color:var(--acc);}
+.out ul{margin:6px 0 0; padding-left:20px;} li{margin:3px 0;}
+.out b{color:var(--ink);}
+.dose{font-weight:600; color:var(--acc); white-space:nowrap;}
+.stepnav{display:flex; gap:8px; margin:16px 0 4px;}
+.stepnav button{flex:1; padding:11px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.04); color:var(--ink);}
+.stepnav button.main{flex:2; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.mbtns button{padding:10px 14px; border-radius:12px; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns button.alt{background:rgba(255,255,255,0.08); color:var(--ink); font-weight:500;}
+pre{white-space:pre-wrap; font:13.5px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; color:var(--ink); background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:14px; padding:12px; margin:8px 0;}
+a{color:var(--acc);}
+.foot{font-size:12px; color:var(--muted); margin:18px 0;}
+.seg3{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 2px;} .seg3 button{padding:8px 12px; border-radius:20px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--muted); font-size:13.5px;} .seg3 button.on{border-color:rgba(79,224,255,0.5); background:rgba(79,224,255,0.12); color:var(--ink);}
+.q{padding:10px 0; border-top:1px solid var(--line);} .q:first-of-type{border-top:0;} .q>b{display:block; color:var(--ink); font-weight:500;} .q small{color:var(--muted); font-size:12.5px;}
+.pts{float:right; font-size:12px; color:var(--muted);}
+input[type=email],input[type=text]{width:100%; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px;}
+table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padding:4px 4px;} table.oh input{margin:0; min-height:40px; padding:8px; text-align:center;}
+textarea{width:100%; font:inherit; font-size:15.5px; line-height:1.45; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:6px; resize:vertical;} textarea:focus{outline:none; border-color:rgba(79,224,255,0.6);}
+#rec{min-width:150px;} .nb{padding:4px 10px; border-radius:9px; border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--ink); font-size:12.5px;} .pts{margin-left:0;} button:disabled{opacity:.45;}
+.copy{font-size:11.5px; color:var(--muted); line-height:1.45; margin:22px 0 6px; padding-top:12px; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="app">
+  <header><h1>Неврологический статус</h1><span>автор — В.&nbsp;Дорогов</span></header>
+  <div class="crumbs" id="crumbs"></div>
+
+<section id="s1" class="on">
+  <div class="card">
+    <h2>Диктовка</h2>
+    <p class="muted">Начинайте каждую часть с названия раздела: «Сознание ясное. Зрачки равные. Сила снижена в левой руке до 4 баллов. Рефлексы…». Не называйте ФИО и данные пациента.</p>
+    <div class="mbtns"><button id="rec">● Начать запись</button><button id="parse" class="alt">Разложить по полям</button><button id="clr" class="alt">Очистить</button></div>
+    <p class="muted" id="recst"></p>
+    <textarea id="dict" rows="9" placeholder="Здесь появится текст диктовки. Можно надиктовать и микрофоном на клавиатуре телефона, и набрать вручную."></textarea>
+    <p class="muted" id="interim"></p>
+  </div>
+  <div class="card">
+    <h2>Ключевые слова разделов</h2>
+    <div id="kw" class="muted"></div>
+  </div>
+  <p class="foot">Распознавание речи выполняет браузер телефона (Apple или Google) — звук может обрабатываться на их серверах. Разбор по полям идёт на телефоне, текст никуда не отправляется, пока вы сами не отправите письмо.</p>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Статус</button></div>
+</section>
+
+<section id="s2">
+  <p class="muted">Поля без диктовки заполнены нормой из шаблона. Проверьте и поправьте; «Норма» возвращает текст шаблона.</p>
+  <div id="fields"></div>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Итог</button></div>
+</section>
+
+<section id="s3">
+  <div class="card">
+    <h2>Неврологический статус</h2>
+    <label class="f">Метка для письма (палата, номер истории — без ФИО)<input type="text" id="tag" autocomplete="off"></label>
+    <pre id="sum"></pre>
+    <label class="f">Отправить на почту<input type="email" id="mail" autocomplete="email" inputmode="email"></label>
+    <div class="mbtns"><button id="copy">Скопировать</button><button id="send" class="alt">Отправить на почту</button><button id="reset" class="alt">Новый пациент</button></div>
+  </div>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">Шаблон</button></div>
+</section>
+
+<section id="s4">
+  <div class="card">
+    <h2>Шаблон нормы</h2>
+    <p class="muted">Текст, которым заполняется раздел, если о нём ничего не сказано. Подстройте под свою манеру записи — сохранится на этом телефоне.</p>
+    <div id="tpl"></div>
+    <div class="mbtns"><button id="tplreset" class="alt">Вернуть исходный шаблон</button></div>
+  </div>
+  <p class="copy">© 2026 Василий Дорогов, врач-невролог. Все права защищены. Копирование, переработка и распространение без письменного разрешения автора запрещены.</p>
+<div class="stepnav"><button class="prev">Назад</button><button class="next main">В начало</button></div>
+</section>
+</div>
+<nav class="tabs"><button data-s="s1" class="on">Запись</button><button data-s="s2">Статус</button><button data-s="s3">Итог</button><button data-s="s4">Шаблон</button></nav>
+<script>
+const $=id=>document.getElementById(id);
+const F=[
+ {k:'cons',t:'Сознание',kw:['сознани','ориентир','оглуш','сопор','кома','глазго','шкг'],n:'Сознание ясное, ориентирован в месте, времени и собственной личности. По шкале комы Глазго 15 баллов.'},
+ {k:'cort',t:'Высшие корковые функции, речь',kw:['речь','речи','афази','дизартри','памят','внимани','праксис','апракси','гнозис','агнози','когнитив'],n:'Речь не нарушена. Память и внимание не снижены. Праксис и гнозис сохранены.'},
+ {k:'men',t:'Менингеальные знаки',kw:['менинг','затылочн','кернинг','брудзинск'],n:'Менингеальных знаков нет.'},
+ {k:'eye',t:'Зрачки и глазодвигательные нервы',kw:['зрач','анизокори','фотореакц','глазн','нистагм','диплопи','двоени','косоглаз','птоз','взор','конвергенц'],n:'Зрачки равные, фотореакции живые. Движения глазных яблок в полном объёме, нистагма нет, диплопии нет.'},
+ {k:'face',t:'Лицо: тройничный и лицевой нервы',kw:['лиц','тройничн','носогуб','мимическ','роговичн','надбровн'],n:'Чувствительность на лице не нарушена. Лицо симметричное.'},
+ {k:'bulb',t:'Слух, бульбарная группа, язык',kw:['слух','глота','поперхив','дисфаги','дисфони','нёб','мягкое неб','глоточн','язык','бульбар'],n:'Слух не снижен. Глотание и фонация не нарушены. Язык по средней линии.'},
+ {k:'pow',t:'Сила',kw:['сила','силы','парез','плеги','слабост'],n:'Парезов нет, сила 5 баллов во всех конечностях.'},
+ {k:'tone',t:'Мышечный тонус',kw:['тонус','спастичн','ригидность мыш','гипотони'],n:'Мышечный тонус не изменён.'},
+ {k:'refl',t:'Рефлексы',kw:['рефлекс','бабинск','россолимо','гоффман','клонус','патологическ','стопн'],n:'Сухожильные рефлексы с рук и ног живые, D=S. Патологических стопных знаков нет.'},
+ {k:'sens',t:'Чувствительность',kw:['чувствит','гипестези','гиперестези','анестези','парестези','онемени','гипалгези'],n:'Чувствительных нарушений не выявлено.'},
+ {k:'coord',t:'Координация и походка',kw:['координац','пальценос','коленно','пяточн','ромберг','атакси','интенци','походк','шатк','дисметри'],n:'Пальценосовую и коленно-пяточную пробы выполняет уверенно. В позе Ромберга устойчив. Походка не изменена.'},
+ {k:'pelv',t:'Функции тазовых органов',kw:['тазов','мочеиспуск','недержани','задержк','стул'],n:'Функции тазовых органов контролирует.'}];
+const TK='nstat-tpl';let TPL={};try{TPL=JSON.parse(localStorage.getItem(TK))||{}}catch(e){}
+const norm=k=>TPL[k]||F.find(f=>f.k===k).n;
+const S={}; // k -> {txt, src:'norm'|'dict'|'edit'}
+F.forEach(f=>S[f.k]={txt:norm(f.k),src:'norm'});
+const order=['s1','s2','s3','s4'];let cur='s1';
+function show(s){cur=s;document.querySelectorAll('section').forEach(e=>e.classList.toggle('on',e.id===s));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+  const N=['Запись','Статус','Итог','Шаблон'];$('crumbs').innerHTML=N.map((x,i)=>`<span class="${order[i]===s?'on':''}">${i+1}. ${x}</span>`).join('');
+  document.querySelectorAll('section .prev').forEach(b=>b.style.visibility=s==='s1'?'hidden':'visible');window.scrollTo(0,0);render()}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll('section .prev').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);if(i>0)show(order[i-1])});
+document.querySelectorAll('section .next').forEach(b=>b.onclick=()=>{if(cur==='s1')doParse();const i=order.indexOf(cur);show(order[(i+1)%order.length])});
+$('kw').innerHTML=F.map(f=>`<b>${f.t}</b>: ${f.kw.slice(0,5).map(x=>x+'…').join(', ')}`).join('<br>');
+
+// ---- разбор диктовки ----
+function clean(t){return t.replace(/\s+(точка|точку)(?=\s|$)/gi,'.').replace(/\s+запятая(?=\s|$)/gi,',').replace(/\s+(новая строка|абзац)(?=\s|$)/gi,'.\n').replace(/\s+/g,' ').trim()}
+function fieldAt(s){let best=null;F.forEach(f=>f.kw.forEach(w=>{const i=s.toLowerCase().indexOf(w);if(i>=0&&(!best||i<best.i))best={i,k:f.k}}));return best}
+function split(t){
+  const sents=clean(t).split(/(?<=[.;!?\n])\s*/).map(x=>x.trim()).filter(Boolean);const out=[];let last=null;
+  sents.forEach(s=>{ // внутри предложения без точек может быть несколько разделов — режем по ключевым словам
+    let rest=s;
+    while(rest){const a=fieldAt(rest);if(!a){if(last)out.push({k:last,t:rest});break}
+      if(a.i>0&&last&&a.i>25){out.push({k:last,t:rest.slice(0,a.i).trim()});rest=rest.slice(a.i)}
+      const tail=rest.slice(a.i+1);let nxt=null;F.forEach(f=>{if(f.k===a.k)return;f.kw.forEach(w=>{const j=tail.toLowerCase().indexOf(w);if(j>=0&&(!nxt||j<nxt.j))nxt={j,k:f.k}})});
+      let cut=nxt?a.i+1+nxt.j:rest.length; // отступить к началу словосочетания: «снижена сила» — оставить «снижена» с силой
+      if(nxt){const pre=rest.slice(0,cut);const m=pre.match(/(\s(?:снижен\S*|повышен\S*|отсутств\S*|оживлен\S*|сохранен\S*|нет|без|не|D\s*[<>=]\s*S)\s*)+$/i);if(m)cut-=m[0].length-1}
+      out.push({k:a.k,t:rest.slice(0,cut).trim()});last=a.k;rest=rest.slice(cut).trim()}
+  });
+  return out}
+const cap=s=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
+const dot=s=>/[.!?]$/.test(s)?s:s+'.';
+function doParse(){const t=$('dict').value.trim();if(!t)return;const parts=split(t),got={};
+  parts.forEach(p=>{if(!p.t)return;(got[p.k]=got[p.k]||[]).push(dot(cap(p.t.replace(/^[,.;\s]+/,''))))});
+  Object.keys(got).forEach(k=>{S[k]={txt:got[k].join(' '),src:'dict'}});render()}
+
+// ---- распознавание речи ----
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,on=false;
+if(!SR){$('rec').disabled=true;$('rec').textContent='Запись недоступна';$('recst').textContent='Этот браузер не поддерживает распознавание речи. Надиктуйте текст микрофоном на клавиатуре телефона в поле ниже.'}
+function startRec(){rec=new SR();rec.lang='ru-RU';rec.continuous=true;rec.interimResults=true;
+  rec.onresult=e=>{let fin='',im='';for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal)fin+=r[0].transcript;else im+=r[0].transcript}
+    if(fin){const d=$('dict');d.value=(d.value?d.value.replace(/\s*$/,' '):'')+fin.trim();}$('interim').textContent=im};
+  rec.onerror=e=>{$('recst').textContent=e.error==='not-allowed'?'Нет доступа к микрофону: разрешите его в настройках браузера.':'Ошибка распознавания: '+e.error+'. Если запись «зависла», остановите и начните снова или используйте микрофон клавиатуры.'};
+  rec.onend=()=>{if(on){try{rec.start()}catch(e){}}else{$('interim').textContent=''}};
+  try{rec.start();on=true;$('rec').textContent='■ Остановить';$('recst').textContent='Идёт запись… говорите разделами.'}catch(e){$('recst').textContent='Не удалось начать запись.'}}
+function stopRec(){on=false;try{rec&&rec.stop()}catch(e){}$('rec').textContent='● Начать запись';$('recst').textContent='Запись остановлена. Нажмите «Разложить по полям».'}
+$('rec').onclick=()=>on?stopRec():startRec();
+$('parse').onclick=()=>{if(on)stopRec();doParse();show('s2')};
+$('clr').onclick=()=>{$('dict').value='';$('interim').textContent=''};
+
+// ---- поля ----
+function render(){
+  if(cur==='s2'){$('fields').innerHTML=F.map(f=>{const st=S[f.k];const badge=st.src==='dict'?'<span class="pts" style="background:rgba(79,224,255,.12);color:var(--acc)">продиктовано</span>':st.src==='edit'?'<span class="pts">изменено</span>':'<span class="pts" style="background:rgba(255,255,255,.06);color:var(--muted)">норма</span>';
+    return `<div class="card" style="padding:12px 14px;margin:8px 0"><div style="display:flex;align-items:center;gap:8px"><b style="color:var(--ink);flex:1">${f.t}</b>${badge}${st.src!=='norm'?`<button class="nb" data-n="${f.k}">Норма</button>`:''}</div><textarea data-k="${f.k}" rows="2">${st.txt.replace(/</g,'&lt;')}</textarea></div>`}).join('');}
+  fit();
+  if(cur==='s3'){$('sum').textContent=summary()}
+  if(cur==='s4'){$('tpl').innerHTML=F.map(f=>`<label class="f" style="margin-top:10px">${f.t}<textarea data-t="${f.k}" rows="2">${norm(f.k).replace(/</g,'&lt;')}</textarea></label>`).join('');fit()}
+}
+document.addEventListener('input',e=>{if(e.target.tagName==='TEXTAREA'&&(e.target.dataset.k||e.target.dataset.t)){e.target.style.height='auto';e.target.style.height=(e.target.scrollHeight+2)+'px'}const k=e.target.dataset.k;if(k){S[k]={txt:e.target.value,src:'edit'}}
+  const t=e.target.dataset.t;if(t){const prev=norm(t);TPL[t]=e.target.value;try{localStorage.setItem(TK,JSON.stringify(TPL))}catch(x){};if(S[t].src==='norm')S[t].txt=e.target.value}});
+document.addEventListener('click',e=>{const n=e.target.dataset&&e.target.dataset.n;if(n){S[n]={txt:norm(n),src:'norm'};render()}});
+$('tplreset').onclick=()=>{TPL={};try{localStorage.removeItem(TK)}catch(e){};F.forEach(f=>{if(S[f.k].src==='norm')S[f.k].txt=f.n});render()};
+function fit(){document.querySelectorAll('textarea[data-k],textarea[data-t]').forEach(t=>{t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px'})}
+function summary(){return 'Неврологический статус.\n'+F.map(f=>S[f.k].txt.trim()).filter(Boolean).join('\n')}
+const MK='nstat-mail';try{$('mail').value=localStorage.getItem(MK)||'dorogovvn2@zdrav.mos.ru'}catch(e){$('mail').value='dorogovvn2@zdrav.mos.ru'}
+$('mail').addEventListener('change',()=>{try{localStorage.setItem(MK,$('mail').value.trim())}catch(e){}});
+$('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}const t=$('tag').value.trim(),sub='Неврологический статус'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
+  location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(summary().replace(/\n/g,'\r\n'))};
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText(summary());$('copy').textContent='Скопировано'}catch(e){$('copy').textContent='Не удалось — выделите текст'}setTimeout(()=>$('copy').textContent='Скопировать',1800)};
+$('reset').onclick=()=>{if(on)stopRec();$('dict').value='';$('tag').value='';F.forEach(f=>S[f.k]={txt:norm(f.k),src:'norm'});show('s1')};
+show('s1');
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('/nstat-w8r4ja-sw.js',{scope:'/nstat-w8r4ja'}).catch(()=>{});
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+ "id": "/nstat-w8r4ja.html",
+ "name": "Неврологический статус",
+ "short_name": "Невростатус",
+ "lang": "ru",
+ "start_url": "/nstat-w8r4ja.html",
+ "scope": "/nstat-w8r4ja",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/nstat-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/nstat-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/nstat-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
