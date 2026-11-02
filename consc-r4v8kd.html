@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Сознание: консультация в реанимации</title>
+<meta name="theme-color" content="#08080D">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="consc-r4v8kd.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="consc-icon-192.png">
+<link rel="apple-touch-icon" href="consc-apple-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Сознание">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="author" content="Василий Дорогов">
+<meta name="copyright" content="© 2026 Василий Дорогов">
+<style>
+:root{--bg:#08080D; --ink:#F2F2F5; --body:#C9C9D3; --muted:#8B8B98; --line:rgba(255,255,255,0.09); --glass:rgba(255,255,255,0.045); --acc:#4FE0FF; --acc2:#8A5CFF; --warn:#FF8A7A; --amber:#FFC56B; --ok:#6BE3A4;}
+*{box-sizing:border-box;}
+html,body{margin:0; background:var(--bg); color:var(--body); font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif; -webkit-font-smoothing:antialiased;}
+button{font:inherit; color:inherit; cursor:pointer;}
+.app{max-width:560px; margin:0 auto; padding:0 16px calc(84px + env(safe-area-inset-bottom));}
+header{padding:calc(16px + env(safe-area-inset-top)) 0 10px; display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+header h1{margin:0; font-size:20px; color:var(--ink); letter-spacing:-0.01em;}
+header span{font-size:12.5px; color:var(--muted); white-space:nowrap;}
+nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center; gap:4px; padding:10px 8px calc(10px + env(safe-area-inset-bottom)); background:rgba(10,10,16,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--line);}
+nav.tabs button{flex:1; max-width:120px; padding:9px 2px; border-radius:12px; border:0; background:transparent; color:var(--muted); font-size:12.5px;}
+nav.tabs button.on{background:rgba(79,224,255,0.12); color:var(--ink);}
+section{display:none;} section.on{display:block;}
+.card{background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:16px; margin:12px 0;}
+h2{font-size:17px; color:var(--ink); margin:4px 0 8px;}
+h3{font-size:15px; color:var(--ink); margin:14px 0 6px;}
+p{margin:6px 0;}
+.muted{color:var(--muted); font-size:13px;}
+.crumbs{display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 4px;}
+.crumbs span{font-size:12px; padding:3px 9px; border-radius:20px; background:rgba(255,255,255,0.06); color:var(--muted);}
+.crumbs span.on{background:rgba(79,224,255,0.14); color:var(--ink);}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+label.f{display:block; font-size:12.5px; color:var(--muted);}
+input[type=number],input[type=date],select{width:100%; min-width:0; max-width:100%; -webkit-appearance:none; appearance:none; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px; display:block;}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%; background-size:5px 5px; background-repeat:no-repeat; padding-right:32px;}
+select option{background:#16171f; color:var(--ink);}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.8);}
+input:focus,select:focus{outline:none; border-color:rgba(79,224,255,0.6);}
+.chk{display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); color:var(--ink);}
+.chk:first-of-type{border-top:0;}
+.chk input{-webkit-appearance:none; appearance:none; width:22px; height:22px; flex:0 0 22px; margin:1px 0 0; border-radius:7px; border:1.5px solid rgba(255,255,255,0.25); background:transparent; display:grid; place-content:center;}
+.chk input:checked{background:linear-gradient(120deg,var(--acc),var(--acc2)); border-color:transparent;}
+.chk input:checked::after{content:''; width:10px; height:6px; border:2.5px solid #08080D; border-top:0; border-right:0; transform:rotate(-45deg) translate(1px,-1px);}
+.chk small{display:block; color:var(--muted); font-size:12.5px;}
+.out{border-radius:16px; padding:12px 14px; margin:10px 0; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body);}
+.out b.t{display:block; margin-bottom:4px; color:var(--ink); font-size:15px;}
+.out.ok{border-color:rgba(107,227,164,0.35); background:rgba(107,227,164,0.06);} .out.ok b.t{color:var(--ok);}
+.out.warn{border-color:rgba(255,197,107,0.4); background:rgba(255,197,107,0.06);} .out.warn b.t{color:var(--amber);}
+.out.bad{border-color:rgba(255,138,122,0.4); background:rgba(255,138,122,0.06);} .out.bad b.t{color:var(--warn);}
+.out.info{border-color:rgba(79,224,255,0.25); background:rgba(79,224,255,0.04);} .out.info b.t{color:var(--acc);}
+.out ul{margin:6px 0 0; padding-left:20px;} li{margin:3px 0;}
+.out b{color:var(--ink);}
+.dose{font-weight:600; color:var(--acc); white-space:nowrap;}
+.stepnav{display:flex; gap:8px; margin:16px 0 4px;}
+.stepnav button{flex:1; padding:11px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.04); color:var(--ink);}
+.stepnav button.main{flex:2; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.mbtns button{padding:10px 14px; border-radius:12px; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns button.alt{background:rgba(255,255,255,0.08); color:var(--ink); font-weight:500;}
+pre{white-space:pre-wrap; font:13.5px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; color:var(--ink); background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:14px; padding:12px; margin:8px 0;}
+a{color:var(--acc);}
+.foot{font-size:12px; color:var(--muted); margin:18px 0;}
+.seg3{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 2px;} .seg3 button{padding:8px 12px; border-radius:20px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--muted); font-size:13.5px;} .seg3 button.on{border-color:rgba(79,224,255,0.5); background:rgba(79,224,255,0.12); color:var(--ink);}
+.q{padding:10px 0; border-top:1px solid var(--line);} .q:first-of-type{border-top:0;} .q>b{display:block; color:var(--ink); font-weight:500;} .q small{color:var(--muted); font-size:12.5px;}
+.pts{float:right; font-size:12px; color:var(--muted);}
+input[type=email],input[type=text]{width:100%; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px;}
+table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padding:4px 4px;} table.oh input{margin:0; min-height:40px; padding:8px; text-align:center;}
+textarea{width:100%; font:inherit; font-size:15.5px; line-height:1.45; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:6px; resize:vertical;} textarea:focus{outline:none; border-color:rgba(79,224,255,0.6);}
+#rec{min-width:150px;} .nb{padding:4px 10px; border-radius:9px; border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--ink); font-size:12.5px;} .pts{margin-left:0;} button:disabled{opacity:.45;}
+.copy{font-size:11.5px; color:var(--muted); line-height:1.45; margin:22px 0 6px; padding-top:12px; border-top:1px solid var(--line);}
+
+.mc{padding:0;overflow:hidden} .mh{display:flex;align-items:center;gap:8px;padding:13px 14px;cursor:pointer} .mh b{flex:1;color:var(--ink);font-size:15px;line-height:1.3} .ar{color:var(--muted)}
+.x{border:0;background:rgba(255,255,255,0.06);border-radius:10px;width:32px;height:32px;color:var(--muted);flex:0 0 32px;touch-action:manipulation}
+.mb{padding:0 14px 12px;border-top:1px solid var(--line)} .q{padding:9px 0} .ql{display:block;color:var(--ink);font-size:13.5px} .inf{margin:10px 0 2px;font-size:12.5px} .inf summary{cursor:pointer;color:var(--acc)}
+.nt{margin:8px 0;padding:8px 12px;border-radius:12px;background:rgba(79,224,255,0.07);color:var(--ink);font-size:14px}
+.seg3 button{touch-action:manipulation;text-align:left;line-height:1.3}
+.sg{display:block;width:100%;text-align:left;padding:11px 12px;margin:6px 0;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,0.03);color:var(--ink);font-size:14.5px;line-height:1.3}
+.sg:active{background:rgba(79,224,255,0.12)} .gh{margin:14px 2px 2px;color:var(--acc);font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+details.cat summary{cursor:pointer;color:var(--muted);font-size:13.5px;padding:8px 2px}
+#q{font-size:17px} .fc{padding:12px 14px;margin:8px 0} .fh{display:flex;align-items:center;gap:8px} .fh b{flex:1;color:var(--ink)}
+.bd{font-size:11.5px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.06);color:var(--muted)} .bd.ed{background:rgba(255,197,107,0.14);color:var(--amber)}
+textarea[data-k]{min-height:44px} #prev{max-height:none}
+
+.lst{margin:6px 0 0;padding-left:18px} .lst li{margin:4px 0}
+.it{padding:10px 0;border-top:1px solid var(--line)} .it:first-child{border-top:0} .it>b{display:block;color:var(--ink);font-weight:500;font-size:14.5px} .it small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.big{font-size:17px;color:var(--ink);font-weight:600;margin:2px 0}
+</style>
+</head>
+<body>
+<div class="app">
+  <header><h1>Сознание в реанимации</h1><span>автор — В.&nbsp;Дорогов</span></header>
+  <div class="crumbs" id="crumbs"></div>
+
+<section id="s1" class="on">
+  <div class="card"><h2>Контекст</h2><p class="muted">Без этих данных оценка сознания и прогноза ненадёжна. Не вводите ФИО.</p><div id="f1"></div></div>
+  <div class="stepnav"><button class="prev">Назад</button><button class="next main">Осмотр</button></div>
+</section>
+
+<section id="s2">
+  <div class="out info" id="lvl"></div>
+  <div class="card"><h2>Седация и шкала комы Глазго</h2><div id="f2a"></div></div>
+  <div class="card"><h2>FOUR</h2><p class="muted">Full Outline of UnResponsiveness — шкала полной неотвечаемости: оценивает ствол и дыхание, работает у интубированных.</p><div id="f2b"></div></div>
+  <div class="card"><h2>Ствол, движения, рефлексы</h2><div id="f2c"></div></div>
+  <div class="card"><h2>Признаки сознания</h2><p class="muted">Отмечайте только воспроизводимое. Один осмотр недостаточен: при подозрении на вегетативное состояние — повторить не менее 5 раз за 1–2 недели.</p><div id="f2d"></div></div>
+  <div class="stepnav"><button class="prev">Назад</button><button class="next main">Почему не просыпается</button></div>
+</section>
+
+<section id="s3">
+  <div class="card"><h2>Почему не просыпается</h2><p class="muted">Обратимые причины и помехи оценке. Отметьте «не проверено» — пункт попадёт в рекомендации; седация, миорелаксанты и температура попадают туда сами, если указаны в контексте.</p><div id="f3"></div></div>
+  <div class="mbtns" style="margin:4px 0 0"><button class="alt" id="allx">Все «не проверено»</button></div>
+  <div class="stepnav"><button class="prev">Назад</button><button class="next main">Прогноз</button></div>
+</section>
+
+<section id="s4">
+  <div id="progout"></div>
+  <div class="card" id="cacard"><h2>Предикторы после остановки сердца</h2><p class="muted">ERC–ESICM 2021 (Европейский совет по реанимации и Европейское общество интенсивной терапии).</p><div id="f4"></div></div>
+  <div class="card"><h2>Что сказать родственникам</h2><pre id="fam"></pre><div class="mbtns"><button id="copyf" class="alt">Скопировать</button></div></div>
+  <div class="stepnav"><button class="prev">Назад</button><button class="next main">Выход и лечение</button></div>
+</section>
+
+<section id="s6x">
+  <div class="card"><h2>Варианты выхода из комы</h2><p class="muted">Текущее состояние пациента выделено.</p><div id="traj"></div></div>
+  <div class="card"><h2>Лечение</h2><div id="txnote"></div><div id="f5"></div></div>
+  <div class="card"><h2>Чего избегать</h2><ul class="lst">
+   <li>Длительных бензодиазепинов и препаратов с холинолитическим действием (амитриптилин, дифенгидрамин и др.) — углубляют угнетение и делирий.</li>
+   <li>Профилактического назначения противоэпилептических препаратов без приступов — польза не доказана, седация мешает оценке.</li>
+   <li>Ярлыка «стойкое вегетативное состояние» раньше 3 месяцев (нетравматическое поражение) и 12 месяцев (травматическое).</li>
+   <li>«Ноотропов» вместо поиска обратимых причин — доказательств эффекта при нарушениях сознания нет.</li></ul></div>
+  <div class="stepnav"><button class="prev">Назад</button><button class="next main">Итог</button></div>
+</section>
+
+<section id="s5">
+  <div class="card">
+    <h2>Консультация</h2>
+    <label class="f">Метка для письма (палата, номер истории — без ФИО)<input type="text" id="tag" autocomplete="off"></label>
+    <pre id="sum"></pre>
+    <label class="f">Отправить на почту<input type="email" id="mail" autocomplete="email" inputmode="email"></label>
+    <div class="mbtns"><button id="copy">Скопировать</button><button id="send" class="alt">Отправить на почту</button><button id="reset" class="alt">Новый пациент</button></div>
+  </div>
+  <p class="foot">Черновик для врача, не заключение. Прогноз ставится мультидисциплинарно, по нескольким методам и не раньше положенного срока. Данные хранятся только на этом телефоне.</p>
+  <p class="copy">© 2026 Василий Дорогов, врач-невролог. Все права защищены. Копирование, переработка и распространение без письменного разрешения автора запрещены.</p>
+  <div class="stepnav"><button class="prev">Назад</button><button class="next main">В начало</button></div>
+</section>
+</div>
+<nav class="tabs"><button data-s="s1" class="on">Контекст</button><button data-s="s2">Осмотр</button><button data-s="s3">Причины</button><button data-s="s4">Прогноз</button><button data-s="s6x">Выход</button><button data-s="s5">Итог</button></nav>
+<script>
+const $=id=>document.getElementById(id);
+const pl=(n,a,b,c)=>{n=Math.abs(n);const m10=n%10,m100=n%100;return m10===1&&m100!==11?a:(m10>=2&&m10<=4&&(m100<10||m100>=20)?b:c)};
+const ball=n=>n+' '+pl(n,'балл','балла','баллов');
+const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
+const lst=a=>a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+' и '+a[a.length-1];
+const nv=v=>v===''||v==null||isNaN(+v)?null:+v;
+const ST3=[['na','не актуально'],['x','не проверено'],['ok','исключено'],['yes','выявлено']];
+const CAU=[
+ ['sed','Остаточное действие седативных и опиоидов','отменить седацию и повторить оценку через 12–24 ч; дольше — при почечной или печёночной недостаточности, ожирении, пожилом возрасте, после мидазолама и тиопентала'],
+ ['nmb','Остаточная миорелаксация','проверить нервно-мышечную проводимость (TOF, train-of-four — стимуляция «серией из четырёх»)'],
+ ['ncse','Бессудорожный эпилептический статус','ЭЭГ (электроэнцефалография), лучше продлённая — не менее 30–60 минут'],
+ ['str','Структурные: гидроцефалия, отёк, новое кровоизлияние или инфаркт, вклинение','КТ (компьютерная томография) головного мозга в динамике'],
+ ['ele','Натрий, глюкоза, кальций, магний, осмолярность','электролиты, глюкоза, осмолярность'],
+ ['org','Уремия, печёночная энцефалопатия, гипераммониемия (в том числе на вальпроате)','креатинин, мочевина, аммиак, печёночные пробы'],
+ ['gas','Гиперкапния и гипоксемия','газы артериальной крови'],
+ ['endo','Гипотиреоз, надпочечниковая недостаточность','ТТГ (тиреотропный гормон), свободный Т4, кортизол'],
+ ['wer','Энцефалопатия Вернике','тиамин парентерально, до введения глюкозы — эмпирически'],
+ ['inf','Инфекция ЦНС (центральной нервной системы), септическая энцефалопатия','посевы; люмбальная пункция по показаниям'],
+ ['drg','Нейротоксичные препараты: цефепим, карбапенемы, баклофен, литий; злокачественный нейролептический и серотониновый синдромы','сверить лист назначений и дозы с поправкой на функцию почек'],
+ ['tmp','Гипо- или гипертермия','контроль температуры тела'],
+ ['vt','Двустороннее поражение таламусов — тромбоз глубоких вен мозга','КТ- или МР-венография (магнитно-резонансная)'],
+ ['conf','Помехи оценке: тетраплегия, афазия, глухота, слепота, синдром «запертого человека»','проверить вертикальные движения глаз и моргание по команде; учитывать помехи при оценке шкал']];
+const PRED=[['pc','Нет зрачковых и корнеальных рефлексов в 72 ч и позже','зрачковые и корнеальные рефлексы в 72 ч и позже'],['n20','Двустороннее отсутствие N20 на ССВП (соматосенсорных вызванных потенциалах)','ССВП (соматосенсорные вызванные потенциалы), компонент N20'],['eeg','Злокачественная ЭЭГ после 24 ч: подавление фона с периодическими разрядами или без, «вспышка — подавление»','ЭЭГ после 24 ч'],['nse','NSE (нейронспецифическая енолаза) выше 60 мкг/л на 48 и/или 72 ч','NSE (нейронспецифическая енолаза) на 48 и 72 ч'],['myo','Миоклонический статус в первые 72 ч','оценка миоклонического статуса'],['img','Диффузное аноксическое поражение на КТ или МРТ','КТ или МРТ (магнитно-резонансная томография) головного мозга']];
+const F1=[
+ {t:'seg',id:'why',l:'Повод консультации',ch:[['dep','угнетение сознания неясной причины'],['wake','не просыпается после отмены седации'],['prog','оценка прогноза'],['dyn','динамика после события']],d:'dep'},
+ {t:'seg',id:'et',l:'Основная причина',ch:[['ca','остановка сердца'],['tbi','ЧМТ (черепно-мозговая травма)'],['str','инсульт, кровоизлияние'],['met','метаболическая, токсическая'],['inf','инфекция ЦНС, сепсис'],['unk','неясна']],d:'unk'},
+ {t:'num',id:'hrs',l:o=>o.et==='ca'?'Часов от восстановления кровообращения':'Часов от события',min:0,max:5000},
+ {t:'seg',id:'sed',l:'Седация',ch:[['no','не получал'],['off','отменена'],['on','продолжается']],d:'no'},
+ {t:'multi',id:'sd',l:'Препараты седации',ch:[['mdz','мидазолам'],['prp','пропофол'],['fnt','фентанил, другие опиоиды'],['dex','дексмедетомидин'],['tps','тиопентал'],['ket','кетамин']],d:[],v:o=>o.sed!=='no'},
+ {t:'num',id:'sh',l:'Часов после отмены седации',min:0,max:500,v:o=>o.sed==='off'},
+ {t:'chk',id:'nmb',l:'Миорелаксанты за последние сутки'},
+ {t:'chk',id:'ren',l:'Почечная или печёночная недостаточность (седативные выводятся медленнее)'},
+ {t:'seg',id:'tmp',l:'Температура',ch:[['n','нормотермия'],['ttm','целевое управление температурой, гипотермия'],['f','лихорадка']],d:'n'},
+ {t:'seg',id:'br',l:'Дыхание',ch:[['s','самостоятельное'],['i','ИВЛ (искусственная вентиляция лёгких) через интубационную трубку'],['t','через трахеостому']],d:'i'}];
+const F2a=[
+ {t:'seg',id:'rass',l:'RASS (Richmond Agitation–Sedation Scale, Ричмондская шкала ажитации и седации)',ch:[[4,'+4 агрессивен'],[3,'+3 выраженное возбуждение'],[2,'+2 возбуждён'],[1,'+1 беспокоен'],[0,'0 спокоен, бодрствует'],[-1,'−1 сонлив, контакт глазами > 10 с'],[-2,'−2 лёгкая седация, < 10 с'],[-3,'−3 открывает глаза на голос без контакта'],[-4,'−4 реагирует только на физический стимул'],[-5,'−5 не реагирует']],d:-4},
+ {t:'seg',id:'E',l:'ШКГ (шкала комы Глазго): E (eye) — открывание глаз',ch:[[4,'4 спонтанно'],[3,'3 на речь'],[2,'2 на боль'],[1,'1 нет']],d:1},
+ {t:'seg',id:'V',l:'V (verbal) — речь',ch:[[5,'5 ориентирован'],[4,'4 спутанная'],[3,'3 отдельные слова'],[2,'2 звуки'],[1,'1 нет'],['T','T интубирован']],d:'T'},
+ {t:'seg',id:'M',l:'M (motor) — движения',ch:[[6,'6 выполняет инструкции'],[5,'5 локализует боль'],[4,'4 отдёргивает'],[3,'3 патологическое сгибание'],[2,'2 разгибание'],[1,'1 нет']],d:3}];
+const F2b=[
+ {t:'seg',id:'fe',l:'Глаза',ch:[[4,'4 открыты, слежение или моргание по команде'],[3,'3 открыты, без слежения'],[2,'2 открывает на громкий голос'],[1,'1 открывает на боль'],[0,'0 не открывает']],d:0},
+ {t:'seg',id:'fm',l:'Движения',ch:[[4,'4 показывает «класс», кулак, «мир»'],[3,'3 локализует боль'],[2,'2 сгибание на боль'],[1,'1 разгибание на боль'],[0,'0 нет ответа или миоклонический статус']],d:2},
+ {t:'seg',id:'fb',l:'Стволовые рефлексы',ch:[[4,'4 зрачковые и корнеальные есть'],[3,'3 один зрачок широкий, не реагирует'],[2,'2 нет зрачковых или корнеальных'],[1,'1 нет зрачковых и корнеальных'],[0,'0 нет зрачковых, корнеальных и кашлевого']],d:4},
+ {t:'seg',id:'fr',l:'Дыхание',ch:[[4,'4 без ИВЛ, ритмичное'],[3,'3 без ИВЛ, Чейна — Стокса'],[2,'2 без ИВЛ, нерегулярное'],[1,'1 дышит чаще аппарата'],[0,'0 дышит с частотой аппарата или апноэ']],d:1}];
+const F2c=[
+ {t:'seg',id:'pe',l:'Зрачки',ch:[['eq','равные'],['ds','D>S'],['sd','S>D']],d:'eq'},
+ {t:'seg',id:'ps',l:'Величина',ch:[['m','средние'],['n','узкие'],['w','широкие'],['p','точечные']],d:'m'},
+ {t:'seg',id:'ph',l:'Фотореакция',ch:[['a','живая'],['s','вялая'],['0','отсутствует']],d:'a'},
+ {t:'seg',id:'co',l:'Корнеальные рефлексы',ch:[['a','сохранены'],['s','снижены'],['0','отсутствуют']],d:'a'},
+ {t:'seg',id:'oc',l:'Окулоцефалический рефлекс («кукольных глаз»)',ch:[['a','сохранён'],['0','отсутствует'],['x','не исследовался']],d:'a'},
+ {t:'seg',id:'cg',l:'Кашлевой и глоточный',ch:[['a','сохранены'],['s','снижены'],['0','отсутствуют']],d:'a'},
+ {t:'seg',id:'ey',l:'Положение глаз',ch:[['c','по средней линии'],['f','плавающие движения'],['r','девиация вправо'],['l','девиация влево'],['x','расходящееся косоглазие'],['sk','вертикальное расхождение']],d:'c'},
+ {t:'seg',id:'myo',l:'Миоклонии',ch:[['n','нет'],['s','единичные'],['st','миоклонический статус']],d:'n'},
+ {t:'seg',id:'as',l:'Асимметрия движений',ch:[['n','нет'],['l','меньше слева'],['r','меньше справа']],d:'n'},
+ {t:'seg',id:'bb',l:'Симптом Бабинского',ch:[['n','нет'],['r','справа'],['l','слева'],['b','с двух сторон']],d:'n'},
+ {t:'seg',id:'mn',l:'Менингеальные знаки',ch:[['n','нет'],['y','есть'],['x','оценить невозможно']],d:'n'}];
+const F2d=[
+ {t:'multi',id:'sg',l:'Отметьте наблюдаемое',ch:[['open','открывает глаза спонтанно, циклы сна и бодрствования'],['fix','фиксирует взор'],['trk','прослеживает взором (зеркало)'],['loc','локализует болевой раздражитель'],['aut','автоматизированные движения'],['emo','эмоциональные реакции на близких'],['cmd','воспроизводимо выполняет простые инструкции'],['vrb','понятные слова'],['com','функциональная коммуникация «да/нет»']],d:[]},
+ {t:'seg',id:'lis',l:'Вертикальные движения глаз и моргание по команде',ch:[['x','не проверялось'],['no','не выполняет'],['yes','выполняет']],d:'x'}];
+const F4=PRED.map(([id,l])=>({t:'seg',id:'p_'+id,l,ch:[['x','не исследовано'],['no','нет'],['yes','есть']],d:'x'})).concat([{t:'multi',id:'fav',l:'Благоприятные признаки',ch:[['eegn','непрерывная ЭЭГ нормального вольтажа в первые 24 ч'],['nsel','NSE в пределах нормы'],['mot','появился двигательный ответ лучше разгибания']],d:[]}]);
+const F3=CAU.map(([id,l])=>({t:'seg',id:'c_'+id,l,ch:ST3,d:'na'}));
+const F5=[
+ {t:'chk',id:'ama',l:'Амантадин'},
+ {t:'chk',id:'zol',l:'Пробная доза золпидема'},
+ {t:'multi',id:'sup',l:'Поддерживающие меры',ch:[['sed','минимизировать седативные и холинолитики'],['slp','режим сна и бодрствования, дневная активизация'],['reh','ранняя реабилитация: позиционирование, вертикализация'],['spa','профилактика спастичности и контрактур'],['swl','оценка глотания; решение о гастростоме'],['hyd','контроль гидроцефалии (КТ в динамике)'],['prs','профилактика пролежней и венозных тромбозов'],['crs','повторная оценка по CRS-R, не менее 5 раз']],d:['sed','slp','reh','swl']}];
+const ALL=[F1,F2a,F2b,F2c,F2d,F3,F4,F5].flat();
+const SK='consc-st';let O={},TAG='';
+function dflt(){O={};ALL.forEach(p=>{let d=p.d;if(d===undefined)d=p.t==='seg'?p.ch[0][0]:p.t==='multi'?[]:p.t==='chk'?false:'';O[p.id]=Array.isArray(d)?d.slice():d})}
+dflt();try{const x=JSON.parse(localStorage.getItem(SK));if(x&&x.O){Object.assign(O,x.O);TAG=x.tag||''}}catch(e){}
+const save=()=>{try{localStorage.setItem(SK,JSON.stringify({O,tag:TAG}))}catch(e){}};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+function optHTML(p){if(p.v&&!p.v(O))return'';const lab=typeof p.l==='function'?p.l(O):p.l;
+ if(p.t==='seg'||p.t==='multi')return `<div class="q"><span class="ql">${lab}</span><div class="seg3">${p.ch.map((c,i)=>{const on=p.t==='seg'?O[p.id]===c[0]:O[p.id].includes(c[0]);return `<button data-o="${p.id}" data-i="${i}" class="${on?'on':''}">${esc(c[1])}</button>`}).join('')}</div></div>`;
+ if(p.t==='chk')return `<label class="chk"><input type="checkbox" data-o="${p.id}" ${O[p.id]?'checked':''}><span>${lab}</span></label>`;
+ if(p.t==='num')return `<label class="f q">${lab}<input type="number" inputmode="decimal" data-o="${p.id}" value="${O[p.id]}"></label>`;return''}
+const FORMS={f1:F1,f2a:F2a,f2b:F2b,f2c:F2c,f2d:F2d,f3:F3,f4:F4,f5:F5};
+function renderForms(){for(const k in FORMS)$(k).innerHTML=FORMS[k].map(optHTML).join('')}
+const P=id=>ALL.find(x=>x.id===id);
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-o]');if(!b)return;const p=P(b.dataset.o),v=p.ch[+b.dataset.i][0];
+ if(p.t==='seg')O[p.id]=v;else{const a=O[p.id],k=a.indexOf(v);k>=0?a.splice(k,1):a.push(v)}
+ if(p.id==='E'||p.id==='M')syncFour();if(['ph','co','cg','pe'].includes(p.id))syncB();if(p.id==='br')O.fr=O.br==='s'?4:1;upd()});
+document.addEventListener('change',e=>{const t=e.target;if(!t.dataset.o)return;const p=P(t.dataset.o);if(p.t==='chk')O[p.id]=t.checked;upd()});
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset.o&&P(t.dataset.o).t==='num'){O[t.dataset.o]=t.value===''?'':+t.value.replace(',','.');save();compute();}});
+function syncB(){O.fb=(O.ph==='0'&&O.co==='0')?(O.cg==='0'?0:1):(O.ph==='0'||O.co==='0')?2:(O.pe!=='eq'&&O.ph!=='a'?3:4)}
+function syncFour(){O.fm={6:4,5:3,4:2,3:2,2:1,1:0}[O.M];O.fe={4:3,3:2,2:1,1:0}[O.E];if(O.sg.includes('trk')&&O.E===4)O.fe=4}
+function upd(){renderForms();compute();save()}
+
+// ===== расчёт =====
+function gcs(){const v=O.V==='T'?1:O.V,t=O.E+v+O.M;return{t,str:`${O.E+(O.V==='T'?1:O.V)+O.M}${O.V==='T'?'T':''}`,lv:t>=15?'ясное':t>=13?'умеренное оглушение':t>=11?'глубокое оглушение':t>=9?'сопор':t>=7?'кома I (умеренная)':t>=5?'кома II (глубокая)':'кома III (атоническая)'}}
+const four=()=>O.fe+O.fm+O.fb+O.fr;
+function level(){const g=gcs(),h=k=>O.sg.includes(k);const sedOn=O.sed==='on'||(O.sed==='off'&&nv(O.sh)!==null&&nv(O.sh)<12);
+ let doc=null;
+ if(O.lis==='yes')doc='синдром «запертого человека» не исключён: выполняет команды глазами — сознание может быть сохранено';
+ else if(h('com'))doc='выход из состояния минимального сознания';
+ else if(h('cmd')||h('vrb'))doc='состояние минимального сознания «плюс»';
+ else if(h('fix')||h('trk')||h('loc')||h('aut')||h('emo'))doc='состояние минимального сознания «минус»';
+ else if(h('open'))doc='синдром ареактивного бодрствования (вегетативное состояние)';
+ const lim=sedOn&&O.rass<=-3;
+ return{g,doc,lim,sedOn}}
+const autoRel=id=>(id==='sed'&&O.sed!=='no')||(id==='nmb'&&O.nmb)||(id==='tmp'&&O.tmp!=='n')||(id==='inf'&&O.et==='inf')||(id==='org'&&O.ren);
+function causes(){const r={na:[],x:[],ok:[],yes:[]};CAU.forEach(([id,l,rec])=>{let st=O['c_'+id];if(st==='na'&&autoRel(id))st='x';r[st].push({id,l,rec})});return r}
+function prog(){if(O.et!=='ca')return{kind:'other'};
+ const h=nv(O.hrs),why=[];
+ if(h===null||h<72)why.push(h===null?'не указано время от восстановления кровообращения':`прошло ${h} ч, нужно не меньше 72`);
+ if(O.sed!=='no'&&!(O.sed==='off'&&nv(O.sh)!==null&&nv(O.sh)>=24))why.push('не исключено действие седации');
+ if(O.tmp==='ttm')why.push('идёт управление температурой / гипотермия');
+ if(O.nmb)why.push('недавние миорелаксанты');
+ const m3=O.M<=3;const pos=PRED.filter(([id])=>O['p_'+id]==='yes').map(([id,l])=>l),neg=PRED.filter(([id])=>O['p_'+id]==='no').length,nx=PRED.filter(([id])=>O['p_'+id]==='x').map(([,l])=>l),nxs=PRED.filter(([id])=>O['p_'+id]==='x').map(([,,s])=>s);
+ return{kind:'ca',why,m3,pos,neg,nx,nxs,fav:O.fav}}
+function statusText(){const L=level(),g=L.g;const RX={a:'сохранены',s:'снижены','0':'отсутствуют'};const s=[];
+ s.push(`Уровень сознания: ${L.doc?L.doc:g.lv}. ШКГ ${g.str} (E${O.E} V${O.V} M${O.M}); FOUR ${four()} (E${O.fe} M${O.fm} B${O.fb} R${O.fr}); RASS ${O.rass>0?'+':''}${O.rass}.`+(L.lim?' Оценка ограничена медикаментозной седацией.':''));
+ s.push(`Зрачки ${{eq:'равные',ds:'D>S',sd:'S>D'}[O.pe]}, ${{m:'средней величины',n:'узкие',w:'широкие',p:'точечные'}[O.ps]}, фотореакция ${{a:'живая',s:'вялая','0':'отсутствует'}[O.ph]}. Корнеальные рефлексы ${RX[O.co]}. Окулоцефалический рефлекс ${{a:'сохранён','0':'отсутствует',x:'не исследовался'}[O.oc]}. Положение глаз: ${{c:'по средней линии',f:'плавающие движения',r:'девиация вправо',l:'девиация влево',x:'расходящееся косоглазие',sk:'вертикальное расхождение'}[O.ey]}. Кашлевой и глоточный рефлексы ${RX[O.cg]}.`);
+ const MM={6:'выполняет инструкции',5:'локализует болевой раздражитель',4:'на боль отдёргивает конечность',3:'на боль — патологическое сгибание (декортикационная поза)',2:'на боль — разгибание (децеребрационная поза)',1:'двигательной реакции на боль нет'};
+ let m=`Двигательный ответ: ${MM[O.M]}.`;if(O.as!=='n')m+=` Движения в ${O.as==='l'?'левых':'правых'} конечностях меньше.`;
+ if(O.bb!=='n')m+=` Симптом Бабинского ${{r:'справа',l:'слева',b:'с двух сторон'}[O.bb]}.`;
+ if(O.myo!=='n')m+=O.myo==='st'?' Миоклонический статус.':' Единичные миоклонии.';
+ m+={n:' Менингеальных знаков нет.',y:' Менингеальные знаки положительные.',x:' Менингеальные знаки оценить невозможно.'}[O.mn];s.push(m);
+ if(O.sg.length){const T={open:'открывает глаза спонтанно',fix:'фиксирует взор',trk:'прослеживает взором',loc:'локализует болевой раздражитель',aut:'автоматизированные движения',emo:'эмоциональные реакции на близких',cmd:'воспроизводимо выполняет простые инструкции',vrb:'произносит понятные слова',com:'функциональная коммуникация «да/нет»'};s.push(cap(lst(O.sg.map(k=>T[k])))+'.')}
+ if(O.lis!=='x')s.push(O.lis==='yes'?'Вертикальные движения глаз и моргание по команде выполняет.':'Вертикальные движения глаз и моргание по команде не выполняет.');
+ return s.join('\n')}
+function ctxText(){const et={ca:'остановка сердца',tbi:'черепно-мозговая травма',str:'инсульт / кровоизлияние',met:'метаболическая или токсическая энцефалопатия',inf:'инфекция ЦНС / сепсис',unk:'причина не установлена'}[O.et];
+ const h=nv(O.hrs);let s=`Основная причина: ${et}${h!==null?`, ${h} ч ${O.et==='ca'?'от восстановления кровообращения':'от события'}`:''}.`;
+ const SD={mdz:'мидазолам',prp:'пропофол',fnt:'опиоиды',dex:'дексмедетомидин',tps:'тиопентал',ket:'кетамин'};const sd=O.sd.map(k=>SD[k]);
+ s+={no:' Седацию не получал.',off:` Седация (${sd.join(', ')||'препараты не указаны'}) отменена${nv(O.sh)!==null?` ${nv(O.sh)} ч назад`:''}.`,on:` На седации: ${sd.join(', ')||'препараты не указаны'}.`}[O.sed];
+ if(O.nmb)s+=' Миорелаксанты в последние сутки.';if(O.ren)s+=' Почечная / печёночная недостаточность.';
+ s+={n:'',ttm:' Целевое управление температурой.',f:' Лихорадка.'}[O.tmp];
+ s+={s:' Дыхание самостоятельное.',i:' ИВЛ через интубационную трубку.',t:' Дыхание через трахеостому.'}[O.br];return s}
+function progText(){const p=prog();
+ if(p.kind==='other'){const t={tbi:'ЧМТ: ранний прогноз (до 72 ч) ненадёжен; для расчёта используют модели IMPACT и CRASH.',str:'Инсульт / кровоизлияние: прогностические шкалы не должны быть единственным основанием для ограничения терапии.',met:'Метаболическая / токсическая энцефалопатия: прогноз определяется обратимостью причины; после её коррекции — повторная оценка.',inf:'Инфекция / сепсис: септическая энцефалопатия часто обратима; оценка после санации очага.',unk:'Причина не установлена: прогноз не оценивается до выяснения причины.'}[O.et];
+  return{head:'Формальный алгоритм прогноза для этой причины не применяется',body:t+' При хроническом нарушении сознания не называть его «стойким» раньше 3 месяцев (нетравматическое) и 12 месяцев (травматическое поражение) — рекомендации AAN (Американской академии неврологии) 2018.',cls:'info'}}
+ if(p.why.length)return{head:'Прогноз пока не определяется',body:'Причины: '+p.why.join('; ')+'. Повторить оценку после устранения.',cls:'warn'};
+ if(!p.m3)return{head:'Критерии плохого прогноза неприменимы',body:'Двигательный ответ лучше разгибания или сгибания на боль (M ≥ 4) — алгоритм ERC–ESICM применяют только при M ≤ 3. Продолжать лечение и наблюдение.',cls:'ok'};
+ if(p.pos.length>=2)return{head:'Плохой неврологический исход вероятен',body:`Есть ${p.pos.length} ${pl(p.pos.length,'предиктор','предиктора','предикторов')} из 6 (нужно не менее 2): ${p.pos.map(x=>/^[А-ЯЁ][а-яё]/.test(x)?x[0].toLowerCase()+x.slice(1):x).join('; ')}. Вывод формулирует мультидисциплинарная команда; заключение — не основание для немедленных решений без подтверждения.`,cls:'bad'};
+ return{head:'Прогноз неопределённый',body:`Предикторов плохого исхода: ${p.pos.length} (нужно не менее 2)`+(p.nx.length?`. Не исследовано: ${p.nx.join('; ')}`:'')+'. Наблюдать и переоценивать'+(p.fav.length?'; есть благоприятные признаки':'')+'.',cls:'warn'}}
+function recs(){const r=[];const L=level(),c=causes();
+ c.x.forEach(x=>r.push(x.rec));c.yes.forEach(x=>r.push('коррекция: '+x.l.toLowerCase()));
+ if(L.lim)r.unshift('оценить уровень сознания повторно после отмены или минимизации седации');
+ if(L.doc&&/ареактивного|минус|плюс/.test(L.doc))r.push('повторная оценка по CRS-R (Coma Recovery Scale – Revised, пересмотренной шкале восстановления после комы) не менее 5 раз за 1–2 недели');
+ if(O.lis==='x'&&!c.x.some(x=>x.id==='conf'))r.push('проверить вертикальные движения глаз и моргание по команде');
+ const p=prog();if(p.kind==='ca'&&p.m3&&p.nx.length&&!p.why.length)r.push('для прогноза: '+p.nxs.join('; '));
+ if(p.kind==='ca'&&p.why.length)r.push('повторная оценка прогноза не ранее 72 ч после восстановления кровообращения, вне седации и гипотермии');
+ const SUP={sed:'минимизировать седативные препараты и препараты с холинолитическим действием',slp:'режим сна и бодрствования, дневная активизация',reh:'ранняя реабилитация: позиционирование, вертикализация',spa:'профилактика спастичности и контрактур',swl:'оценка глотания логопедом; при стойкой дисфагии — решение о гастростоме',hyd:'КТ головного мозга в динамике для контроля гидроцефалии; при её нарастании — консультация нейрохирурга о шунтировании',prs:'профилактика пролежней и венозных тромбоэмболических осложнений',crs:'повторная оценка по CRS-R (пересмотренной шкале восстановления после комы) не менее 5 раз за 1–2 недели'};
+ O.sup.forEach(k=>r.push(SUP[k]));
+ if(O.ama)r.push('амантадина гидрохлорид внутрь или через зонд: 100 мг 2 раза в день 2 недели; при отсутствии улучшения — 150 мг 2 раза в день на 3-й неделе и 200 мг 2 раза в день на 4-й; оценка эффекта по CRS-R еженедельно; коррекция дозы по функции почек; осторожно при судорожной готовности');
+ if(O.zol)r.push('пробная доза золпидема 10 мг через зонд с оценкой по CRS-R через 30–60 минут; при ответе — обсудить курсовой приём');
+ return[...new Set(r)]}
+function famText(){const L=level(),p=prog(),pt=progText();
+ let s;
+ if(O.lis==='yes')s='Пациент, возможно, всё понимает, но почти не может двигаться и говорить. Разговаривайте при нём спокойно и обращайтесь к нему напрямую. Мы проверим это подробнее.';
+ else if(L.doc&&/выход/.test(L.doc))s='Пациент приходит в сознание: он может отвечать «да» и «нет». Впереди длительное восстановление, но это хороший знак.';
+ else if(L.doc&&/минимального/.test(L.doc))s='У пациента есть признаки сознания: он реагирует на окружающее, но непостоянно. Это состояние может улучшаться неделями и месяцами. Говорите с ним, называйте себя — это не вредит и может помочь.';
+ else if(L.doc)s='Пациент открывает глаза и спит по циклам, но пока не реагирует осмысленно. Это не окончательный вывод: признаки сознания могут появиться позже, и мы будем осматривать его повторно.';
+ else s=`Пациент находится в ${L.g.lv.startsWith('кома')?'коме':'состоянии угнетения сознания'}. Сейчас мы выясняем все причины, которые можно исправить${L.lim?', и ждём, пока выведутся препараты для седации':''}.`;
+ if(p.kind==='ca'&&p.why.length)s+=' Делать выводы о прогнозе рано: надёжно его оценивают не раньше чем через трое суток после остановки сердца и после отмены седации.';
+ else if(pt.cls==='bad')s+=' К сожалению, результаты нескольких независимых исследований указывают на тяжёлое повреждение мозга и высокую вероятность того, что пациент не придёт в сознание. Мы обсудим это вместе со всей командой.';
+ else if(pt.cls==='warn'&&p.kind==='ca')s+=' Прогноз пока неопределённый: нужны дополнительные исследования и время.';
+ return s}
+function summary(){const L=level(),c=causes(),pt=progText(),r=recs();
+ let s=`Консультация невролога (${new Date().toLocaleString('ru-RU',{dateStyle:'short',timeStyle:'short'})}).\nПовод: ${{dep:'угнетение сознания неясной причины',wake:'не просыпается после отмены седации',prog:'оценка прогноза',dyn:'оценка динамики'}[O.why]}.\n${ctxText()}\n\nНеврологический статус.\n${statusText()}\n\nЗаключение: ${L.doc?L.doc:L.g.lv}`+(L.lim?' (оценка ограничена седацией)':'')+'.';
+ if(c.yes.length)s+=`\nВыявлено: ${c.yes.map(x=>x.l.toLowerCase()).join('; ')}.`;
+ if(c.ok.length)s+=`\nИсключено: ${c.ok.map(x=>x.l.toLowerCase()).join('; ')}.`;
+ if(O.why==='prog'||O.et==='ca')s+=`\nПрогноз: ${pt.head.toLowerCase()}. ${pt.body}`;
+ if(r.length)s+='\n\nРекомендовано:\n'+r.map((x,i)=>`${i+1}. ${cap(x)}.`).join('\n');
+ return s}
+function compute(){const L=level(),g=L.g;
+ $('lvl').innerHTML=`<b class="t">${cap(L.doc?L.doc:g.lv)}</b>ШКГ ${g.str} · FOUR ${four()} · RASS ${O.rass>0?'+':''}${O.rass}`+(L.lim?'<br><b>Оценка ограничена седацией</b> — сначала отмена или минимизация.':'');
+ const pt=progText();$('progout').innerHTML=`<div class="out ${pt.cls}"><b class="t">${pt.head}</b>${esc(pt.body)}</div>`;
+ $('cacard').style.display=O.et==='ca'?'':'none';
+ $('fam').textContent=famText();renderTraj();if(cur==='s5')$('sum').textContent=summary()}
+const TRAJ=[
+ ['del','Пробуждение через спутанность и делирий','Самый частый путь. Открывает глаза, но дезориентирован, возбуждён или заторможен; после травмы — посттравматическая амнезия. Нужны: оценка делирия по CAM-ICU (метод оценки спутанности сознания в интенсивной терапии), поиск лекарственных и метаболических причин, режим сна.'],
+ ['vs','Синдром ареактивного бодрствования (вегетативное состояние)','Глаза открыты, есть циклы сна и бодрствования, но нет признаков осознания. Состояние называют хроническим через 28 дней. Около 40% таких диагнозов при тщательном повторном осмотре оказываются минимальным сознанием.'],
+ ['mcs','Состояние минимального сознания «минус» и «плюс»','Воспроизводимые, но непостоянные признаки осознания: слежение, локализация боли («минус»), выполнение инструкций и слова («плюс»). Прогноз лучше, чем при вегетативном состоянии; улучшение возможно в течение месяцев.'],
+ ['emcs','Выход из состояния минимального сознания','Функциональная коммуникация («да/нет» достоверно) или использование предметов по назначению. Дальше — когнитивные и двигательные последствия, длительная реабилитация.'],
+ ['akm','Акинетический мутизм','Бодрствует, следит взором, но почти не говорит и не двигается по своей инициативе. Поражение медиальных отделов лобных долей и поясной извилины, гидроцефалия. Исключить гидроцефалию; дофаминергические препараты — по слабым данным.'],
+ ['lis','Синдром «запертого человека»','Сознание сохранено, тетраплегия и анартрия; общение — вертикальными движениями глаз и морганием. Поражение основания моста. Главная ошибка — принять за кому или вегетативное состояние.'],
+ ['bd','Смерть мозга','Устанавливается только комиссией по регламентированной процедуре, с исключением влияния препаратов, гипотермии и метаболических нарушений. Приложение для этого не используется.']];
+function curTraj(){const L=level();if(O.lis==='yes')return'lis';if(!L.doc)return L.g.t>=13?'del':null;if(/выход/.test(L.doc))return'emcs';if(/минимального/.test(L.doc))return'mcs';if(/ареактивного/.test(L.doc))return'vs';return null}
+function renderTraj(){const c=curTraj();$('traj').innerHTML=TRAJ.map(([id,t,d])=>`<div class="it"${id===c?' style="background:rgba(79,224,255,.08);border-radius:12px;padding:10px;margin:4px -10px"':''}><b>${id===c?'● ':''}${t}</b><small>${d}</small></div>`).join('')+'<p class="muted" style="margin-top:10px">Не называть состояние стойким раньше 3 месяцев при нетравматическом и 12 месяцев при травматическом поражении — рекомендации AAN (Американской академии неврологии) 2018.</p>';
+ const L=level(),ok=O.et==='tbi'&&L.doc&&/ареактивного|минимального/.test(L.doc),wk=nv(O.hrs)!==null?Math.round(nv(O.hrs)/168):null;
+ $('txnote').innerHTML=`<div class="out ${ok?'ok':'info'}"><b class="t">Амантадин</b>Единственное средство с доказательством из рандомизированного исследования (Giacino, NEJM — New England Journal of Medicine, 2012): при <b>травматическом</b> синдроме ареактивного бодрствования или минимальном сознании, через 4–16 недель после травмы, ускоряет восстановление; рекомендация AAN 2018. Схема — 100 мг 2 раза в день с наращиванием до 200 мг 2 раза в день за 4 недели.${ok?(wk!==null?` Сейчас ${wk} ${pl(wk,'неделя','недели','недель')} от травмы.`:''):' <b>Для текущего пациента показание не подтверждено</b> (нужны травматическая причина и уровень «ареактивное бодрствование / минимальное сознание»); при нетравматическом поражении — только по решению консилиума.'} Внутривенный амантадина сульфат широко применяется в России, но доказательная база получена для перорального амантадина гидрохлорида.</div><div class="out info"><b class="t">Золпидем</b>Парадоксальное кратковременное «пробуждение» бывает примерно у 5% пациентов с нарушениями сознания. Однократная проба 10 мг с оценкой через 30–60 минут; при ответе — обсуждать курс.</div><div class="out info"><b class="t">Слабые данные</b>Метилфенидат, леводопа, интратекальный баклофен, транскраниальная стимуляция постоянным током — доказательства недостаточны, только индивидуально.</div>`}
+// ===== вкладки =====
+const order=['s1','s2','s3','s4','s6x','s5'],TN=['Контекст','Осмотр','Причины','Прогноз','Выход','Итог'];let cur='s1';
+function show(s){cur=s;document.querySelectorAll('section').forEach(e=>e.classList.toggle('on',e.id===s));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+ $('crumbs').innerHTML=TN.map((x,i)=>`<span class="${order[i]===s?'on':''}">${i+1}. ${x}</span>`).join('');
+ document.querySelectorAll('section .prev').forEach(b=>b.style.visibility=s==='s1'?'hidden':'visible');window.scrollTo(0,0);compute()}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll('section .prev').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);if(i>0)show(order[i-1])});
+document.querySelectorAll('section .next').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);show(order[(i+1)%order.length])});
+$('allx').onclick=()=>{CAU.forEach(([id])=>O['c_'+id]='x');upd()};
+$('tag').value=TAG;$('tag').oninput=()=>{TAG=$('tag').value;save()};
+const MK='consc-mail';try{$('mail').value=localStorage.getItem(MK)||'dorogovvn2@zdrav.mos.ru'}catch(e){$('mail').value='dorogovvn2@zdrav.mos.ru'}
+$('mail').addEventListener('change',()=>{try{localStorage.setItem(MK,$('mail').value.trim())}catch(e){}});
+$('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}const t=$('tag').value.trim(),sub='Консультация: сознание'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
+ location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(summary().replace(/\n/g,'\r\n'))};
+const cp=async(b,t)=>{const o=b.textContent;try{await navigator.clipboard.writeText(t);b.textContent='Скопировано'}catch(e){b.textContent='Не удалось — выделите текст'}setTimeout(()=>b.textContent=o,1800)};
+$('copy').onclick=()=>cp($('copy'),summary());$('copyf').onclick=()=>cp($('copyf'),famText());
+let rT=0;$('reset').onclick=()=>{if(Date.now()-rT>2500){rT=Date.now();$('reset').textContent='Нажмите ещё раз';setTimeout(()=>$('reset').textContent='Новый пациент',2500);return}dflt();TAG='';$('tag').value='';save();renderForms();show('s1')};
+renderForms();show('s1');
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('/consc-r4v8kd-sw.js',{scope:'/consc-r4v8kd'}).catch(()=>{});
+</script>
+</body>
+</html>

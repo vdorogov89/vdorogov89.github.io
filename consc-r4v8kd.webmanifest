@@ -1,0 +1,31 @@
+{
+ "id": "/consc-r4v8kd.html",
+ "name": "Сознание в реанимации",
+ "short_name": "Сознание",
+ "lang": "ru",
+ "start_url": "/consc-r4v8kd.html",
+ "scope": "/consc-r4v8kd",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/consc-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/consc-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/consc-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
