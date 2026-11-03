@@ -1,4 +1,4 @@
-const CACHE='consc-r4v8kd-v10';
+const CACHE='consc-r4v8kd-v11';
 const CORE=['/consc-r4v8kd.html','/consc-r4v8kd.webmanifest','/consc-icon-192.png','/consc-icon-512.png','/consc-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('consc-r4v8kd-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
