@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ликвор: разбор</title>
+<meta name="theme-color" content="#08080D">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="csf-k7m2qp.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="csf-icon-192.png">
+<link rel="apple-touch-icon" href="csf-apple-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ликвор">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="author" content="Василий Дорогов">
+<meta name="copyright" content="© 2026 Василий Дорогов">
+<style>
+:root{--bg:#08080D; --ink:#F2F2F5; --body:#C9C9D3; --muted:#8B8B98; --line:rgba(255,255,255,0.09); --glass:rgba(255,255,255,0.045); --acc:#4FE0FF; --acc2:#8A5CFF; --warn:#FF8A7A; --amber:#FFC56B; --ok:#6BE3A4;}
+*{box-sizing:border-box;}
+html,body{margin:0; background:var(--bg); color:var(--body); font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif; -webkit-font-smoothing:antialiased;}
+button{font:inherit; color:inherit; cursor:pointer;}
+.app{max-width:560px; margin:0 auto; padding:0 16px calc(84px + env(safe-area-inset-bottom));}
+header{padding:calc(16px + env(safe-area-inset-top)) 0 10px; display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+header h1{margin:0; font-size:20px; color:var(--ink); letter-spacing:-0.01em;}
+header span{font-size:12.5px; color:var(--muted); white-space:nowrap;}
+nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center; gap:4px; padding:10px 8px calc(10px + env(safe-area-inset-bottom)); background:rgba(10,10,16,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--line);}
+nav.tabs button{flex:1; max-width:120px; padding:9px 2px; border-radius:12px; border:0; background:transparent; color:var(--muted); font-size:12.5px;}
+nav.tabs button.on{background:rgba(79,224,255,0.12); color:var(--ink);}
+section{display:none;} section.on{display:block;}
+.card{background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:16px; margin:12px 0;}
+h2{font-size:17px; color:var(--ink); margin:4px 0 8px;}
+h3{font-size:15px; color:var(--ink); margin:14px 0 6px;}
+p{margin:6px 0;}
+.muted{color:var(--muted); font-size:13px;}
+.crumbs{display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 4px;}
+.crumbs span{font-size:12px; padding:3px 9px; border-radius:20px; background:rgba(255,255,255,0.06); color:var(--muted);}
+.crumbs span.on{background:rgba(79,224,255,0.14); color:var(--ink);}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+label.f{display:block; font-size:12.5px; color:var(--muted);}
+input[type=number],input[type=date],select{width:100%; min-width:0; max-width:100%; -webkit-appearance:none; appearance:none; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px; display:block;}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%; background-size:5px 5px; background-repeat:no-repeat; padding-right:32px;}
+select option{background:#16171f; color:var(--ink);}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.8);}
+input:focus,select:focus{outline:none; border-color:rgba(79,224,255,0.6);}
+.chk{display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); color:var(--ink);}
+.chk:first-of-type{border-top:0;}
+.chk input{-webkit-appearance:none; appearance:none; width:22px; height:22px; flex:0 0 22px; margin:1px 0 0; border-radius:7px; border:1.5px solid rgba(255,255,255,0.25); background:transparent; display:grid; place-content:center;}
+.chk input:checked{background:linear-gradient(120deg,var(--acc),var(--acc2)); border-color:transparent;}
+.chk input:checked::after{content:''; width:10px; height:6px; border:2.5px solid #08080D; border-top:0; border-right:0; transform:rotate(-45deg) translate(1px,-1px);}
+.chk small{display:block; color:var(--muted); font-size:12.5px;}
+.out{border-radius:16px; padding:12px 14px; margin:10px 0; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body);}
+.out b.t{display:block; margin-bottom:4px; color:var(--ink); font-size:15px;}
+.out.ok{border-color:rgba(107,227,164,0.35); background:rgba(107,227,164,0.06);} .out.ok b.t{color:var(--ok);}
+.out.warn{border-color:rgba(255,197,107,0.4); background:rgba(255,197,107,0.06);} .out.warn b.t{color:var(--amber);}
+.out.bad{border-color:rgba(255,138,122,0.4); background:rgba(255,138,122,0.06);} .out.bad b.t{color:var(--warn);}
+.out.info{border-color:rgba(79,224,255,0.25); background:rgba(79,224,255,0.04);} .out.info b.t{color:var(--acc);}
+.out ul{margin:6px 0 0; padding-left:20px;} li{margin:3px 0;}
+.out b{color:var(--ink);}
+.dose{font-weight:600; color:var(--acc); white-space:nowrap;}
+.stepnav{display:flex; gap:8px; margin:16px 0 4px;}
+.stepnav button{flex:1; padding:11px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.04); color:var(--ink);}
+.stepnav button.main{flex:2; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.mbtns button{padding:10px 14px; border-radius:12px; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns button.alt{background:rgba(255,255,255,0.08); color:var(--ink); font-weight:500;}
+pre{white-space:pre-wrap; font:13.5px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; color:var(--ink); background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:14px; padding:12px; margin:8px 0;}
+a{color:var(--acc);}
+.foot{font-size:12px; color:var(--muted); margin:18px 0;}
+.seg3{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 2px;} .seg3 button{padding:8px 12px; border-radius:20px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--muted); font-size:13.5px;} .seg3 button.on{border-color:rgba(79,224,255,0.5); background:rgba(79,224,255,0.12); color:var(--ink);}
+.q{padding:10px 0; border-top:1px solid var(--line);} .q:first-of-type{border-top:0;} .q>b{display:block; color:var(--ink); font-weight:500;} .q small{color:var(--muted); font-size:12.5px;}
+.pts{float:right; font-size:12px; color:var(--muted);}
+input[type=email],input[type=text]{width:100%; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px;}
+table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padding:4px 4px;} table.oh input{margin:0; min-height:40px; padding:8px; text-align:center;}
+textarea{width:100%; font:inherit; font-size:15.5px; line-height:1.45; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:6px; resize:vertical;} textarea:focus{outline:none; border-color:rgba(79,224,255,0.6);}
+#rec{min-width:150px;} .nb{padding:4px 10px; border-radius:9px; border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--ink); font-size:12.5px;} .pts{margin-left:0;} button:disabled{opacity:.45;}
+.copy{font-size:11.5px; color:var(--muted); line-height:1.45; margin:22px 0 6px; padding-top:12px; border-top:1px solid var(--line);}
+
+.mc{padding:0;overflow:hidden} .mh{display:flex;align-items:center;gap:8px;padding:13px 14px;cursor:pointer} .mh b{flex:1;color:var(--ink);font-size:15px;line-height:1.3} .ar{color:var(--muted)}
+.x{border:0;background:rgba(255,255,255,0.06);border-radius:10px;width:32px;height:32px;color:var(--muted);flex:0 0 32px;touch-action:manipulation}
+.mb{padding:0 14px 12px;border-top:1px solid var(--line)} .q{padding:9px 0} .ql{display:block;color:var(--ink);font-size:13.5px} .inf{margin:10px 0 2px;font-size:12.5px} .inf summary{cursor:pointer;color:var(--acc)}
+.nt{margin:8px 0;padding:8px 12px;border-radius:12px;background:rgba(79,224,255,0.07);color:var(--ink);font-size:14px}
+.seg3 button{touch-action:manipulation;text-align:left;line-height:1.3}
+.sg{display:block;width:100%;text-align:left;padding:11px 12px;margin:6px 0;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,0.03);color:var(--ink);font-size:14.5px;line-height:1.3}
+.sg:active{background:rgba(79,224,255,0.12)} .gh{margin:14px 2px 2px;color:var(--acc);font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+details.cat summary{cursor:pointer;color:var(--muted);font-size:13.5px;padding:8px 2px}
+#q{font-size:17px} .fc{padding:12px 14px;margin:8px 0} .fh{display:flex;align-items:center;gap:8px} .fh b{flex:1;color:var(--ink)}
+.bd{font-size:11.5px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.06);color:var(--muted)} .bd.ed{background:rgba(255,197,107,0.14);color:var(--amber)}
+textarea[data-k]{min-height:44px} #prev{max-height:none}
+
+.lst{margin:6px 0 0;padding-left:18px} .lst li{margin:4px 0}
+.it{padding:10px 0;border-top:1px solid var(--line)} .it:first-child{border-top:0} .it>b{display:block;color:var(--ink);font-weight:500;font-size:14.5px} .it small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.big{font-size:17px;color:var(--ink);font-weight:600;margin:2px 0}
+.it small{line-height:1.45}
+</style>
+</head>
+<body>
+<div class="app">
+  <header><h1>Ликвор: разбор</h1><span>автор — В.&nbsp;Дорогов</span></header>
+  <div class="crumbs" id="crumbs"></div>
+
+<section id="s1" class="on">
+  <div class="card"><h2>Клиника</h2><p class="muted">Ликвор без клиники читается плохо: одна и та же картина бывает при разных болезнях. Не вводите ФИО.</p><div id="f1"></div></div>
+  <div class="stepnav"><button class="prev">Назад</button><button class="next main">Ликвор</button></div>
+</section>
+
+<section id="s2">
+  <div class="card"><h2>Ликвор</h2><p class="muted">Заполните то, что есть; пустые поля не учитываются. Дробные числа — через запятую или точку.</p><div id="f2"></div></div>
+  <div class="card"><h2>Дополнительно</h2><div id="f2b"></div></div>
+  <div class="out info"><b class="t">Норма (люмбальный ликвор, взрослые)</b>Давление открытия 10–25 см вод. ст. · цитоз до 5 в 1 мкл, лимфоциты и моноциты · белок 0,15–0,45 г/л (старше 50 лет — до 0,6) · глюкоза 2,5–4,4 ммоль/л, соотношение с глюкозой крови 0,6 и выше · лактат до 2,8 ммоль/л.</div>
+  <div class="stepnav"><button class="prev">Назад</button><button class="next main">Разбор</button></div>
+</section>
+
+<section id="s3">
+  <div id="pat"></div>
+  <div id="urg"></div>
+  <div id="ddx"></div>
+  <div class="stepnav"><button class="prev">Назад</button><button class="next main">Итог</button></div>
+</section>
+
+<section id="s4">
+  <div class="card"><h2>Заключение</h2><p class="muted">Проверьте и при необходимости поправьте в истории болезни.</p><pre id="sum"></pre>
+    <div class="mbtns"><button id="copy">Скопировать</button></div></div>
+  <div class="card"><h2>Отправить на почту</h2>
+    <label class="f">Метка (без ФИО), например «реанимация 2, койка 5»<input type="text" id="tag"></label>
+    <label class="f" style="margin-top:8px">Адрес<input type="email" id="mail"></label>
+    <div class="mbtns"><button id="send">Отправить</button><button class="alt" id="reset">Новый пациент</button></div></div>
+  <p class="copy">Подсказка для дифференциального диагноза, а не диагноз. Пороговые значения ориентировочные: опираются на рекомендации ESCMID 2016 (Европейское общество клинической микробиологии и инфекционных болезней) по бактериальному менингиту, EFNS 2010 по нейроборрелиозу, консенсус 2018 по нейросаркоидозу и шкалу Thwaites (2002). Данные хранятся только на этом устройстве. © 2026 Василий Дорогов.</p>
+</section>
+</div>
+<nav class="tabs"><button data-s="s1" class="on">Клиника</button><button data-s="s2">Ликвор</button><button data-s="s3">Разбор</button><button data-s="s4">Итог</button></nav>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
+const nv=v=>{if(v===''||v==null)return null;const x=+String(v).replace(',','.');return isNaN(x)?null:x};
+const fm=x=>(Math.round(x*100)/100).toString().replace('.',',');
+const F1=[
+ {id:'age',t:'seg',l:'Возраст',ch:[['y','18–35 лет'],['m','36–50 лет'],['o','старше 50 лет'],['c','ребёнок']],d:'m'},
+ {id:'dur',t:'seg',l:'Сколько длятся симптомы',ch:[['h','до 48 часов'],['d','3–5 дней'],['s','6 дней – 4 недели'],['c','больше 4 недель']]},
+ {id:'imm',t:'seg',l:'Иммунитет',ch:[['n','не нарушен'],['hiv','ВИЧ-инфекция'],['is','иммуносупрессия: трансплантация, химиотерапия, глюкокортикоиды']]},
+ {id:'ab',t:'seg',l:'Антибиотики до пункции',ch:[['n','нет'],['y','да']]},
+ {id:'ns',t:'seg',l:'Нейрохирургия, шунт или наружный дренаж',ch:[['n','нет'],['y','да']]},
+ {id:'cl',t:'multi',l:'Клиника — отметьте всё, что есть',ch:[['fev','лихорадка'],['men','менингеальный синдром'],['enc','энцефалопатия: спутанность, изменение поведения'],['sz','судороги'],['foc','очаговая симптоматика'],['cn','поражение черепных нервов'],['fp2','двусторонний парез лицевых нервов'],['rad','корешковая боль, радикулопатия'],['flac','вялый восходящий парез, арефлексия'],['myel','поражение спинного мозга'],['rash','сыпь, петехии'],['ent','отит, синусит, мастоидит'],['tick','укус клеща или мигрирующая эритема'],['sarc','увеит, лимфоузлы корней лёгких, узловатая эритема'],['ca','известное онкологическое заболевание'],['tb','туберкулёз в анамнезе или контакт'],['ths','громоподобная головная боль'],['rel','повторные эпизоды менингита'],['drug','недавно: НПВС, иммуноглобулин, ко-тримоксазол, ламотриджин']]},
+ {id:'bwbc',t:'num',l:'Лейкоциты крови, ×10⁹/л — для шкалы Thwaites'},
+ {id:'na',t:'num',l:'Натрий крови, ммоль/л'}];
+const F2=[
+ {id:'op',t:'num',l:'Давление открытия, см вод. ст. (лёжа)'},
+ {id:'app',t:'seg',l:'Вид',ch:[['cl','прозрачный'],['op','мутный'],['bl','кровянистый'],['xa','ксантохромный']]},
+ {id:'cu',t:'seg',l:'Как записан цитоз',ch:[['1','в 1 мкл'],['3','в 3 мкл («/3», камера Фукса — Розенталя)']]},
+ {id:'wbc',t:'num',l:'Цитоз (лейкоциты)'},
+ {id:'neu',t:'num',l:'Нейтрофилы, %'},
+ {id:'eos',t:'num',l:'Эозинофилы, %'},
+ {id:'rbc',t:'num',l:'Эритроциты, в 1 мкл'},
+ {id:'prot',t:'num',l:'Белок, г/л'},
+ {id:'glu',t:'num',l:'Глюкоза ликвора, ммоль/л'},
+ {id:'bglu',t:'num',l:'Глюкоза крови, ммоль/л (за 0–2 часа до пункции)'},
+ {id:'lac',t:'num',l:'Лактат ликвора, ммоль/л'}];
+const F2b=[
+ {id:'gram',t:'seg',l:'Окраска мазка по Граму',ch:[['nd','не делали'],['neg','бактерии не найдены'],['pos','найдены бактерии']]},
+ {id:'atyp',t:'seg',l:'Цитологическое исследование',ch:[['nd','не делали'],['neg','атипичных клеток нет'],['pos','атипичные клетки']]},
+ {id:'ocb',t:'seg',l:'Олигоклональные полосы IgG',ch:[['nd','не делали'],['neg','нет'],['t2','2 тип — только в ликворе'],['m','зеркальные — 4 тип']]},
+ {id:'ada',t:'num',l:'Аденозиндезаминаза (АДА), Ед/л'}];
+const ALL=[F1,F2,F2b].flat(), P=id=>ALL.find(x=>x.id===id);
+const SK='csf-st';let O={},TAG='';
+function dflt(){O={};ALL.forEach(p=>{let d=p.d;if(d===undefined)d=p.t==='seg'?p.ch[0][0]:p.t==='multi'?[]:'';O[p.id]=Array.isArray(d)?d.slice():d})}
+dflt();try{const x=JSON.parse(localStorage.getItem(SK));if(x&&x.O){Object.assign(O,x.O);TAG=x.tag||''}}catch(e){}
+const save=()=>{try{localStorage.setItem(SK,JSON.stringify({O,tag:TAG}))}catch(e){}};
+function optHTML(p){const lab=p.l;
+ if(p.t==='seg'||p.t==='multi')return `<div class="q"><span class="ql">${lab}</span><div class="seg3">${p.ch.map((c,i)=>{const on=p.t==='seg'?O[p.id]===c[0]:O[p.id].includes(c[0]);return `<button data-o="${p.id}" data-i="${i}" class="${on?'on':''}">${esc(c[1])}</button>`}).join('')}</div></div>`;
+ return `<label class="f q">${lab}<input type="text" inputmode="decimal" autocomplete="off" data-o="${p.id}" value="${esc(O[p.id])}"></label>`}
+const FORMS={f1:F1,f2:F2,f2b:F2b};
+function renderForms(){for(const k in FORMS)$(k).innerHTML=FORMS[k].map(optHTML).join('')}
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-o]');if(!b)return;const p=P(b.dataset.o),v=p.ch[+b.dataset.i][0];
+ if(p.t==='seg')O[p.id]=v;else{const a=O[p.id],k=a.indexOf(v);k>=0?a.splice(k,1):a.push(v)}renderForms();save()});
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset.o&&P(t.dataset.o).t==='num'){O[t.dataset.o]=t.value.trim();save()}});
+
+// ===== расчёт =====
+function derive(){
+ const has=k=>O.cl.includes(k), w0=nv(O.wbc), rbc=nv(O.rbc)||0, p0=nv(O.prot);
+ const wR=w0==null?null:w0/(O.cu==='3'?3:1);
+ const trauma=rbc>=1000&&O.app!=='xa';
+ const W=wR==null?null:trauma?Math.max(0,wR-rbc/700):wR;
+ const Pr=p0==null?null:trauma?Math.max(0,p0-rbc/1000*0.01):p0;
+ const N=nv(O.neu), Eo=nv(O.eos), M=N==null?null:Math.max(0,100-N-(Eo||0));
+ const g=nv(O.glu), bg=nv(O.bglu), R=g!=null&&bg?g/bg:null;
+ const G=g==null?null:R!=null?(R<0.4?'vl':R<0.5?'l':R<0.6?'b':'n'):(g<1.9?'vl':g<2.5?'l':'n');
+ const L=nv(O.lac), op=nv(O.op), pn=O.age==='o'?0.6:0.45;
+ const eos=W!=null&&Eo!=null&&W>=10&&(Eo>=10||W*Eo/100>=10);
+ return {has,wR,W,rbc,trauma,Pr,p0,N,M,Eo,eos,g,bg,R,G,L,op,pn,ada:nv(O.ada),bw:nv(O.bwbc),na:nv(O.na)}}
+function thwaites(D){if(O.age==='c'||D.bw==null||D.W==null||D.N==null)return null;
+ const s=(O.age==='y'?0:2)+(D.bw>=15?4:0)+(O.dur==='s'||O.dur==='c'?-5:0)+(D.W>=900?3:0)+(D.N>=75?4:0);return s}
+const GL={vl:'резко снижена',l:'снижена',b:'на нижней границе',n:'в норме'};
+function pattern(D){
+ if(D.W==null&&D.Pr==null&&D.g==null)return null;
+ const W=D.W, parts=[];let head;
+ if(O.app==='xa'||(D.rbc>=1000&&O.app==='bl'))parts.push(O.app==='xa'?'ксантохромия — признак крови в ликворе давностью больше 12 часов':'примесь крови');
+ if(W==null)head='Цитоз не указан';
+ else if(W<=5)head=D.Pr!=null&&D.Pr>D.pn?'Белково-клеточная диссоциация':'Цитоз в норме';
+ else if(D.eos)head='Эозинофильный плеоцитоз';
+ else{const lvl=W<=50?'небольшой':W<=500?'умеренный':W<=1000?'выраженный':'резко выраженный';
+  const typ=D.N==null?'':D.N>=50?' нейтрофильный':' лимфоцитарный (мононуклеарный)';head=cap(lvl)+typ+' плеоцитоз';
+  if(W<=10&&D.Pr!=null&&D.Pr>D.pn)head+=' с повышенным белком';}
+ if(D.Pr!=null&&!/диссоциация/.test(head))parts.push(D.Pr>D.pn?`белок повышен (${fm(D.Pr)} г/л${D.Pr>3?', резко':''})`:'белок в норме');
+ if(D.G)parts.push('глюкоза '+GL[D.G]+(D.R!=null?` (соотношение с кровью ${fm(D.R)})`:''));
+ if(D.L!=null)parts.push(D.L>=3.5?`лактат повышен (${fm(D.L)} ммоль/л)`:`лактат ${fm(D.L)} ммоль/л`);
+ if(D.op!=null)parts.push(D.op>25?`давление повышено (${fm(D.op)} см вод. ст.)`:`давление ${fm(D.op)} см вод. ст.`);
+ return {head,parts}}
+
+// ===== дифференциальный ряд =====
+const B=(c,n,why,arr,txt)=>{if(c){arr.s+=n;if(txt)arr.r.push(txt)}};
+const DX=[
+ {id:'bac',n:'Бактериальный менингит',f(D,a){const W=D.W;if(W==null||W<=5){a.s=-9;return}
+   B(W>=1000,3,0,a,`цитоз ${Math.round(W)} в 1 мкл`);B(W>=100&&W<1000,1,0,a);B(D.N!=null&&D.N>=80,2,0,a,`нейтрофилы ${D.N}%`);B(D.N!=null&&D.N>=50&&D.N<80,1,0,a);
+   B(D.G==='vl',3,0,a,'глюкоза резко снижена');B(D.G==='l',1,0,a);B(D.Pr!=null&&D.Pr>2,2,0,a,`белок ${fm(D.Pr)} г/л`);B(D.Pr!=null&&D.Pr>1&&D.Pr<=2,1,0,a);
+   B(D.L!=null&&D.L>=3.5,3,0,a,'лактат ≥ 3,5 ммоль/л');B(D.L!=null&&D.L<3.5&&O.ab==='n',-3,0,a);B(O.app==='op',1,0,a,'мутный ликвор');
+   B(O.gram==='pos',6,0,a,'бактерии в мазке');B(O.dur==='h'||O.dur==='d',1,0,a);B(O.dur==='c',-3,0,a);B(D.has('rash'),2,0,a,'сыпь');B(D.has('ent'),1,0,a,'отит или синусит');
+   B(D.N!=null&&D.N<50&&O.ab==='n'&&W<1000,-2,0,a);B(O.ab==='y'&&W>=10,1,0,a,'антибиотики до пункции могли «смазать» картину')},
+  t:['посев ликвора и крови (кровь — до антибиотика, если это не задерживает лечение)','ПЦР (полимеразная цепная реакция) ликвора на менингококк, пневмококк, гемофильную палочку, листерию','прокальцитонин и С-реактивный белок крови']},
+ {id:'lis',n:'Листериозный менингит или ромбэнцефалит',f(D,a){const W=D.W;if(W==null||W<=5||!(O.age==='o'||O.imm!=='n')){a.s=-9;return}
+   a.s+=2;a.r.push(O.age==='o'?'возраст старше 50 лет':'иммуносупрессия');B(D.has('cn'),2,0,a,'черепные нервы — возможен ромбэнцефалит');B(D.G==='l'||D.G==='vl',1,0,a);B(D.N!=null&&D.N>=20&&D.N<=80,1,0,a,'смешанный клеточный состав')},
+  t:['посев крови и ликвора на листерию','МРТ (магнитно-резонансная томография) ствола мозга при поражении черепных нервов']},
+ {id:'vir',n:'Вирусный (асептический) менингит',f(D,a){const W=D.W;if(W==null||W<=5){a.s=-9;return}
+   B(W>=10&&W<=500,2,0,a,`цитоз ${Math.round(W)} в 1 мкл`);B(W>500&&W<=1000,1,0,a);B(W>2000,-2,0,a);B(D.M!=null&&D.M>=50,2,0,a,'преобладают лимфоциты');
+   B(D.N!=null&&D.N>=50&&O.dur==='h',1,0,a,'в первые 48 часов вирусный менингит бывает нейтрофильным');
+   B(D.G==='n',2,0,a,'глюкоза в норме');B(D.G==='vl',-3,0,a);B(D.G==='l',-1,0,a);B(D.Pr!=null&&D.Pr<=1,1,0,a);B(D.Pr!=null&&D.Pr>1.5,-1,0,a);
+   B(D.L!=null&&D.L<3.5,1,0,a,'лактат не повышен');B(D.L!=null&&D.L>=3.5,-2,0,a);B(D.has('fev')&&D.has('men'),1,0,a);B(D.has('enc'),-2,0,a);B(O.dur==='h'||O.dur==='d',1,0,a);B(O.dur==='c',-2,0,a);B(O.imm==='hiv',1,0,a,'первичная ВИЧ-инфекция тоже даёт асептический менингит')},
+  t:['ПЦР ликвора на энтеровирусы, вирус простого герпеса 1 и 2 типа, вирус варицелла-зостер','IgM к вирусу клещевого энцефалита в крови и ликворе (тёплый сезон, эндемичный район)','ВИЧ: антитела и антиген p24']},
+ {id:'hsv',n:'Герпетический или другой вирусный энцефалит',f(D,a){if(!D.has('enc')){a.s=-9;return}
+   a.s+=3;a.r.push('энцефалопатия');B(D.has('sz'),2,0,a,'судороги');B(D.has('foc'),1,0,a,'очаговая симптоматика');B(D.has('fev'),1,0,a,'лихорадка');
+   B(D.W!=null&&D.W>5&&D.W<=500,2,0,a,'умеренный плеоцитоз');B(D.M!=null&&D.M>=50,1,0,a);B(D.rbc>=100&&D.rbc<1000,1,0,a,'эритроциты в ликворе (геморрагический некроз)');B(D.G==='n',1,0,a);
+   B(D.W!=null&&D.W<=5,0,0,a,'нормальный цитоз в первые сутки энцефалит не исключает')},
+  t:['ПЦР ликвора на вирус простого герпеса 1 и 2 типа и вирус варицелла-зостер; при отрицательном результате в первые 72 часа — повторить через 3–7 дней','МРТ головного мозга (височные доли, островок)','ЭЭГ (электроэнцефалография)']},
+ {id:'tb',n:'Туберкулёзный менингит',f(D,a){const W=D.W;if(W==null||W<=5){a.s=-9;return}
+   B(O.dur==='s'||O.dur==='c',2,0,a,'подострое течение');B(O.dur==='h',-2,0,a);B(W>=10&&W<=500,2,0,a);B(D.M!=null&&D.M>=50,1,0,a,'лимфоцитарный состав');
+   B(D.G==='l'||D.G==='vl',2,0,a,'глюкоза снижена');B(D.G==='n',-2,0,a);B(D.Pr!=null&&D.Pr>1,2,0,a,`белок ${fm(D.Pr)} г/л`);B(D.Pr!=null&&D.Pr>2.5,1,0,a);
+   B(D.has('cn'),2,0,a,'черепные нервы — базальный менингит');B(D.has('tb'),3,0,a,'туберкулёз в анамнезе или контакт');B(O.imm==='hiv',2,0,a,'ВИЧ');
+   B(D.na!=null&&D.na<135,1,0,a,'гипонатриемия');B(D.ada!=null&&D.ada>=10,3,0,a,`АДА ${fm(D.ada)} Ед/л`);B(D.ada!=null&&D.ada<4,-2,0,a);
+   const th=thwaites(D);B(th!=null&&th<=4,2,0,a,`шкала Thwaites ${String(th).replace('-','−')} — за туберкулёз`);B(th!=null&&th>4,-2,0,a)},
+  t:['ПЦР ликвора на ДНК микобактерий (Xpert MTB/RIF Ultra), микроскопия и посев большого объёма ликвора (не меньше 6 мл)','АДА ликвора','КТ (компьютерная томография) грудной клетки; МРТ с контрастом — базальный менингит, туберкулёмы, гидроцефалия','консультация фтизиатра']},
+ {id:'fun',n:'Криптококковый или другой грибковый менингит',f(D,a){if(O.imm==='n'&&!(O.dur==='c'&&(D.G==='l'||D.G==='vl'))){a.s=-9;return}
+   B(O.imm==='hiv',3,0,a,'ВИЧ');B(O.imm==='is',2,0,a,'иммуносупрессия');B(O.dur==='s'||O.dur==='c',2,0,a,'подострое течение');B(D.op!=null&&D.op>25,2,0,a,`давление ${fm(D.op)} см вод. ст.`);
+   B(D.G==='l'||D.G==='vl',1,0,a,'глюкоза снижена');B(D.M!=null&&D.M>=50,1,0,a);B(D.W!=null&&D.W<=50&&O.imm==='hiv',1,0,a,'при ВИЧ цитоз бывает минимальным')},
+  t:['криптококковый антиген (CrAg) в ликворе и крови','окраска тушью, посев на грибы']},
+ {id:'lym',n:'Нейроборрелиоз',f(D,a){const W=D.W;if(!['tick','fp2','cn','rad'].some(D.has)){a.s=-9;return}
+   B(D.has('tick'),3,0,a,'укус клеща или эритема');B(D.has('fp2'),3,0,a,'двусторонний парез лицевых нервов');B(D.has('cn')&&!D.has('fp2'),1,0,a,'черепные нервы');B(D.has('rad'),2,0,a,'корешковая боль (синдром Баннварта)');
+   B(O.dur==='s',2,0,a,'подострое течение');B(O.dur==='c',1,0,a);B(D.M!=null&&D.M>=50,1,0,a);B(W!=null&&W>=10&&W<=1000,1,0,a);B(D.G==='n',1,0,a);B(D.G==='vl',-2,0,a);B(W!=null&&W<=5,-2,0,a)},
+  t:['индекс интратекального синтеза антител к боррелиям: парные сыворотка и ликвор в один день','ИФА (иммуноферментный анализ) и иммуноблот крови','CXCL13 в ликворе, если доступен']},
+ {id:'syph',n:'Нейросифилис',f(D,a){const W=D.W;if(!(O.imm==='hiv'||D.has('cn')||(D.has('enc')&&O.dur==='c'))){a.s=-9;return}
+   B(O.imm==='hiv',2,0,a,'ВИЧ');B(D.has('cn'),1,0,a,'черепные нервы');B(D.has('enc')&&(O.dur==='c'),1,0,a,'хронические когнитивные или психические нарушения');B(O.dur==='c',1,0,a);
+   B(D.M!=null&&D.M>=50,1,0,a);B(W!=null&&W>5&&W<=100,1,0,a);B(W!=null&&W>500,-2,0,a)},
+  t:['реакция микропреципитации и РПГА (реакция пассивной гемагглютинации) или ИФА крови; при положительных — VDRL (Venereal Disease Research Laboratory) ликвора']},
+ {id:'sarc',n:'Нейросаркоидоз',f(D,a){const W=D.W;if(!['sarc','cn','fp2','myel'].some(D.has)){a.s=-9;return}
+   B(D.has('sarc'),3,0,a,'системные признаки саркоидоза');B(D.has('cn'),2,0,a,'черепные нервы');B(D.has('fp2'),2,0,a,'двусторонний парез лицевых нервов');B(D.has('myel'),1,0,a,'миелит');
+   B(O.dur==='c',2,0,a,'хроническое течение');B(O.dur==='s',1,0,a);B(D.G==='l',1,0,a,'глюкоза снижена');B(D.Pr!=null&&D.Pr>1,1,0,a);B(D.M!=null&&D.M>=50,1,0,a);B(W!=null&&W>5&&W<=200,1,0,a);B(W!=null&&W>1000,-3,0,a)},
+  t:['КТ грудной клетки; при отрицательной и сохраняющемся подозрении — ПЭТ-КТ (позитронно-эмиссионная томография) для выбора места биопсии','АПФ (ангиотензин-превращающий фермент), кальций, растворимый рецептор интерлейкина-2 в крови; нормальный АПФ саркоидоз не исключает','МРТ головного и спинного мозга с контрастом, осмотр офтальмолога','цитология и посевы ликвора — исключить лимфому и туберкулёз до глюкокортикоидов']},
+ {id:'carc',n:'Карциноматоз или лимфома оболочек',f(D,a){if(!(['ca','cn','rad'].some(D.has)||O.atyp==='pos')){a.s=-9;return}
+   B(D.has('ca'),4,0,a,'онкологическое заболевание');B(O.atyp==='pos',6,0,a,'атипичные клетки');B(D.has('cn'),2,0,a,'черепные нервы');B(D.has('rad'),1,0,a,'корешковая симптоматика');
+   B(D.G==='l'||D.G==='vl',2,0,a,'глюкоза снижена');B(D.Pr!=null&&D.Pr>1,1,0,a);B(O.dur==='s'||O.dur==='c',1,0,a);B(D.W!=null&&D.W>5&&D.W<=100,1,0,a);B(D.W!=null&&D.W>1000,-3,0,a)},
+  t:['цитологическое исследование 2–3 раза, каждый раз не меньше 10 мл, быстрая доставка','проточная цитометрия ликвора при подозрении на лимфому','МРТ головного мозга и всего спинного мозга с контрастом']},
+ {id:'gbs',n:'Синдром Гийена — Барре',f(D,a){if(!D.has('flac')){a.s=-9;return}
+   a.s+=4;a.r.push('вялый восходящий парез');const dis=D.W!=null&&D.W<=10&&D.Pr!=null&&D.Pr>D.pn;B(dis,3,0,a,'белково-клеточная диссоциация');
+   B(D.W!=null&&D.W<=5&&D.Pr!=null&&D.Pr<=D.pn&&(O.dur==='h'||O.dur==='d'),0,0,a,'в первую неделю белок бывает нормальным');B(D.W!=null&&D.W>50,-4,0,a,'цитоз больше 50 — против: исключить ВИЧ, боррелиоз, цитомегаловирус, лимфому');B(D.W!=null&&D.W>10&&D.W<=50,-1,0,a)},
+  t:['ЭНМГ (электронейромиография)','спирометрия, ЖЕЛ (жизненная ёмкость лёгких) и контроль глотания в динамике']},
+ {id:'blk',n:'Блок ликворных путей, компрессия спинного мозга',f(D,a){if(!(D.Pr!=null&&D.Pr>2&&D.W!=null&&D.W<=20)){a.s=-9;return}
+   a.s+=2;a.r.push(`белок ${fm(D.Pr)} г/л при небольшом цитозе`);B(D.has('myel'),3,0,a,'миелопатия');B(D.Pr>5,1,0,a,'очень высокий белок (синдром Фруана)')},
+  t:['МРТ спинного мозга с контрастом']},
+ {id:'ms',n:'Рассеянный склероз или другое демиелинизирующее заболевание',f(D,a){if(!(O.ocb==='t2'||D.has('myel')||D.has('foc'))){a.s=-9;return}
+   B(O.ocb==='t2',4,0,a,'олигоклональные полосы 2 типа');B(D.W!=null&&D.W>5&&D.W<=50,1,0,a);B(D.W!=null&&D.W>50,-3,0,a);B(D.Pr!=null&&D.Pr<=1,1,0,a);B(D.G==='n',1,0,a);
+   B(D.has('myel'),1,0,a);B(D.has('foc'),1,0,a);B(D.has('fev'),-1,0,a)},
+  t:['МРТ головного и спинного мозга с контрастом','олигоклональные полосы и IgG-индекс (парные сыворотка и ликвор)','антитела к аквапорину-4 и MOG (миелин-олигодендроцитарному гликопротеину) при миелите или неврите зрительного нерва']},
+ {id:'ae',n:'Аутоиммунный энцефалит',f(D,a){if(!D.has('enc')&&!D.has('sz')){a.s=-9;return}
+   B(D.has('enc'),2,0,a,'энцефалопатия');B(D.has('sz'),2,0,a,'судороги');B(D.W!=null&&D.W>5&&D.W<=100,1,0,a);B(O.ocb==='t2',1,0,a,'олигоклональные полосы');B(D.G==='n',1,0,a);
+   B(O.dur==='s',1,0,a,'подострое течение (до 3 месяцев)');B(D.W!=null&&D.W>500,-3,0,a)},
+  t:['антитела к NMDA-рецептору в ликворе и крови; LGI1 и CASPR2 в крови','ЭЭГ, МРТ с контрастом','онкопоиск (тератома яичника, мелкоклеточный рак лёгкого)']},
+ {id:'pm',n:'Параменингеальный очаг: абсцесс, эмпиема, остеомиелит',f(D,a){if(!(D.has('ent')||D.has('foc'))){a.s=-9;return}
+   B(D.has('ent'),3,0,a,'отит, синусит или мастоидит');B(D.has('foc'),2,0,a,'очаговая симптоматика');B(D.W!=null&&D.W>=10&&D.W<=500,1,0,a);B(D.G==='n',1,0,a,'глюкоза в норме при плеоцитозе')},
+  t:['КТ или МРТ головного мозга с контрастом; КТ височных костей и пазух','консультация ЛОР-врача, нейрохирурга']},
+ {id:'vent',n:'Вентрикулит, инфекция шунта или дренажа',f(D,a){if(O.ns!=='y'){a.s=-9;return}
+   a.s+=4;a.r.push('нейрохирургическое вмешательство');B(D.W!=null&&D.W>=50,1,0,a);B(D.G==='l'||D.G==='vl',1,0,a);B(D.L!=null&&D.L>=4,1,0,a,'лактат ≥ 4 ммоль/л')},
+  t:['посев ликвора из шунта или дренажа, повторно','консультация нейрохирурга: удаление или замена инфицированного устройства']},
+ {id:'sah',n:'Субарахноидальное кровоизлияние',f(D,a){
+   B(O.app==='xa',4,0,a,'ксантохромия');B(D.has('ths'),3,0,a,'громоподобная головная боль');B(O.app==='bl'&&D.rbc>=1000,1,0,a,'кровянистый ликвор');B(D.rbc>=10000,1,0,a)},
+  t:['КТ-ангиография сосудов головного мозга','спектрофотометрия ликвора на билирубин (не раньше 12 часов от начала боли)']},
+ {id:'eos',n:'Эозинофильный менингит',f(D,a){if(!D.eos){a.s=-9;return}
+   a.s+=6;a.r.push('эозинофилов 10% и больше')},
+  t:['паразиты: токсокароз, цистицеркоз, эхинококкоз — серология, МРТ','реакция на шунт или лекарства; лимфома и лейкоз — цитология и проточная цитометрия; кокцидиоидоз (путешествия)']},
+ {id:'drg',n:'Лекарственный асептический менингит',f(D,a){if(!D.has('drug')){a.s=-9;return}
+   a.s+=3;a.r.push('недавний приём препарата, вызывающего асептический менингит');B(D.G==='n',1,0,a);B(D.W!=null&&D.W>=50,1,0,a)},
+  t:['отменить препарат; бактериальный менингит исключить посевом и ПЦР']},
+ {id:'mol',n:'Рецидивирующий доброкачественный менингит (Молларе)',f(D,a){if(!D.has('rel')){a.s=-9;return}a.s+=3;a.r.push('повторные эпизоды');B(D.G==='n',1,0,a)},
+  t:['ПЦР ликвора на вирус простого герпеса 2 типа','исключить ликворею (бета-2-трансферрин) и эпидермоидную кисту (МРТ)']}];
+function ddx(D){return DX.map(x=>{const a={s:0,r:[]};x.f(D,a);return Object.assign({},x,{s:a.s,r:a.r})}).filter(x=>x.s>=3).sort((a,b)=>b.s-a.s)}
+
+// ===== срочное =====
+function urgent(D,L){const u=[],top=L[0]&&L[0].id, bac=L.find(x=>x.id==='bac'), sc=bac?bac.s:0;
+ const bacHi=O.gram==='pos'||sc>=7||(D.W!=null&&D.W>=100&&D.N!=null&&D.N>=50&&(D.G==='vl'||(D.L!=null&&D.L>=3.5)||D.N>=80));
+ const bacMid=!bacHi&&bac&&(sc>=4||(O.ab==='y'&&D.W!=null&&D.W>=50));
+ if(bacHi||bacMid){const lis=O.age==='o'||O.imm!=='n', ns=O.ns==='y';
+  const rx=ns?['ванкомицин 15–20 мг/кг внутривенно каждые 8–12 часов (по уровню в крови) + меропенем 2 г каждые 8 часов (или цефепим 2 г каждые 8 часов)','дексаметазон при послеоперационном менингите не рекомендован']
+   :['дексаметазон 10 мг внутривенно каждые 6 часов 4 дня — до первой дозы антибиотика или вместе с ней; отменить, если подтвердится не пневмококк и не гемофильная палочка','цефтриаксон 2 г внутривенно каждые 12 часов','+ ванкомицин 15–20 мг/кг каждые 8–12 часов, если возможен резистентный пневмококк'].concat(lis?['+ ампициллин 2 г внутривенно каждые 4 часа — покрытие листерии (возраст старше 50 лет или иммуносупрессия)']:[]);
+  if(D.has('rash'))rx.push('сыпь — возможна менингококковая инфекция: изоляция, экстренное извещение, химиопрофилактика контактным');
+  u.push({c:bacHi?'bad':'warn',h:bacHi?'Высокая вероятность бактериального менингита — лечить сейчас':'Бактериальный менингит не исключён',b:(bacHi?'':'Пока нет посева и ПЦР, безопаснее начать эмпирическую терапию. ')+'Антибиотик — в течение часа, не дожидаясь результатов.',l:rx})}
+ if(O.ab==='y'&&D.W!=null&&D.W>5)u.push({c:'warn',h:'Антибиотики до пункции',b:'Посев часто стерилен, доля нейтрофилов и лактат снижаются, глюкоза восстанавливается. ПЦР сохраняет чувствительность дольше. При сомнении — лечить как бактериальный.'});
+ if(D.has('enc'))u.push({c:'warn',h:'Энцефалит: ацикловир, не дожидаясь ПЦР',b:'Нормальный ликвор в первые сутки энцефалит не исключает.',l:['ацикловир 10 мг/кг внутривенно каждые 8 часов (по фактической массе; при почечной недостаточности — снизить дозу), инфузия не меньше часа, достаточная гидратация']});
+ const tb=L.find(x=>x.id==='tb');if(tb&&tb.s>=8)u.push({c:'warn',h:'Высокая вероятность туберкулёзного менингита',b:'Задержка лечения ухудшает исход. При высокой клинической вероятности противотуберкулёзную терапию начинают эмпирически, не дожидаясь посева (рост — недели), вместе с дексаметазоном; решение — с фтизиатром.'});
+ if(D.op!=null&&D.op>25){const fn=L.find(x=>x.id==='fun');u.push({c:'warn',h:'Повышенное давление ликвора',b:fn&&fn.s>=5?'При криптококковом менингите давление выше 25 см вод. ст. — показание к разгрузочным пункциям: выпускать ликвор до давления ниже 20 или на 50% от исходного, ежедневно до стабилизации.':'Выше 25 см вод. ст. Исключить объёмное образование, тромбоз венозных синусов, криптококковый менингит.'})}
+ if(D.trauma)u.push({c:'info',h:'Примесь крови — возможна травматическая пункция',b:`Поправка: минус 1 лейкоцит на 700 эритроцитов и 0,01 г/л белка на 1000 эритроцитов. С поправкой: цитоз ${D.W!=null?Math.round(D.W):'—'} в 1 мкл, белок ${D.Pr!=null?fm(D.Pr):'—'} г/л. Травматическую пункцию отличает уменьшение эритроцитов от первой пробирки к третьей и отсутствие ксантохромии.`});
+ if(D.W!=null&&D.W<=5&&!(D.Pr!=null&&D.Pr>D.pn))u.push({c:'info',h:'Нормальный ликвор не исключает',b:'Вирусный энцефалит в первые сутки, синдром Гийена — Барре в первую неделю, менингит у пациентов с глубокой иммуносупрессией, параменингеальный очаг, рассеянный склероз.'});
+ return u}
+
+// ===== вывод =====
+const box=(c,h,b,l)=>`<div class="out ${c}"><b class="t">${h}</b>${b?esc(b):''}${l&&l.length?'<ul>'+l.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}</div>`;
+function compute(){const D=derive(), pt=pattern(D);
+ if(!pt){$('pat').innerHTML=box('info','Нет данных','Введите хотя бы цитоз, белок или глюкозу во вкладке «Ликвор».');$('urg').innerHTML='';$('ddx').innerHTML='';return {D,pt,L:[],U:[]}}
+ const th=thwaites(D);
+ $('pat').innerHTML=`<div class="card"><h2>Картина</h2><p class="big">${esc(pt.head)}</p><p>${esc(cap(pt.parts.join('; ')))}.</p>${th!=null?`<p class="muted">Шкала Thwaites: ${String(th).replace('-','−')} — ${th<=4?'за туберкулёзный менингит':'за бактериальный менингит'} (4 и меньше — туберкулёзный; менее надёжна при ВИЧ).</p>`:''}</div>`;
+ const L=ddx(D), U=urgent(D,L);
+ $('urg').innerHTML=U.map(u=>box(u.c,u.h,u.b,u.l)).join('');
+ $('ddx').innerHTML=`<div class="card"><h2>Дифференциальный ряд</h2>${L.length?L.map((x,i)=>`<div class="it"><b>${i+1}. ${esc(x.n)} <span class="bd${i<3&&x.s>=6?' ed':''}">${x.s>=8?'высокая вероятность':x.s>=5?'вероятно':'рассмотреть'}</span></b>${x.r.length?`<small>${esc(cap(x.r.join('; ')))}.</small>`:''}<small style="color:var(--body)">Досдать: ${esc(x.t.join('; '))}.</small></div>`).join(''):'<p class="muted">Ни один вариант не набрал достаточно признаков. Добавьте клинику во вкладке «Клиника».</p>'}<p class="muted" style="margin-top:10px">Порядок — по числу совпавших признаков, это не вероятность в процентах.</p></div>`;
+ return {D,pt,L,U}}
+function summary(){const {D,pt,L,U}=compute();if(!pt)return 'Нет данных ликвора.';
+ const v=[];if(D.op!=null)v.push(`давление открытия ${fm(D.op)} см вод. ст.`);
+ v.push({cl:'прозрачный',op:'мутный',bl:'кровянистый',xa:'ксантохромный'}[O.app]);
+ if(D.wR!=null)v.push(`цитоз ${fm(D.wR)} в 1 мкл${O.cu==='3'?` (${O.wbc}/3)`:''}${D.N!=null?` (нейтрофилы ${D.N}%, лимфоциты и моноциты ${Math.round(D.M)}%${D.Eo?`, эозинофилы ${D.Eo}%`:''})`:''}`);
+ if(D.rbc)v.push(`эритроциты ${D.rbc} в 1 мкл`);if(D.p0!=null)v.push(`белок ${fm(D.p0)} г/л`);
+ if(D.g!=null)v.push(`глюкоза ${fm(D.g)} ммоль/л${D.R!=null?` (крови ${fm(D.bg)}, соотношение ${fm(D.R)})`:''}`);if(D.L!=null)v.push(`лактат ${fm(D.L)} ммоль/л`);
+ if(O.gram!=='nd')v.push(O.gram==='pos'?'в мазке по Граму бактерии':'в мазке по Граму бактерии не найдены');if(O.atyp!=='nd')v.push(O.atyp==='pos'?'атипичные клетки':'атипичных клеток нет');
+ if(O.ocb!=='nd')v.push({neg:'олигоклональных полос нет',t2:'олигоклональные полосы 2 типа',m:'зеркальные олигоклональные полосы'}[O.ocb]);if(D.ada!=null)v.push(`АДА ${fm(D.ada)} Ед/л`);
+ let s=`Ликвор (${new Date().toLocaleDateString('ru-RU')}): ${v.join(', ')}.\nЗаключение: ${pt.head.toLowerCase()}${pt.parts.length?'; '+pt.parts.join('; '):''}.`;
+ if(D.trauma)s+=` С поправкой на примесь крови цитоз ${Math.round(D.W)} в 1 мкл.`;
+ if(L.length)s+='\nДифференциальный ряд: '+L.slice(0,4).map(x=>x.n.toLowerCase()).join('; ')+'.';
+ const rx=[];U.filter(u=>u.c!=='info'&&u.l).forEach(u=>u.l.forEach(x=>rx.push(x)));
+ const tests=[...new Set(L.filter((x,i)=>i===0||x.s>=5).slice(0,3).flatMap(x=>x.t))];
+ const r=[...rx,...tests];if(r.length)s+='\n\nРекомендовано:\n'+r.map((x,i)=>`${i+1}. ${cap(x.replace(/^\+ /,''))}.`).join('\n');
+ return s}
+
+// ===== вкладки =====
+const order=['s1','s2','s3','s4'],TN=['Клиника','Ликвор','Разбор','Итог'];let cur='s1';
+function show(s){cur=s;document.querySelectorAll('section').forEach(e=>e.classList.toggle('on',e.id===s));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+ $('crumbs').innerHTML=TN.map((x,i)=>`<span class="${order[i]===s?'on':''}">${i+1}. ${x}</span>`).join('');
+ document.querySelectorAll('section .prev').forEach(b=>b.style.visibility=s==='s1'?'hidden':'visible');window.scrollTo(0,0);
+ if(s==='s3')compute();if(s==='s4')$('sum').textContent=summary()}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll('section .prev').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);if(i>0)show(order[i-1])});
+document.querySelectorAll('section .next').forEach(b=>b.onclick=()=>{const i=order.indexOf(cur);show(order[(i+1)%order.length])});
+$('tag').value=TAG;$('tag').oninput=()=>{TAG=$('tag').value;save()};
+const MK='csf-mail';try{$('mail').value=localStorage.getItem(MK)||'dorogovvn2@zdrav.mos.ru'}catch(e){$('mail').value='dorogovvn2@zdrav.mos.ru'}
+$('mail').addEventListener('change',()=>{try{localStorage.setItem(MK,$('mail').value.trim())}catch(e){}});
+$('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}const t=$('tag').value.trim(),sub='Ликвор'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
+ location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(summary().replace(/\n/g,'\r\n'))};
+$('copy').onclick=async()=>{const b=$('copy');try{await navigator.clipboard.writeText(summary());b.textContent='Скопировано'}catch(e){b.textContent='Не удалось — выделите текст'}setTimeout(()=>b.textContent='Скопировать',1800)};
+let rT=0;$('reset').onclick=()=>{if(Date.now()-rT>2500){rT=Date.now();$('reset').textContent='Нажмите ещё раз';setTimeout(()=>$('reset').textContent='Новый пациент',2500);return}dflt();TAG='';$('tag').value='';save();renderForms();show('s1')};
+renderForms();show('s1');
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('/csf-k7m2qp-sw.js',{scope:'/csf-k7m2qp'}).catch(()=>{});
+</script>
+</body>
+</html>

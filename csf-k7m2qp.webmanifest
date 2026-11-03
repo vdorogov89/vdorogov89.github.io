@@ -1,0 +1,31 @@
+{
+ "id": "/csf-k7m2qp.html",
+ "name": "Ликвор: разбор",
+ "short_name": "Ликвор",
+ "lang": "ru",
+ "start_url": "/csf-k7m2qp.html",
+ "scope": "/csf-k7m2qp",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/csf-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/csf-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/csf-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
