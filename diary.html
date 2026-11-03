@@ -88,6 +88,7 @@ input[type=range]{width:100%; accent-color:var(--grad1); height:28px;}
 .chip.on{border-color:var(--grad1); background:rgba(79,224,255,0.12); color:var(--ink);}
 .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;}
 .btn-primary{padding:13px 24px; border-radius:100px; border:0; background:linear-gradient(120deg, var(--grad1), var(--grad2)); color:#08080D; font:600 15px 'Inter',sans-serif; cursor:pointer;}
+.btn-ghost.lvbtn{padding:7px 14px; font-size:13.5px;} .btn-ghost.lvbtn.on{background:rgba(183,155,255,0.18); border-color:#B79BFF;}
 .btn-ghost{padding:12px 22px; border-radius:100px; border:1px solid var(--line); background:transparent; color:var(--ink); font:500 15px 'Inter',sans-serif; cursor:pointer;}
 .btn-danger{padding:12px 22px; border-radius:100px; border:1px solid rgba(255,138,122,0.5); background:transparent; color:var(--warn); font:500 15px 'Inter',sans-serif; cursor:pointer;}
 .filebtn{display:inline-block;}
@@ -531,7 +532,7 @@ function wxText(pt,short){
 }
 function wxRange(){
   const t=today(); let start=dPlus(t,-2);
-  if(entries.length){const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); start=dPlus(first,-3);}
+  if(entries.length){const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); start=dPlus(first,-33);}
   const lim=dPlus(t,-400); if(start<lim) start=lim; return [start,t];
 }
 async function wxFetch(url){const r=await fetch(url); if(!r.ok) throw new Error(r.status); return r.json();}
@@ -748,6 +749,70 @@ function wxRiskRender(){
   $('wxRiskHide').onclick=()=>{try{localStorage.setItem('hd_wx_dis',dates.join(','));}catch(e){} box.hidden=true;};
   $('wxRiskGo').onclick=()=>{showTab('summary'); setTimeout(()=>{const h=[...document.querySelectorAll('#tab-summary h2')].find(x=>x.textContent==='Атмосферное давление'); if(h) h.scrollIntoView({behavior:'smooth',block:'start'});},50);};
 }
+// уровень давления: в каких диапазонах чаще болит (полдень; абсолютное и отклонение от своей нормы за 30 дней)
+const LVMIN=8;
+function wxLev(d){const pt=wxPoint(d,12); return pt?pt.p:null;}
+function wxDev(d){const v=wxLev(d); if(v==null) return null; let s=0,n=0; for(let k=1;k<=30;k++){const x=wxLev(dPlus(d,-k)); if(x!=null){s+=x;n++;}} return n>=20?v-s/n:null;}
+function pressLevel(start,end,hd){
+  const days=[]; for(let d=start; d<=end; d=dPlus(d,1)) days.push(d); const L=days.length;
+  const A=days.map(wxLev), D=days.map(wxDev), pain=days.map(d=>hd.has(d)?1:0);
+  const nA=A.filter(x=>x!=null).length; if(nA<40) return {short:true,nA};
+  const lo=Math.min(...A.filter(x=>x!=null)), hi=Math.max(...A.filter(x=>x!=null));
+  const C=[]; for(let T=Math.floor(lo/5)*5+5; T<hi; T+=5){C.push({f:'abs',s:'lo',T,m:A.map(x=>x==null?null:x<T?1:0)}); C.push({f:'abs',s:'hi',T,m:A.map(x=>x==null?null:x>=T?1:0)});}
+  [-10,-5,0,5,10].forEach(T=>{C.push({f:'dev',s:'lo',T,m:D.map(x=>x==null?null:x<T?1:0)}); C.push({f:'dev',s:'hi',T,m:D.map(x=>x==null?null:x>=T?1:0)});});
+  const ev=(c,sh)=>{let ni=0,pi=0,no=0,po=0; for(let i=0;i<L;i++){const v=c.m[i]; if(v==null) continue; const p=pain[(i+sh)%L]; if(v){ni++;pi+=p;} else {no++;po+=p;}}
+    return (ni<LVMIN||no<LVMIN||pi<4)?null:{ni,pi,no,po,a:pi/ni,b:po/no};};
+  const T=sh=>{let best=-1e9; C.forEach(c=>{const r=ev(c,sh); if(r&&r.a-r.b>best) best=r.a-r.b;}); return best;};
+  let best=null; C.forEach(c=>{const r=ev(c,0); if(!r) return; const A_=Math.round(r.a*100),B_=Math.round(r.b*100);
+    if(A_>=B_*1.5&&A_-B_>=10&&(!best||r.a-r.b>best.r.a-best.r.b)) best={c,r,A:A_,B:B_};});
+  let pm=null; if(best){const t0=T(0); let n=0,ge=0; for(let sh=3; sh<=L-3; sh++){const t=T(sh); if(t<=-1e8) continue; n++; if(t>=t0-1e-9) ge++;} if(n>=20) pm={n,ge,p:(ge+1)/(n+1)};}
+  // столбики
+  const bins=(vals,key,lab)=>{const B={}; vals.forEach((v,i)=>{if(v==null) return; const k=key(v); (B[k]=B[k]||{k,n:0,h:0}).n++; B[k].h+=pain[i];});
+    return Object.values(B).sort((a,b)=>a.k-b.k).map(b=>Object.assign(b,{l:lab(b.k)}));};
+  const absB=bins(A,v=>Math.floor(v/5)*5,k=>k+'–'+(k+4));
+  const DL={'-15':'< −10','-10':'−10…−5','-5':'−5…0','0':'0…+5','5':'+5…+10','10':'≥ +10'};
+  const devB=bins(D,v=>Math.max(-15,Math.min(10,Math.floor(v/5)*5)),k=>DL[k]);
+  const all=(vals)=>{let n=0,h=0; vals.forEach((v,i)=>{if(v!=null){n++;h+=pain[i];}}); return n?h/n:0;};
+  return {nA,nD:D.filter(x=>x!=null).length,absB,devB,rA:all(A),rD:all(D),best,pm};
+}
+function lvChart(B,rate,mode,sel){
+  const pr=mode==='print', C=pr?{b:'#7a4fd6',a:'#e08a00',g:'#ddd',t:'#555',l:'#333'}:{b:'#B79BFF',a:'#FFC56B',g:'rgba(255,255,255,0.08)',t:'rgba(255,255,255,0.55)',l:'rgba(255,255,255,0.7)'};
+  if(!B.length) return '';
+  const n=B.length, bw=Math.max(34,Math.min(60,Math.floor(320/n))), pl=8, W=pl*2+n*bw, Ht=170, pt=18, pb=36, ih=Ht-pt-pb;
+  const mx=Math.max(rate*100,...B.filter(b=>b.n>=LVMIN).map(b=>b.h/b.n*100),10), top=Math.ceil(mx/10)*10, ty=v=>pt+ih-(v/top)*ih;
+  let g=`<svg viewBox="0 0 ${W} ${Ht}" style="width:100%;max-width:${Math.max(W,340)}px;min-width:${Math.min(W,n*30)}px;height:auto" role="img" aria-label="Доля дней с головной болью по диапазонам давления">`;
+  g+=`<line x1="${pl}" x2="${W-pl}" y1="${ty(0)}" y2="${ty(0)}" stroke="${C.g}"/>`;
+  B.forEach((b,i)=>{const v=Math.min(top,b.h/b.n*100), x=pl+i*bw+4, w=bw-8, ok=b.n>=LVMIN, hl=sel&&sel(b.k), col=hl?C.a:C.b;
+    g+=`<rect x="${x}" y="${ty(v).toFixed(1)}" width="${w}" height="${(ty(0)-ty(v)).toFixed(1)}" rx="3" fill="${col}" opacity="${ok?0.85:0.25}"/>`;
+    g+=`<text x="${x+w/2}" y="${(ty(v)-4).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="${ok?C.l:C.t}">${ok?Math.round(v)+'%':'—'}</text>`;
+    g+=`<text x="${x+w/2}" y="${Ht-pb+13}" text-anchor="middle" font-size="9.5" fill="${C.t}">${b.l}</text>`;
+    g+=`<text x="${x+w/2}" y="${Ht-pb+26}" text-anchor="middle" font-size="9" fill="${C.t}">${b.n} дн.</text>`;});
+  g+=`<line x1="${pl}" x2="${W-pl}" y1="${ty(rate*100).toFixed(1)}" y2="${ty(rate*100).toFixed(1)}" stroke="${C.l}" stroke-dasharray="4 3" stroke-width="1"/>`;
+  return `<div class="chartbox" style="overflow-x:auto">${g}</svg></div>`;
+}
+document.addEventListener('click',e=>{const b=e.target.closest('.lvbtn'); if(b) lvSw(b,b.dataset.m);});
+function lvSw(btn,m){const box=btn.closest('.lvbox'); box.querySelectorAll('[data-lv]').forEach(x=>x.hidden=x.dataset.lv!==m); box.querySelectorAll('.lvbtn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));}
+function levelBlock(start,end,hd,mode){
+  const R=pressLevel(start,end,hd), pr=mode==='print', h=pr?'<h3>В каком диапазоне давления чаще болит голова</h3>':'<h2 style="font-size:1.05em">В каком диапазоне давления чаще болит голова</h2>';
+  if(R.short) return pr?'':h+`<p class="small">Для этого анализа нужно хотя бы 40 дней, по которым известно давление. Сейчас: ${R.nA}.</p>`;
+  const b=R.best, pm=R.pm, c=b&&b.c;
+  const sel=f=>c&&c.f===f?(k=>c.s==='lo'?k+5<=c.T:k>=c.T):null;
+  const cond=!c?'':c.f==='abs'?`при давлении ${c.s==='lo'?'ниже':'от'} ${c.T} мм рт. ст.${c.s==='hi'?' и выше':''}`
+    :c.s==='lo'?(c.T<=0?`когда давление ниже вашей обычной нормы${c.T<0?' на '+(-c.T)+' мм рт. ст. и больше':''}`:`когда давление ниже нормы или выше её меньше чем на ${c.T} мм рт. ст.`)
+    :(c.T>=0?`когда давление выше вашей обычной нормы${c.T>0?' на '+c.T+' мм рт. ст. и больше':''}`:`когда давление выше нормы или ниже её не больше чем на ${-c.T} мм рт. ст.`);
+  const head=b?`${cond[0].toUpperCase()+cond.slice(1)} голова болела в ${b.A}% дней (${b.r.pi} из ${b.r.ni}) против ${b.B}% в остальные дни (${b.r.po} из ${b.r.no}).`:'';
+  const perm=pm?` Проверка на случайность: такая же или большая разница при сдвиге дневника относительно погоды получилась ${pm.ge?`в ${pm.ge} из ${pm.n} сдвигов`:`ни в одном из ${pm.n} сдвигов`}.`:'';
+  const verdict=!b?'Ни в одном диапазоне давления — ни по абсолютной величине, ни относительно вашей обычной нормы — боль не бывала заметно чаще, чем в остальные дни.'
+    :!pm?head+' Данных пока мало, чтобы проверить, не случайность ли это.'
+    :pm.p<=0.05?head+perm+' Случайно такое бывает редко — похоже, уровень давления для вас имеет значение.'
+    :pm.p<=0.15?head+perm+' Это на грани: связь возможна, но может быть и совпадением. Понаблюдайте ещё 1–2 месяца.'
+    :head+perm+' Такая разница нередко получается и случайно — вывод делать рано.';
+  const cA=lvChart(R.absB,R.rA,mode,sel('abs')), cD=lvChart(R.devB,R.rD,mode,sel('dev'));
+  const note=`Столбик — доля дней с головной болью среди всех дней, когда давление (в полдень) было в этом диапазоне; под столбиком — сколько таких дней было. Пунктир — ваша средняя доля дней с болью. Бледные столбики — меньше ${LVMIN} дней, по ним выводов не делаем. «Отклонение от нормы» — разница с вашим средним давлением за предыдущие 30 дней: так убирается разница между сезонами.${pm?' Проверка учитывает, что перебирается сразу много порогов.':''} Низкое давление часто бывает сразу после падения, поэтому этот анализ и анализ перепадов выше не независимы: это совпадения по времени, а не доказательство причины.`;
+  if(pr) return h+`<p class="small">Абсолютное давление, мм рт. ст.</p>${cA}${cD?`<p class="small">Отклонение от вашей нормы, мм рт. ст.</p>${cD}`:''}<p>${verdict}</p><p class="pnote">${note}</p>`;
+  const first=c&&c.f==='dev'&&cD?'dev':'abs', btn=(m,t)=>`<button type="button" class="btn-ghost lvbtn${m===first?' on':''}" style="padding:7px 14px;font-size:13.5px;width:auto;display:inline-block;margin:0" data-m="${m}">${t}</button>`;
+  return `<div class="lvbox">${h}${cD?`<p style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 8px">${btn('abs','Абсолютное давление')}${btn('dev','Отклонение от нормы')}</p>`:''}<div data-lv="abs"${first==='abs'?'':' hidden'}>${cA}</div>${cD?`<div data-lv="dev"${first==='dev'?'':' hidden'}>${cD}<p class="small" style="margin-top:-6px">Сколько мм рт. ст. выше или ниже вашего среднего за 30 дней.</p></div>`:''}<p>${verdict}</p><p class="small">${note}</p></div>`;
+}
 function pressureBlock(list,months,mode){
   if(!wx.on||!wx.lat) return '';
   const t=today(); let start=months[0]+'-01'; const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); if(first>start) start=first;
@@ -777,8 +842,9 @@ function pressureBlock(list,months,mode){
   const NW=' style="white-space:nowrap"', cell=(dir,k)=>`<td${NW}${best&&best.dir===dir&&best.k===k?' class="amber"':''}>${P(H,dir,k)} / ${P(N,dir,k)}</td>`, rows=LAGS.map(([k,l])=>`<tr><td>${l}</td>${cell('fall',k)}${cell('rise',k)}${cell('any',k)}</tr>`).join('');
   const tbl=`<table><tr><th>Когда</th><th>Падение</th><th>Подъём</th><th>Любое</th></tr>${rows}</table>`;
   const note=`Дней с болью: ${hN}, без боли: ${nN}. В ячейках: % дней с болью / % дней без боли, у которых было резкое изменение давления (полдень к полудню предыдущих суток) в указанный день. «Любое» — падение или подъём вместе. ${best?`Выделено сочетание из вывода: ${best.dir==='any'?H.any[best.k]:H[best.dir][best.k]} из ${hN} дней с болью против ${N[best.dir][best.k]} из ${nN} дней без боли. `:''}${pm?'Проверка на случайность сохраняет серии боли и погодные волны и учитывает, что сравнивается сразу 12 вариантов. ':''}Чем больше месяцев записей, тем надёжнее вывод. Это совпадения по времени, а не доказательство причины. Данные: Open-Meteo, ${esc(wx.name)}.`;
-  if(mode==='print') return `<h2>Атмосферное давление (${esc(wx.name)})</h2>${chart}${tbl}<p>${verdict}</p><p class="pnote">${note}</p>`;
-  return title+chart+expl+`<div class="mtable">${tbl}</div><p>${verdict}</p><p class="small">${note}</p>`;
+  const lvb=levelBlock(start,end,hd,mode);
+  if(mode==='print') return `<h2>Атмосферное давление (${esc(wx.name)})</h2>${chart}${tbl}<p>${verdict}</p><p class="pnote">${note}</p>${lvb}`;
+  return title+chart+expl+`<div class="mtable">${tbl}</div><p>${verdict}</p><p class="small">${note}</p>`+lvb;
 }
 
 // аура
