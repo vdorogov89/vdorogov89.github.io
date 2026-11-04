@@ -93,6 +93,13 @@ textarea[data-k]{min-height:44px} #prev{max-height:none}
 <div class="app">
   <header><h1>Неврологический статус</h1><span id="cnt"></span></header>
 
+<section id="s0">
+  <p class="muted">Скрининговые вопросы первичного приёма. Ответы попадают в начало итогового текста. Не вводите ФИО.</p>
+  <div id="analert"></div>
+  <div id="anbox"></div>
+  <div class="card"><h2>Текст для истории болезни</h2><pre id="anprev"></pre></div>
+</section>
+
 <section id="s1" class="on">
   <div class="card" style="padding:12px 14px">
     <input type="text" id="q" placeholder="Заболевание: нейронит, L5, инсульт, кома, ХИГМ…" autocomplete="off" autocapitalize="off" spellcheck="false">
@@ -145,7 +152,7 @@ textarea[data-k]{min-height:44px} #prev{max-height:none}
   <p class="copy">© 2026 Василий Дорогов, врач-невролог. Все права защищены. Копирование, переработка и распространение без письменного разрешения автора запрещены.</p>
 </section>
 </div>
-<nav class="tabs"><button data-s="s1" class="on">Конструктор</button><button data-s="s2">Статус</button><button data-s="s3">Итог</button><button data-s="s4">Диктовка</button><button data-s="s5">Шаблон</button></nav>
+<nav class="tabs"><button data-s="s0">Анамнез</button><button data-s="s1" class="on">Конструктор</button><button data-s="s2">Статус</button><button data-s="s3">Итог</button><button data-s="s4">Диктовка</button><button data-s="s5">Шаблон</button></nav>
 <script>
 const $=id=>document.getElementById(id);
 // ===== справочники =====
@@ -872,6 +879,29 @@ gen(o,c){const h=k=>o.sg.includes(k);
  const N={cf:'спутанность',op:'офтальмоплегия',ny:'нистагм',at:'атаксия',ko:'корсаковский синдром',pn:'полинейропатия'};
  c.sy('Энцефалопатия Вернике: '+o.sg.map(k=>N[k]).join(', '));
 }},
+{id:'ssnms',g:'other',n:'Серотониновый синдром и злокачественный нейролептический синдром',s:'серотониновый синдром злокачественный нейролептический знс клонус ригидность гипертермия кфк трамадол линезолид ондансетрон антидепрессант нейролептик антихолинергический',
+info:'Серотониновый синдром — часы (обычно до 24 часов): клонус, гиперрефлексия больше в ногах, тремор, мидриаз, потливость, диарея. Злокачественный нейролептический синдром (ЗНС) — дни (1–3 суток): свинцовая ригидность, брадикинезия, угнетение сознания, креатинфосфокиназа выше 4 норм. Гипертермия и вегетативная нестабильность бывают при обоих. Подробно — карточка serotoninovyj-zns-kartochka.netlify.app.',
+o:[{t:'multi',id:'dr',l:'Препараты',ch:[['s2','два и более серотонинергических'],['s1','серотонинергический: новый или повышение дозы'],['nl','нейролептик, метоклопрамид: старт или повышение дозы'],['pw','отмена противопаркинсонических'],['ach','холинолитики (амитриптилин, дифенгидрамин, тригексифенидил)']],d:['s2']},
+ {t:'seg',id:'tm',l:'Как быстро развилось',ch:[['h','часы (до 24 ч)'],['d','дни (1–3 суток)']],d:'h'},
+ {t:'multi',id:'sg',l:'Признаки',ch:[['csp','спонтанный клонус'],['cin','индуцируемый клонус стоп'],['coc','глазной клонус'],['hr','гиперрефлексия, больше в ногах'],['tr','тремор'],['my','миоклонус'],['ag','возбуждение, тревога'],['md','мидриаз'],['sw','потливость'],['di','диарея'],['rg','свинцовая ригидность всех конечностей'],['bk','брадикинезия, мутизм'],['dp','угнетение сознания'],['dry','сухая горячая кожа, кишечник «молчит»']],d:['cin','hr','tr','ag','sw']},
+ {t:'seg',id:'t',l:'Температура',ch:[['n','до 38 °C'],['38','38–38,5 °C'],['hi','выше 38,5 °C, растёт'],['41','выше 41 °C']],d:'n'},
+ {t:'seg',id:'ck',l:'Креатинфосфокиназа (КФК)',ch:[['nd','не определяли'],['n','норма или до 4 норм'],['hi','выше 4 верхних границ нормы']],d:'nd'},
+ {t:'multi',id:'cx',l:'Осложнения',ch:[['rs','нарушение дыхания или глотания'],['au','скачки давления, пульс > 120, аритмия'],['kd','растёт креатинин, тёмная моча, гиперкалиемия'],['dic','признаки ДВС-синдрома (диссеминированного внутрисосудистого свёртывания)']],d:[]},
+ {t:'note',l:o=>{const v=ssv(o);return `<b>${v.dx}</b>${v.why?' — '+v.why:''}<br><b>Отменить:</b> ${v.stop}<br><b>Лечение:</b> ${v.rx}<br><b>${v.icu.length?'В реанимацию':'Реанимация пока не нужна'}:</b> ${v.icu.length?v.icu.join('; '):v.obs}`}}],
+gen(o,c){const h=k=>o.sg.includes(k),v=ssv(o);
+ if(h('dp'))c.r('cons','Сознание угнетено.');else if(h('ag'))c.r('cons','Сознание ясное; психомоторное возбуждение, тревога.');
+ if(h('md'))c.r('pup','Зрачки расширены, фотореакции сохранены.');
+ if(h('coc'))c.r('nyst','Глазной клонус (непроизвольные ритмичные движения глазных яблок).');
+ if(h('rg'))c.r('tone','Мышечный тонус повышен по пластическому типу во всех конечностях («свинцовая трубка»).');
+ if(h('hr')){c.rf('legs','b',4,3);c.rf('arms','b',3,3)}else if(h('rg'))c.rf('all','b',2,1);
+ const cl=[];if(h('csp'))cl.push('спонтанный клонус стоп');if(h('cin'))cl.push('индуцируемый клонус стоп');if(cl.length)c.a('path',cap(cl.join(', '))+' с двух сторон.');
+ const ex=[];if(h('tr'))ex.push('тремор рук');if(h('my'))ex.push('мультифокальный миоклонус');if(h('bk'))ex.push('брадикинезия, гипомимия, мутизм');if(ex.length)c.r('ext',cap(ex.join('; '))+'.');
+ const T={n:'не выше 38 °C',38:'38–38,5 °C',hi:'выше 38,5 °C',41:'выше 41 °C'}[o.t],ot=['температура тела '+T];if(h('sw'))ot.push('потливость');if(h('di'))ot.push('диарея');if(h('dry'))ot.push('кожа сухая, горячая, перистальтика ослаблена');
+ if(o.ck!=='nd')ot.push(o.ck==='hi'?'КФК выше 4 верхних границ нормы':'КФК не выше 4 норм');
+ c.a('other',cap(ot.join('; '))+'.');
+ if(v.icu.length)c.a('other','Показан перевод в отделение реанимации: '+v.icu.join('; ')+'.');
+ c.sy(v.sy);
+}},
 {id:'fnd',g:'other',n:'Функциональное (диссоциативное) неврологическое расстройство',s:'функциональное диссоциативное конверсионное психогенное гувер неэпилептические приступы',
 o:[{t:'seg',id:'sd',l:'Сторона',ch:SIDE,d:'l'},
  {t:'multi',id:'sg',l:'Позитивные признаки',ch:[['ho','симптом Гувера'],['gw','слабость «с провалами» (give-way)'],['dr','опускание руки без пронации'],['tr','функциональный тремор (вовлечение ритмом)'],['sn','чувствительность — граница точно по средней линии'],['gt','функциональная походка'],['pn','функциональные (неэпилептические) приступы']],d:['ho','gw']}],
@@ -885,6 +915,31 @@ gen(o,c){const S=SD[o.sd],h=k=>o.sg.includes(k);
  c.sy('Функциональное (диссоциативное) неврологическое расстройство: позитивные клинические признаки');
 }}
 ];
+function ssv(o){const h=k=>o.sg.includes(k),d=k=>o.dr.includes(k),ag=h('ag')||h('sw'),hot=o.t!=='n';
+ const hunter=h('csp')||(h('cin')&&ag)||(h('coc')&&ag)||(h('tr')&&h('hr'))||(h('rg')&&hot&&(h('coc')||h('cin')));
+ const ser=d('s2')||d('s1'),dop=d('nl')||d('pw');
+ const nms=dop&&h('rg')&&(hot||o.ck==='hi'),anc=d('ach')&&h('dry')&&!h('rg')&&!h('csp')&&!h('cin');
+ let dx,why='',sy;
+ if(hunter&&nms){dx='Смешанная картина: признаки и серотонинового синдрома, и ЗНС';why='клонус говорит за серотониновый синдром, свинцовая ригидность — за ЗНС';sy='Смешанный серотониновый и нейролептический синдром'}
+ else if(hunter){dx='Серотониновый синдром'+(ser?'':' — но серотонинергический препарат не отмечен');why='выполнены критерии Хантера'+(o.tm==='d'?'; развитие за дни нетипично — проверьте ЗНС':'');sy='Серотониновый синдром (критерии Хантера)'}
+ else if(nms){dx='Злокачественный нейролептический синдром';why='блокатор дофамина или отмена противопаркинсонических + ригидность + '+(hot?'гипертермия':'высокая КФК')+(o.ck==='nd'?'; определите КФК':'');sy='Злокачественный нейролептический синдром'}
+ else if(anc){dx='Антихолинергический синдром, а не серотониновый';why='сухая кожа и «молчащий» кишечник без клонуса';sy='Антихолинергический синдром'}
+ else if(h('rg')&&!dop){dx='Ригидность без блокатора дофамина';why='исключить кататонию, отмену баклофена, столбняк, инфекцию нервной системы';sy='Ригидность неясного генеза'}
+ else {dx='Критерии пока не выполнены';why=ser?'для серотонинового синдрома нужен клонус или тремор с гиперрефлексией':'отметьте препараты и признаки';sy='Подозрение на лекарственный гипертермический синдром'}
+ const sev=o.t==='41'?' тяжёлый':o.t==='hi'?' средней тяжести':'';
+ if(/^Серотон/.test(sy)||/^Злокач/.test(sy))sy+=sev?','+sev+' ('+{hi:'температура выше 38,5 °C',41:'температура выше 41 °C'}[o.t]+')':'';
+ const isS=/Серотон|Смешан/.test(dx),isN=/нейролепт|ЗНС/.test(dx)&&!/^Серотон/.test(dx);
+ const stop=[isS||ser?'все серотонинергические препараты, включая трамадол, ондансетрон, линезолид':null,isN||dop?'нейролептик и другие блокаторы дофамина (метоклопрамид, прометазин); литий':null,d('pw')?'— наоборот, вернуть отменённые противопаркинсонические в прежней дозе':null,anc?'холинолитики':null].filter(Boolean).join('; ')||'препарат, с которым связано начало';
+ const rx=[];
+ if(isS)rx.push('бензодиазепины при возбуждении (диазепам 5–10 мг или лоразепам 1–2 мг внутривенно), ципрогептадин 12 мг через зонд, затем 2 мг каждые 2 часа; без физической фиксации; бромокриптин и дантролен не назначать');
+ if(isN)rx.push('лоразепам 1–2 мг внутривенно каждые 4–6 часов; бромокриптин 2,5 мг 2–3 раза в день или амантадин 100 мг 2–3 раза в день; при тяжёлой ригидности и гипертермии — дантролен 1–2,5 мг/кг внутривенно');
+ if(anc)rx.push('отмена холинолитиков, бензодиазепины при возбуждении, наблюдение');
+ rx.push('инфузия, наружное охлаждение (жаропонижающие не помогают), контроль КФК, креатинина, калия; сукцинилхолин не применять');
+ const icu=[];if(o.t==='41')icu.push('температура выше 41 °C — седация, интубация, миорелаксация без отлагательства');else if(o.t==='hi')icu.push('температура выше 38,5 °C'+(h('rg')?' с ригидностью':''));
+ if(h('dp'))icu.push('угнетение сознания');const CX={rs:'нарушение дыхания или глотания',au:'вегетативная нестабильность',kd:'рабдомиолиз и острое повреждение почек',dic:'ДВС-синдром'};o.cx.forEach(k=>icu.push(CX[k]));
+ if(h('rg')&&isN&&!icu.length&&o.ck==='hi')icu.push('ЗНС с высокой КФК — риск рабдомиолиза');
+ const obs=isN?'ЗНС даже в лёгкой форме — ежедневный контроль КФК, креатинина и электролитов':'отмена препарата и наблюдение 6–24 часа в отделении';
+ return {dx,why,sy,stop,rx:rx.join('; '),icu,obs}}
 function gcs(o){const v=o.V==='T'?1:o.V,t=o.E+v+o.M;const lv=t>=15?'ясное':t>=13?'умеренное оглушение':t>=11?'глубокое оглушение':t>=9?'сопор':t>=7?'кома I (умеренная)':t>=5?'кома II (глубокая)':'кома III (атоническая)';return{t,lv}}
 function nih(o){return ['a1','b1','c1','n2','n3','n4','ra','la','rl','ll','n7','n8','n9','n10','n11'].reduce((a,k)=>a+(+o[k]||0),0)}
 function pz(o){return o.ra||o.la||o.rl||o.ll}
@@ -997,7 +1052,7 @@ function renderPath(PT){const k=Object.keys(PT);if(!k.length)return null;
  return cap(k.map(n=>'симптом '+n+' '+(PT[n].r&&PT[n].l?'с двух сторон':PT[n].r?'справа':'слева')).join(', '))+'.'}
 function recompute(){const b=build();GEN=b.out;SYN=b.syn;const p=document.getElementById('prev');if(p)p.textContent=summary();save()}
 const fieldText=k=>ST.ov[k]!=null?ST.ov[k]:GEN[k]||'';
-function summary(){let s='Неврологический статус.\n'+FL.map(f=>fieldText(f.k).trim()).filter(Boolean).join('\n');
+function summary(){const an=typeof anText==='function'?anText():'';let s=(an?an+'\n\n':'')+'Неврологический статус.\n'+FL.map(f=>fieldText(f.k).trim()).filter(Boolean).join('\n');
  if(ST.syn&&SYN.length)s+='\nСиндромально: '+SYN.map((x,i)=>i&&/^[А-ЯЁ][а-яё]/.test(x)?x[0].toLowerCase()+x.slice(1):x).join('; ')+'.';return s}
 
 // ===== интерфейс конструктора =====
@@ -1047,6 +1102,49 @@ const badge=k=>ST.ov[k]!=null?`<span data-badge="${k}" class="bd ed">измен�
 function renderFields(){$('fields').innerHTML=FL.map(f=>`<div class="card fc"><div class="fh"><b>${f.t}</b>${badge(f.k)}</div><textarea data-k="${f.k}" rows="1" placeholder="(не включается в статус)">${esc(fieldText(f.k))}</textarea></div>`).join('');fit()}
 function fit(){document.querySelectorAll('textarea[data-k],textarea[data-t]').forEach(t=>{t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px'})}
 function renderTpl(){$('tpl').innerHTML=FL.filter(f=>f.k!=='scale').map(f=>`<h3>${f.t}</h3>`+f.s.map(s=>`<label class="f">${SLN[s][0]}<textarea data-t="${s}" rows="1" placeholder="(пусто — не включается)">${esc(normS(s))}</textarea></label>`).join('')).join('');fit()}
+
+// ===== анамнез: скрининговые вопросы первичного приёма =====
+const AN=[
+ {id:'drug',h:'Лекарства — спросить по группам',n:'Спрашивайте по группам: трамадол, ондансетрон, линезолид сами пациенты не называют. Период — последние 5 недель (флуоксетин и ингибиторы моноаминоксидазы действуют долго).',it:[
+  ['ad','антидепрессанты (любые, в том числе амитриптилин от боли)','s'],['tram','трамадол, тапентадол, другие опиоиды','s'],['ond','ондансетрон и другие противорвотные-сетроны','s'],
+  ['trip','триптаны','s'],['lin','линезолид, метиленовый синий','s'],['herb','зверобой, триптофан, стимуляторы','s'],['li','литий','sd'],
+  ['meto','метоклопрамид, домперидон','d'],['nl','нейролептики, в том числе «снотворные» (кветиапин, хлорпротиксен)','d'],['pd','леводопа, агонисты дофамина, амантадин','p'],
+  ['stat','статины','m'],['metf','метформин, ингибиторы протонной помпы','b'],['chem','химиотерапия, противотуберкулёзные, нитрофураны','n'],['ac','антикоагулянты, антиагреганты','a'],
+  ['none','ничего из перечисленного','']]},
+ {id:'chg',h:'За последние 2 недели',seg:true,it:[['','не спрашивал'],['no','изменений в лечении не было'],['yes','новый препарат, повышение дозы или резкая отмена']]},
+ {id:'diet',h:'Питание и ЖКТ (дефицит B12)',it:[['veg','строгая веганская диета'],['gi','операции на желудке или кишечнике'],['alc','регулярный приём алкоголя'],['none','нет']]},
+ {id:'back',h:'Боль в спине — красные флаги',it:[['ret','задержка или недержание мочи, кала'],['sad','онемение в промежности (седловидная анестезия)'],['bil','слабость в обеих ногах'],['prog','нарастающий неврологический дефицит'],['tr','недавняя травма, онкология, лихорадка, иммуносупрессия'],['none','флагов нет']]},
+ {id:'tum',h:'Красные флаги объёмного процесса',it:[['ha50','новая головная боль после 50 лет'],['pf','прогрессирующая очаговая симптоматика'],['sz','впервые судороги во взрослом возрасте'],['onc','онкологическое заболевание'],['fev','лихорадка'],['imm','иммуносупрессия'],['vom','утренняя рвота'],['pers','изменение личности'],['none','флагов нет']]}];
+if(!ST.an)ST.an={};
+const anV=id=>ST.an[id]||(AN.find(s=>s.id===id).seg?'':[]);
+const anSel=id=>{const s=AN.find(x=>x.id===id),v=anV(id);return s.it.filter(i=>v.includes(i[0])&&i[0]!=='none')};
+function anAlerts(){const d=anSel('drug'),tag=t=>d.filter(i=>i[2].includes(t)),chg=anV('chg')==='yes',A=[];
+ const s=tag('s'),dp=tag('d'),pd=tag('p');
+ if(s.length>=2)A.push(['bad','Два и более серотонинергических препарата',`${s.map(i=>i[1].split(' (')[0]).join('; ')}. Риск серотонинового синдрома: при треморе, клонусе, гиперрефлексии, потливости, возбуждении — думать о нём; новые серотонинергические препараты (трамадол, триптан, ондансетрон, ещё один антидепрессант) — не добавлять без необходимости.`]);
+ else if(s.length&&chg)A.push(['warn','Серотонинергический препарат с недавним изменением',`${s[0][1].split(' (')[0]}. Перед назначением трамадола, триптана, ондансетрона или антидепрессанта — свериться; при клонусе и гиперрефлексии исключить серотониновый синдром.`]);
+ if(dp.length&&chg)A.push(['warn','Недавний старт или повышение дозы блокатора дофамина','При ригидности, лихорадке, нарушении сознания — исключить злокачественный нейролептический синдром: креатинфосфокиназа, температура, давление.']);
+ if(pd.length&&chg)A.push(['warn','Изменение противопаркинсонической терапии','Резкая отмена или снижение дозы может вызвать синдром «гиперпирексия — паркинсонизм»: при ригидности и лихорадке — вернуть прежнюю дозу.']);
+ if(tag('m').length)A.push(['info','Статины','При слабости или миалгиях — креатинфосфокиназа и тиреотропный гормон (статиновая миопатия, гипотиреоз).']);
+ const b12=tag('b').length||anSel('diet').some(i=>i[0]==='veg'||i[0]==='gi');
+ if(b12)A.push(['info','Риск дефицита B12','При парестезиях, атаксии, когнитивных жалобах — B12; при пограничном уровне — гомоцистеин и метилмалоновая кислота. Нормальный гемоглобин дефицит не исключает.']);
+ if(tag('n').length||anSel('diet').some(i=>i[0]==='alc'))A.push(['info','Возможна лекарственная или токсическая нейропатия','Сопоставить сроки приёма с началом симптомов.']);
+ if(tag('a').length)A.push(['info','Антикоагулянты или антиагреганты','Учесть перед люмбальной пункцией и блокадами.']);
+ const bk=anSel('back');if(bk.length)A.push(['bad','Красные флаги при боли в спине',`${bk.map(i=>i[1]).join('; ')}. Экстренная МРТ (магнитно-резонансная томография) и направление в приёмное отделение: исключить синдром конского хвоста и компрессию спинного мозга.`]);
+ const tm=anSel('tum');if(tm.length)A.push([tm.length>=2?'bad':'warn','Красные флаги объёмного процесса',`${tm.map(i=>i[1]).join('; ')}. МРТ головного мозга с контрастом не откладывать.`]);
+ return A}
+function anText(){const L=[],v=id=>anV(id);
+ const sec=(id,lab)=>{const a=v(id);if(!a.length)return;const s=anSel(id);L.push(lab+': '+(s.length?s.map(i=>i[1].replace(/ \(.*\)$/,'')).join('; '):'нет')+'.')};
+ sec('drug','Принимает (за 5 недель)');if(v('chg'))L.push('Изменения в лечении за 2 недели: '+(v('chg')==='yes'?'есть (новый препарат, повышение дозы или отмена)':'нет')+'.');
+ sec('diet','Питание и ЖКТ');sec('back','Красные флаги боли в спине');sec('tum','Красные флаги объёмного процесса');
+ if(!L.length)return'';const A=anAlerts().filter(a=>a[0]!=='info');
+ return 'Анамнез (скрининг).\n'+L.join('\n')+(A.length?'\nОбратить внимание: '+A.map(a=>a[1].toLowerCase()).join('; ')+'.':'')}
+function renderAn(){const box=$('anbox');if(!box)return;
+ box.innerHTML=AN.map(s=>`<div class="card"><h2>${s.h}</h2>${s.n?`<p class="muted">${s.n}</p>`:''}<div class="seg3">${s.it.map(([k,l])=>{const v=anV(s.id),on=s.seg?v===k:v.includes(k);return `<button data-an="${s.id}" data-k="${k}" class="${on?'on':''}">${esc(l)}</button>`}).join('')}</div></div>`).join('');
+ const A=anAlerts();$('analert').innerHTML=A.map(([c,h,b])=>`<div class="out ${c}"><b class="t">${h}</b>${esc(b)}</div>`).join('');
+ const t=anText();$('anprev').textContent=t||'Отметьте ответы — здесь появится текст для истории болезни.'}
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-an]');if(!b)return;const id=b.dataset.an,k=b.dataset.k,s=AN.find(x=>x.id===id);
+ if(s.seg)ST.an[id]=k;else{let a=(ST.an[id]||[]).slice();if(k==='none')a=a.includes('none')?[]:['none'];else{a=a.filter(x=>x!=='none');a=a.includes(k)?a.filter(x=>x!==k):a.concat(k)}ST.an[id]=a}
+ save();renderAn();recompute()});
 
 // ===== диктовка (резерв) =====
 const B='(?<=^|\\s)',E='(?=\\s|$|[.,])';
@@ -1102,10 +1200,10 @@ $('parse').onclick=()=>{if(on)stopRec();const n=doParse();$('recst').textContent
 $('clr').onclick=()=>{$('dict').value='';$('interim').textContent=''};
 
 // ===== вкладки и итог =====
-const order=['s1','s2','s3','s4','s5'],TN=['Конструктор','Статус','Итог','Диктовка','Шаблон'];let cur='s1';
+const order=['s0','s1','s2','s3','s4','s5'],TN=['Анамнез','Конструктор','Статус','Итог','Диктовка','Шаблон'];let cur='s1';
 function show(s){if(cur==='s4'&&s!=='s4'&&on)stopRec();cur=s;document.querySelectorAll('section').forEach(e=>e.classList.toggle('on',e.id===s));
  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));window.scrollTo(0,0);
- if(s==='s2')renderFields();if(s==='s3'){$('sum').textContent=summary();$('syn').checked=ST.syn}if(s==='s5')renderTpl();if(s==='s1')recompute()}
+ if(s==='s2')renderFields();if(s==='s3'){$('sum').textContent=summary();$('syn').checked=ST.syn}if(s==='s5')renderTpl();if(s==='s1')recompute();if(s==='s0')renderAn()}
 document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.s));
 $('syn').onchange=()=>{ST.syn=$('syn').checked;save();$('sum').textContent=summary()};
 $('tag').value=ST.tag||'';$('tag').oninput=()=>{ST.tag=$('tag').value;save()};
@@ -1115,7 +1213,7 @@ $('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus()
   location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(summary().replace(/\n/g,'\r\n'))};
 const cp=async b=>{try{await navigator.clipboard.writeText(summary());b.textContent='Скопировано'}catch(e){b.textContent='Не удалось — выделите текст'}setTimeout(()=>b.textContent='Скопировать',1800)};
 $('copy').onclick=()=>cp($('copy'));$('copy2').onclick=()=>cp($('copy2'));
-const reset=()=>{if(!confirmReset())return;if(on)stopRec();ST={mods:[],ov:{},tag:'',syn:ST.syn};$('dict').value='';$('tag').value='';save();renderMods();recompute();show('s1')};
+const reset=()=>{if(!confirmReset())return;if(on)stopRec();ST={mods:[],ov:{},tag:'',syn:ST.syn,an:{}};$('dict').value='';$('tag').value='';save();renderMods();recompute();show('s1')};
 let rT=0;function confirmReset(){const b=document.activeElement;if(Date.now()-rT<2500)return true;rT=Date.now();document.querySelectorAll('.rst').forEach(x=>{x.textContent='Нажмите ещё раз';setTimeout(()=>x.textContent='Новый пациент',2500)});return false}
 document.querySelectorAll('.rst').forEach(b=>b.onclick=reset);
 $('tplreset').onclick=()=>{TPL={};try{localStorage.removeItem(TK)}catch(e){}renderTpl();recompute()};
