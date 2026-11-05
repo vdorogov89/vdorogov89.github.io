@@ -1150,7 +1150,11 @@ function renderAn(){const box=$('anbox');if(!box)return;const A=anAlerts(),al=id
  const chips=s=>`<div class="seg3">${s.it.map(([k,l])=>{const v=anV(s.id),on=s.seg?v===k:v.includes(k);return `<button data-an="${s.id}" data-k="${k}" class="${on?'on':''}">${esc(l)}</button>`}).join('')}</div>`;
  const rows=s=>{const f=ST.an.fat||{};let h=s.q.map(([id,l,ch])=>`<div class="q"><span class="ql">${l}</span><div class="seg3">${ch.map(([k,t])=>`<button data-fat="${id}" data-k="${k}" class="${f[id]===k?'on':''}">${t}</button>`).join('')}</div></div>`).join('');
   const F=fat();if(F)h+=`<div class="out ${!F.full?'info':F.t>=4?'bad':F.t>=1?'warn':'ok'}"><b class="t">4AT: ${F.t} из 12</b>${F.full?cap(F.i)+'.':'Заполните все 4 пункта.'}</div>`;return h};
- box.innerHTML=AN.map(s=>`<div class="card"><h2>${s.h}</h2>${s.n?`<p class="muted">${s.n}</p>`:''}${s.q?rows(s):chips(s)}${al(s.id)}</div>`).join('');
+ const camBox=()=>{const v=anV('del');if(!v.length||v.includes('none'))return v.includes('none')?'<div class="out ok"><b class="t">CAM: изменений нет</b>Признаков делирия со слов близких и персонала нет.</div>':'';const h=k=>v.includes(k);
+ const f=[h('chg')||h('fl'),h('in'),h('dz'),h('hypo')||h('hyp')],pos=f[0]&&f[1]&&(f[2]||f[3]);
+ const nm=['1. Острое начало или колебания','2. Невнимательность','3. Дезорганизованное мышление','4. Изменённый уровень сознания'];
+ return `<div class="out ${pos?'bad':'info'}"><b class="t">CAM: ${pos?'положительный — делирий':'отрицательный по отмеченным признакам'}</b>${nm.map((n,i)=>n+' — '+(f[i]?'есть':'нет')).join('<br>')}${pos?'':'<br>Делирий = 1 + 2 + (3 или 4). Отметьте признаки, которые проверили.'}</div>`};
+ box.innerHTML=AN.map(s=>`<div class="card"><h2>${s.h}</h2>${s.n?`<p class="muted">${s.n}</p>`:''}${s.q?rows(s):chips(s)}${s.id==='del'?camBox():''}${al(s.id)}</div>`).join('');
  $('analert').innerHTML=A.length?`<p class="muted">Предупреждений: ${A.length} — они показаны в своих разделах ниже.</p>`:'';
  const t=anText();$('anprev').textContent=t||'Отметьте ответы — здесь появится текст для истории болезни.'}
 document.addEventListener('click',e=>{const b=e.target.closest('button[data-fat]');if(!b)return;const f=Object.assign({},ST.an.fat);f[b.dataset.fat]=f[b.dataset.fat]===b.dataset.k?null:b.dataset.k;ST.an.fat=f;save();renderAn();recompute()});
