@@ -104,6 +104,7 @@ textarea[data-k]{min-height:44px} #prev{max-height:none}
   <div class="card" style="padding:12px 14px">
     <input type="text" id="q" placeholder="Заболевание: нейронит, L5, инсульт, кома, ХИГМ…" autocomplete="off" autocapitalize="off" spellcheck="false">
     <div id="sug"></div>
+    <div class="seg3" id="sexsel" style="margin-top:10px"><button data-sex="m">Мужчина</button><button data-sex="f">Женщина</button></div>
   </div>
   <div id="mods"></div>
   <div class="card">
@@ -1051,7 +1052,10 @@ function renderRefl(RF){if(!Object.keys(RF).length)return null;const g=(r,s)=>RF
 function renderPath(PT){const k=Object.keys(PT);if(!k.length)return null;
  return cap(k.map(n=>'симптом '+n+' '+(PT[n].r&&PT[n].l?'с двух сторон':PT[n].r?'справа':'слева')).join(', '))+'.'}
 function recompute(){const b=build();GEN=b.out;SYN=b.syn;const p=document.getElementById('prev');if(p)p.textContent=summary();save()}
-const fieldText=k=>ST.ov[k]!=null?ST.ov[k]:GEN[k]||'';
+const FEM={'ориентирован':'ориентирована','дезориентирован':'дезориентирована','устойчив':'устойчива','неустойчив':'неустойчива','сонлив':'сонлива','заторможен':'заторможена','возбуждён':'возбуждена','возбужден':'возбуждена','вял':'вяла','недоступен':'недоступна','доступен':'доступна','беспокоен':'беспокойна','контактен':'контактна','адекватен':'адекватна','критичен':'критична','оглушён':'оглушена','обездвижен':'обездвижена','истощаем':'истощаема','эйфоричен':'эйфорична','апатичен':'апатична','растерян':'растеряна','напряжён':'напряжена'};
+const FEMRE=new RegExp('(^|[^А-Яа-яЁё])('+Object.keys(FEM).join('|')+')(?![А-Яа-яЁё])','gi');
+const fem=t=>ST.sex!=='f'?t:t.replace(FEMRE,(m,a,w)=>{const f=FEM[w.toLowerCase()];return a+(w[0]===w[0].toUpperCase()?f[0].toUpperCase()+f.slice(1):f)});
+const fieldText=k=>ST.ov[k]!=null?ST.ov[k]:fem(GEN[k]||'');
 function summary(){const an=typeof anText==='function'?anText():'';let s=(an?an+'\n\n':'')+'Неврологический статус.\n'+FL.map(f=>fieldText(f.k).trim()).filter(Boolean).join('\n');
  if(ST.syn&&SYN.length)s+='\nСиндромально: '+SYN.map((x,i)=>i&&/^[А-ЯЁ][а-яё]/.test(x)?x[0].toLowerCase()+x.slice(1):x).join('; ')+'.';return s}
 
@@ -1229,10 +1233,12 @@ $('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus()
   location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(summary().replace(/\n/g,'\r\n'))};
 const cp=async b=>{try{await navigator.clipboard.writeText(summary());b.textContent='Скопировано'}catch(e){b.textContent='Не удалось — выделите текст'}setTimeout(()=>b.textContent='Скопировать',1800)};
 $('copy').onclick=()=>cp($('copy'));$('copy2').onclick=()=>cp($('copy2'));
-const reset=()=>{if(!confirmReset())return;if(on)stopRec();ST={mods:[],ov:{},tag:'',syn:ST.syn,an:{}};$('dict').value='';$('tag').value='';save();renderMods();recompute();show('s1')};
+const reset=()=>{if(!confirmReset())return;if(on)stopRec();ST={mods:[],ov:{},tag:'',syn:ST.syn,an:{}};sexUI();$('dict').value='';$('tag').value='';save();renderMods();recompute();show('s1')};
 let rT=0;function confirmReset(){const b=document.activeElement;if(Date.now()-rT<2500)return true;rT=Date.now();document.querySelectorAll('.rst').forEach(x=>{x.textContent='Нажмите ещё раз';setTimeout(()=>x.textContent='Новый пациент',2500)});return false}
 document.querySelectorAll('.rst').forEach(b=>b.onclick=reset);
 $('tplreset').onclick=()=>{TPL={};try{localStorage.removeItem(TK)}catch(e){}renderTpl();recompute()};
+const sexUI=()=>document.querySelectorAll('#sexsel button').forEach(b=>b.classList.toggle('on',(ST.sex||'m')===b.dataset.sex));
+document.getElementById('sexsel').onclick=e=>{const b=e.target.closest('button[data-sex]');if(!b)return;ST.sex=b.dataset.sex;save();sexUI();recompute()};sexUI();
 renderSug();renderMods();recompute();show('s1');
 if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('/nstat-w8r4ja-sw.js',{scope:'/nstat-w8r4ja'}).catch(()=>{});
 
