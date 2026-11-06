@@ -1,0 +1,31 @@
+{
+ "id": "/vert-h5n2tb.html",
+ "name": "Головокружение: консультация",
+ "short_name": "Головокружение",
+ "lang": "ru",
+ "start_url": "/vert-h5n2tb.html",
+ "scope": "/vert-h5n2tb",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/vert-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/vert-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/vert-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
