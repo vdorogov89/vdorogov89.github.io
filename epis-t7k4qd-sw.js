@@ -1,4 +1,4 @@
-const CACHE='epis-t7k4qd-v4';
+const CACHE='epis-t7k4qd-v5';
 const CORE=['/epis-t7k4qd.html','/epis-t7k4qd.webmanifest','/epis-icon-192.png','/epis-icon-512.png','/epis-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('epis-t7k4qd-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
