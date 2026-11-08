@@ -123,6 +123,13 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
     <label class="chk"><input type="checkbox" id="cvh"><span>Есть венозный инфаркт с геморрагическим пропитыванием или кровоизлияние<small>Не противопоказание к гепарину</small></span></label>
   </div>
 
+  <div class="card" id="c_ap">
+    <h2>Антиагреганты: ситуация</h2>
+    <p class="muted">Показание к антикоагуляции не отмечено — выберите, чтобы получить схему антиагрегантов с дозами и сроками.</p>
+    <div class="seg" data-k="apm"><button data-v="minor">малый инсульт (NIHSS 3 и меньше) или ТИА высокого риска (ABCD² 4 и больше)</button><button data-v="ica">симптомный интракраниальный стеноз 70–99%</button><button data-v="cas">каротидное стентирование</button><button data-v="std">остальные: инсульт средней или тяжёлой степени, давность больше 72 часов</button></div>
+    <p class="muted" style="font-size:13px">NIHSS — шкала инсульта Национальных институтов здоровья; ABCD² — шкала риска инсульта после ТИА.</p>
+  </div>
+
   <div class="card" id="c_heart">
     <h2>Показание к антикоагуляции</h2>
     <p class="muted">Отметьте хотя бы одно — без показания приложение антикоагулянт не предложит.</p>
@@ -197,7 +204,7 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
 const $=id=>document.getElementById(id);const KEY='oac-st',DEFMAIL='dorogovvn2@zdrav.mos.ru';
 const CB=['af','tlt','cvh','imm','ondoac','hte','alt','bp','mech','ms','bio','lvt','dial','cpc','cpb','plt20','plt50','aps','preg','vera','azol','gib','cog'];
 const TX=['d0','age','sex','wt','cr','tag','mail'];
-let ST={cvc:'tr',ev:'is',sz:'s',ht:'0',ichc:'deep',op:'0',mail:DEFMAIL};
+let ST={apm:'minor',cvc:'tr',ev:'is',sz:'s',ht:'0',ichc:'deep',op:'0',mail:DEFMAIL};
 try{const x=JSON.parse(localStorage.getItem(KEY));if(x)ST=Object.assign(ST,x)}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 const num=k=>{const v=parseFloat(String(ST[k]||'').replace(',','.'));return isNaN(v)?null:v};
@@ -207,7 +214,21 @@ const add=(n)=>{if(!ST.d0)return null;const d=new Date(ST.d0+'T12:00');d.setDate
 const when=(a,b)=>{const A=add(a),B=b!=null?add(b):null;if(!A)return b!=null&&b!==a?`${a}–${b}-е сутки`:`${a}-е сутки`;return B&&b!==a?`${dfmt(A)} — ${dfmt(B)}`:dfmt(A)};
 function crcl(){const a=num('age'),w=num('wt'),c=num('cr');if(!a||!w||!c)return null;return Math.round((140-a)*w*(ST.sex==='f'?1.04:1.23)/c)}
 const hasInd=()=>!!(ST.af||ST.mech||ST.ms||ST.bio||ST.lvt);
-const NOIND='Показание к антикоагуляции не отмечено. Антикоагулянт не назначать: антиагреганты по механизму инсульта. Искать фибрилляцию предсердий — холтеровское мониторирование не меньше 24 часов, при неясной причине — длительное мониторирование ритма. При эмболическом инсульте из неустановленного источника прямые антикоагулянты пользы не показали (исследования NAVIGATE ESUS, RE-SPECT ESUS).';
+function apPlan(){const A=[],m=ST.apm||'minor',d=n=>ST.d0?' — по '+dfmt(add(n-1))+' включительно':'';
+ const tl=ST.tlt?' После тромболизиса — не раньше чем через 24 часа и после контрольной КТ.':'';
+ const ppi='Вместе с клопидогрелом не назначать омепразол и эзомепразол (снижают его действие); при необходимости защиты желудка — пантопразол.';
+ if(m==='minor'){A.push('Двойная антиагрегантная терапия на 21 день'+d(21)+', начать в первые 24 часа (при атеросклеротической причине — до 72 часов и при NIHSS до 5).'+tl+' 1-е сутки: клопидогрел 300 мг + ацетилсалициловая кислота 75–300 мг. Со 2-х по 21-е сутки: клопидогрел 75 мг 1 раз в сутки + ацетилсалициловая кислота 75–100 мг 1 раз в сутки.');
+  A.push('С 22-х суток — одна таблетка длительно: клопидогрел 75 мг 1 раз в сутки (или ацетилсалициловая кислота 75–100 мг). Продлевать двойную терапию дольше не нужно — растёт риск кровотечений.');
+  A.push('Основание: исследования CHANCE, POINT, INSPIRES; рекомендации Европейской организации по инсульту (2021) и Американской ассоциации сердца и инсульта (2021). В клинических рекомендациях РФ 2020 года этой схемы нет — там комбинация клопидогрела с ацетилсалициловой кислотой рутинно не рекомендуется.')}
+ else if(m==='ica'){A.push('Двойная антиагрегантная терапия на 90 дней'+d(90)+': клопидогрел 75 мг + ацетилсалициловая кислота 75–100 мг 1 раз в сутки; в 1-е сутки клопидогрел 300 мг.'+tl+' Плюс интенсивная терапия статинами и давление меньше 140/90 мм рт. ст.');
+  A.push('После 90 дней — одна таблетка длительно: клопидогрел 75 мг или ацетилсалициловая кислота 75–100 мг.');
+  A.push('Основание: исследование SAMMPRIS, рекомендации Американской ассоциации сердца и инсульта (2021).')}
+ else if(m==='cas'){A.push('После каротидного стентирования — двойная антиагрегантная терапия (клинические рекомендации РФ 2020): клопидогрел 75 мг + ацетилсалициловая кислота 75–100 мг 1 раз в сутки, обычно не меньше 1 месяца'+d(30)+'; точный срок — по решению сосудистого хирурга.');
+  A.push('Затем — одна таблетка длительно: клопидогрел 75 мг или ацетилсалициловая кислота 75–100 мг.')}
+ else{A.push('Ацетилсалициловая кислота 160–325 мг 1 раз в сутки в первые 48 часов от начала инсульта, затем 75–100 мг 1 раз в сутки длительно.'+tl);
+  A.push('Альтернатива: клопидогрел 75 мг 1 раз в сутки — по клиническим рекомендациям РФ 2020 с 7-го дня; предпочтителен при сахарном диабете и атеросклерозе в нескольких сосудистых бассейнах. При непереносимости обоих — дипиридамол замедленного высвобождения 200 мг 2 раза в сутки.')}
+ A.push(ppi);return A}
+const NOIND='Показание к антикоагуляции не отмечено — антикоагулянт не назначать, лечение антиагрегантами. Искать фибрилляцию предсердий — холтеровское мониторирование не меньше 24 часов, при неясной причине — длительное мониторирование ритма. При эмболическом инсульте из неустановленного источника прямые антикоагулянты пользы не показали (исследования NAVIGATE ESUS, RE-SPECT ESUS).';
 function noDoac(){const R=[];if(ST.mech)R.push('механический протез клапана');if(ST.ms)R.push('умеренный или тяжёлый митральный стеноз');if(ST.bio)R.push('биопротез клапана — первые 3 месяца');
  const k=crcl();if(ST.dial||(k!=null&&k<15))R.push('клиренс креатинина меньше 15 мл/мин или диализ');if(ST.cpc)R.push('печёночная недостаточность класса C');if(ST.plt20)R.push('тромбоциты меньше 20 × 10⁹/л');if(ST.aps)R.push('антифосфолипидный синдром');if(ST.preg)R.push('беременность');if(ST.lvt)R.push('тромб левого желудочка (предпочтителен варфарин)');return R}
 function timing(){const T=[];let t=null,txt='';
@@ -274,11 +295,11 @@ function summary(){const L=[],ti=timing(),p=pick(),k=crcl();
  if(ST.ev==='is'){L.push('Очаг: '+({s:'малый (до 1,5 см)',m:'средний',l:'большой'})[ST.sz]+'; геморрагическая трансформация: '+({0:'нет',hi1:'геморрагический инфаркт 1-го типа',hi2:'геморрагический инфаркт 2-го типа',ph1:'паренхиматозная гематома 1-го типа',ph2:'паренхиматозная гематома 2-го типа'})[ST.ht]+'.')}
  if(k!=null)L.push('Клиренс креатинина (Кокрофт — Голт): '+k+' мл/мин.');
  const R=[];
- if(!hasInd()){R.push(NOIND);const v=vteText();if(v)R.push('Профилактика тромбоза глубоких вен. '+v);return L.join('\n')+'\nРекомендации:\n'+R.map((x,i)=>(i+1)+'. '+x).join('\n')}
+ if(!hasInd()){R.push(NOIND);if(ST.ev!=='ich')apPlan().forEach(x=>R.push(x));const v=vteText();if(v)R.push('Профилактика тромбоза глубоких вен. '+v);return L.join('\n')+'\nРекомендации:\n'+R.map((x,i)=>(i+1)+'. '+x).join('\n')}
  if(ST.ondoac)R.push('Инсульт на фоне антикоагулянта: проверить регулярность приёма и обоснованность сниженной дозы; исключить другую причину — сосудистая визуализация (КТ-ангиография) для поиска инсульт-связанного стеноза, оценка лакунарного инфаркта; при отсутствии другой причины и правильном приёме слепая замена препарата или добавление антиагреганта пользы не показали.');
  R.push('Срок начала антикоагулянта: '+ti.txt+(ti.t?' Ориентир: '+when(ti.t[0],ti.t[1])+'.':''));
  if(ST.ev==='is'&&(ST.sz==='l'||ST.ht!=='0'||ST.alt))R.push('Перед стартом — контрольная КТ головного мозга (большой очаг, затылочная доля или мозжечок, геморрагическая трансформация).');
- if(ST.ev!=='tia'&&!(ST.ev==='ich'))R.push('До начала антикоагулянта — антиагрегантная терапия (ацетилсалициловая кислота'+(ST.alt?' или двойная антитромбоцитарная терапия по основному механизму':'')+'); в день старта антикоагулянта антиагрегант отменить, если нет отдельных показаний.');
+ if(ST.ev!=='tia'&&!(ST.ev==='ich'))R.push('До начала антикоагулянта — антиагрегантная терапия (ацетилсалициловая кислота 160–325 мг в первые 48 часов, затем 75–100 мг 1 раз в сутки'+(ST.alt?' или двойная антитромбоцитарная терапия по основному механизму':'')+'); в день старта антикоагулянта антиагрегант отменить, если нет отдельных показаний.');
  if(!(ST.ev==='ich'&&ST.ichc==='css'))R.push('Препарат'+(()=>{const t=timing().t;return t&&t[1]>0?' (начать не раньше '+when(t[0],t[0])+')':''})()+': '+p.drug.toLowerCase()+' '+p.dose+'. '+p.why+(p.alt?' '+p.alt:'')+(p.notes&&p.notes.length?' Учесть: '+p.notes.join('; ')+'.':''));
  else R.push('Антикоагулянт нежелателен: направить на консультацию по окклюзии ушка левого предсердия.');
  if(ST.af)R.push('Лечебные дозы гепарина и «мост» гепарином до перорального антикоагулянта при фибрилляции предсердий не показаны: пользы нет, кровоизлияний больше (исследования IST, TAIST, метаанализы)'+(ST.mech?'; при механическом клапане — решение с кардиологом':'')+'.');
@@ -288,13 +309,13 @@ function summary(){const L=[],ti=timing(),p=pick(),k=crcl();
  if(p.drug!=='Варфарин')R.push('Доза полная, если нет критериев для снижения. Не снижать «на всякий случай»: сниженная доза хуже защищает от повторного инсульта.');
  return L.join('\n')+'\nРекомендации:\n'+R.map((x,i)=>(i+1)+'. '+x).join('\n')}
 function render(){document.querySelectorAll('.seg').forEach(g=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',ST[g.dataset.k]===b.dataset.v)));
- $('c_is').style.display=ST.ev==='is'?'':'none';$('c_ich').style.display=ST.ev==='ich'?'':'none';$('c_cvt').style.display=ST.ev==='cvt'?'':'none';$('c_heart').style.display=ST.ev==='cvt'?'none':'';$('l_tlt').style.display=ST.ev==='is'?'':'none';
+ $('c_is').style.display=ST.ev==='is'?'':'none';$('c_ich').style.display=ST.ev==='ich'?'':'none';$('c_cvt').style.display=ST.ev==='cvt'?'':'none';$('c_heart').style.display=ST.ev==='cvt'?'none':'';$('l_tlt').style.display=ST.ev==='is'?'':'none';$('c_ap').style.display=(ST.ev==='is'||ST.ev==='tia')&&!hasInd()?'':'none';
  $('vte').innerHTML=ST.imm?box('info','Профилактика',vteText()):'';
  const k=crcl();$('crcl').innerHTML=k==null?'<p class="muted">Заполните возраст, массу и креатинин — посчитается клиренс по Кокрофту — Голту.</p>':box(k<15?'bad':k<30?'warn':k<50?'info':'ok','Клиренс креатинина: '+k+' мл/мин','Формула Кокрофта — Голта.');
 const sT=startTxt(),sB=sT?box(sT.c,sT.h,sT.b):'';
  if(ST.ev==='cvt'){const c=cvtPlan();$('drug').innerHTML=box('ok','Лечение тромбоза церебральных вен',c.start+'<br><b>Острый период:</b> '+c.acute+'<br>'+c.oral+'<br>'+c.dur)}else{const p=pick();$('drug').innerHTML=sB+box(p.drug==='Варфарин'?'warn':'ok',p.drug+': '+p.dose,p.why+(p.alt?'<br>'+p.alt:'')+(p.notes&&p.notes.length?'<ul>'+p.notes.map(x=>'<li>'+x+'</li>').join('')+'</ul>':''))}
  $('opout').innerHTML=ST.op==='0'?'':box('info','Отмена и возобновление',opText());
- if(ST.ev!=='cvt'&&!hasInd()){$('drug').innerHTML=box('warn','Показание к антикоагуляции не отмечено',NOIND+'<br>Отметьте показание на вкладке «Ситуация».');$('timing').innerHTML=box('warn','Антикоагулянт не показан',NOIND);$('opout').innerHTML='';$('sum').textContent=summary();return}
+ if(ST.ev!=='cvt'&&!hasInd()){$('drug').innerHTML=box('warn','Показание к антикоагуляции не отмечено',NOIND+'<br>Отметьте показание на вкладке «Ситуация».')+(ST.ev!=='ich'?box('info','Антиагреганты: дозы и сроки','<ol>'+apPlan().map(x=>'<li>'+x+'</li>').join('')+'</ol>'):'');$('timing').innerHTML=box('warn','Антикоагулянт не показан',NOIND);$('opout').innerHTML='';$('sum').textContent=summary();return}
  const ti=timing();$('timing').innerHTML=box(ti.t?'info':'warn','Когда начинать',ti.txt+(ti.t?'<br><span class="big">'+when(ti.t[0],ti.t[1])+'</span>':''))+(ST.ondoac?box('bad','Инсульт на фоне антикоагулянта','Проверить приём и дозу, исключить другую причину, сосудистая визуализация.'):'');
  $('sum').textContent=summary()}
 document.querySelectorAll('.seg').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;ST[g.dataset.k]=b.dataset.v;save();render()});
@@ -305,7 +326,7 @@ function go(s){document.querySelectorAll('section').forEach(x=>x.classList.toggl
 document.querySelector('nav.tabs').onclick=e=>{const b=e.target.closest('button');if(b)go(b.dataset.s)};
 const order=['s1','s2','s3'];document.querySelectorAll('.stepnav').forEach(n=>{const s=n.closest('section').id,i=order.indexOf(s);const p=n.querySelector('.prev'),x=n.querySelector('.next');if(p)p.onclick=()=>go(order[i-1]);if(x)x.onclick=()=>go(order[(i+1)%3])});
 $('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('sum').textContent);$('copy').textContent='Скопировано'}catch(e){$('copy').textContent='Не удалось — выделите текст'}setTimeout(()=>$('copy').textContent='Скопировать',1800)};
-$('reset').onclick=()=>{const b=$('reset');if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Стереть всё? Нажмите ещё раз';setTimeout(()=>{b.dataset.c='';b.textContent='Новый пациент'},2500);return}const mail=ST.mail||DEFMAIL;ST={cvc:'tr',ev:'is',sz:'s',ht:'0',ichc:'deep',op:'0',mail};save();location.reload()};
+$('reset').onclick=()=>{const b=$('reset');if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Стереть всё? Нажмите ещё раз';setTimeout(()=>{b.dataset.c='';b.textContent='Новый пациент'},2500);return}const mail=ST.mail||DEFMAIL;ST={apm:'minor',cvc:'tr',ev:'is',sz:'s',ht:'0',ichc:'deep',op:'0',mail};save();location.reload()};
 $('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}const t=ST.tag||'',sub='Антикоагулянты после инсульта'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
  location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent($('sum').textContent.replace(/\n/g,'\r\n'))};
 render();
