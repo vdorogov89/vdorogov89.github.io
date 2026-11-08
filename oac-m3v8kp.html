@@ -124,7 +124,9 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
   </div>
 
   <div class="card" id="c_heart">
-    <h2>Сердце</h2>
+    <h2>Показание к антикоагуляции</h2>
+    <p class="muted">Отметьте хотя бы одно — без показания приложение антикоагулянт не предложит.</p>
+    <label class="chk"><input type="checkbox" id="af"><span>Фибрилляция или трепетание предсердий<small>Подтверждены на ЭКГ (электрокардиограмме) или при холтеровском мониторировании</small></span></label>
     <label class="chk"><input type="checkbox" id="mech"><span>Механический протез клапана</span></label>
     <label class="chk"><input type="checkbox" id="ms"><span>Умеренный или тяжёлый митральный стеноз<small>Площадь отверстия 1,5 см² и меньше, обычно ревматический</small></span></label>
     <label class="chk"><input type="checkbox" id="bio"><span>Биопротез клапана, установлен меньше 3 месяцев назад</span></label>
@@ -193,7 +195,7 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
 <nav class="tabs"><button data-s="s1" class="on">Ситуация</button><button data-s="s2">Препарат</button><button data-s="s3">Сводка</button></nav>
 <script>
 const $=id=>document.getElementById(id);const KEY='oac-st',DEFMAIL='dorogovvn2@zdrav.mos.ru';
-const CB=['tlt','cvh','imm','ondoac','hte','alt','bp','mech','ms','bio','lvt','dial','cpc','cpb','plt20','plt50','aps','preg','vera','azol','gib','cog'];
+const CB=['af','tlt','cvh','imm','ondoac','hte','alt','bp','mech','ms','bio','lvt','dial','cpc','cpb','plt20','plt50','aps','preg','vera','azol','gib','cog'];
 const TX=['d0','age','sex','wt','cr','tag','mail'];
 let ST={cvc:'tr',ev:'is',sz:'s',ht:'0',ichc:'deep',op:'0',mail:DEFMAIL};
 try{const x=JSON.parse(localStorage.getItem(KEY));if(x)ST=Object.assign(ST,x)}catch(e){}
@@ -204,6 +206,8 @@ const dfmt=d=>d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
 const add=(n)=>{if(!ST.d0)return null;const d=new Date(ST.d0+'T12:00');d.setDate(d.getDate()+n);return d};
 const when=(a,b)=>{const A=add(a),B=b!=null?add(b):null;if(!A)return b!=null&&b!==a?`${a}–${b}-е сутки`:`${a}-е сутки`;return B&&b!==a?`${dfmt(A)} — ${dfmt(B)}`:dfmt(A)};
 function crcl(){const a=num('age'),w=num('wt'),c=num('cr');if(!a||!w||!c)return null;return Math.round((140-a)*w*(ST.sex==='f'?1.04:1.23)/c)}
+const hasInd=()=>!!(ST.af||ST.mech||ST.ms||ST.bio||ST.lvt);
+const NOIND='Показание к антикоагуляции не отмечено. Антикоагулянт не назначать: антиагреганты по механизму инсульта. Искать фибрилляцию предсердий — холтеровское мониторирование не меньше 24 часов, при неясной причине — длительное мониторирование ритма. При эмболическом инсульте из неустановленного источника прямые антикоагулянты пользы не показали (исследования NAVIGATE ESUS, RE-SPECT ESUS).';
 function noDoac(){const R=[];if(ST.mech)R.push('механический протез клапана');if(ST.ms)R.push('умеренный или тяжёлый митральный стеноз');if(ST.bio)R.push('биопротез клапана — первые 3 месяца');
  const k=crcl();if(ST.dial||(k!=null&&k<15))R.push('клиренс креатинина меньше 15 мл/мин или диализ');if(ST.cpc)R.push('печёночная недостаточность класса C');if(ST.plt20)R.push('тромбоциты меньше 20 × 10⁹/л');if(ST.aps)R.push('антифосфолипидный синдром');if(ST.preg)R.push('беременность');if(ST.lvt)R.push('тромб левого желудочка (предпочтителен варфарин)');return R}
 function timing(){const T=[];let t=null,txt='';
@@ -265,22 +269,23 @@ function summary(){const L=[],ti=timing(),p=pick(),k=crcl();
  const ev={tia:'Транзиторная ишемическая атака',is:'Ишемический инсульт',ich:'Внутримозговое кровоизлияние',cvt:'Тромбоз церебральных вен и синусов'}[ST.ev];
  if(ST.ev==='cvt'){const c=cvtPlan(),v=vteText();const R=[c.start,'Острый период: '+c.acute,c.oral,c.dur,'Контроль тромбоцитов на 5–10-е сутки — гепарин-индуцированная тромбоцитопения.','Поиск причины: тромбофилия (в том числе антифосфолипидный синдром), гормональная контрацепция, инфекция, онкологический процесс.'];
   return ev+(ST.d0?', начало '+new Date(ST.d0+'T12:00').toLocaleDateString('ru-RU'):'')+'.'+(k!=null?'\nКлиренс креатинина (Кокрофт — Голт): '+k+' мл/мин.':'')+'\nРекомендации:\n'+R.map((x,i)=>(i+1)+'. '+x).join('\n')}
- const ind=[ST.mech&&'механический протез клапана',ST.ms&&'митральный стеноз',ST.bio&&'биопротез клапана',ST.lvt&&'тромб левого желудочка'].filter(Boolean);
- L.push(ev+'; показание к антикоагуляции: '+(ind.length?ind.join(', '):'фибрилляция предсердий')+(ST.d0?', начало '+new Date(ST.d0+'T12:00').toLocaleDateString('ru-RU'):'')+'.');
+ const ind=[ST.af&&'фибрилляция или трепетание предсердий',ST.mech&&'механический протез клапана',ST.ms&&'митральный стеноз',ST.bio&&'биопротез клапана',ST.lvt&&'тромб левого желудочка'].filter(Boolean);
+ L.push(ev+'; показание к антикоагуляции: '+(ind.length?ind.join(', '):'не отмечено')+(ST.d0?', начало '+new Date(ST.d0+'T12:00').toLocaleDateString('ru-RU'):'')+'.');
  if(ST.ev==='is'){L.push('Очаг: '+({s:'малый (до 1,5 см)',m:'средний',l:'большой'})[ST.sz]+'; геморрагическая трансформация: '+({0:'нет',hi1:'геморрагический инфаркт 1-го типа',hi2:'геморрагический инфаркт 2-го типа',ph1:'паренхиматозная гематома 1-го типа',ph2:'паренхиматозная гематома 2-го типа'})[ST.ht]+'.')}
  if(k!=null)L.push('Клиренс креатинина (Кокрофт — Голт): '+k+' мл/мин.');
  const R=[];
+ if(!hasInd()){R.push(NOIND);const v=vteText();if(v)R.push('Профилактика тромбоза глубоких вен. '+v);return L.join('\n')+'\nРекомендации:\n'+R.map((x,i)=>(i+1)+'. '+x).join('\n')}
  if(ST.ondoac)R.push('Инсульт на фоне антикоагулянта: проверить регулярность приёма и обоснованность сниженной дозы; исключить другую причину — сосудистая визуализация (КТ-ангиография) для поиска инсульт-связанного стеноза, оценка лакунарного инфаркта; при отсутствии другой причины и правильном приёме слепая замена препарата или добавление антиагреганта пользы не показали.');
  R.push('Срок начала антикоагулянта: '+ti.txt+(ti.t?' Ориентир: '+when(ti.t[0],ti.t[1])+'.':''));
  if(ST.ev==='is'&&(ST.sz==='l'||ST.ht!=='0'||ST.alt))R.push('Перед стартом — контрольная КТ головного мозга (большой очаг, затылочная доля или мозжечок, геморрагическая трансформация).');
  if(ST.ev!=='tia'&&!(ST.ev==='ich'))R.push('До начала антикоагулянта — антиагрегантная терапия (ацетилсалициловая кислота'+(ST.alt?' или двойная антитромбоцитарная терапия по основному механизму':'')+'); в день старта антикоагулянта антиагрегант отменить, если нет отдельных показаний.');
  if(!(ST.ev==='ich'&&ST.ichc==='css'))R.push('Препарат'+(()=>{const t=timing().t;return t&&t[1]>0?' (начать не раньше '+when(t[0],t[0])+')':''})()+': '+p.drug.toLowerCase()+' '+p.dose+'. '+p.why+(p.alt?' '+p.alt:'')+(p.notes&&p.notes.length?' Учесть: '+p.notes.join('; ')+'.':''));
  else R.push('Антикоагулянт нежелателен: направить на консультацию по окклюзии ушка левого предсердия.');
- R.push('Лечебные дозы гепарина и «мост» гепарином до перорального антикоагулянта при фибрилляции предсердий не показаны: пользы нет, кровоизлияний больше (исследования IST, TAIST, метаанализы)'+(ST.mech?'; при механическом клапане — решение с кардиологом':'')+'.');
+ if(ST.af)R.push('Лечебные дозы гепарина и «мост» гепарином до перорального антикоагулянта при фибрилляции предсердий не показаны: пользы нет, кровоизлияний больше (исследования IST, TAIST, метаанализы)'+(ST.mech?'; при механическом клапане — решение с кардиологом':'')+'.');
 {const v=vteText();if(v)R.push('Профилактика тромбоза глубоких вен. '+v)}
  if(ST.ev==='ich')R.push('МРТ головного мозга с последовательностью SWI до решения о старте; целевое давление меньше 130/80 мм рт. ст.');
  const o=opText();if(o)R.push(o);
- if(p.drug!=='Варфарин')R.push('Полная доза — у большинства пациентов: неоправданно сниженная доза повышает риск инсульта и смерти.');
+ if(p.drug!=='Варфарин')R.push('Доза полная, если нет критериев для снижения. Не снижать «на всякий случай»: сниженная доза хуже защищает от повторного инсульта.');
  return L.join('\n')+'\nРекомендации:\n'+R.map((x,i)=>(i+1)+'. '+x).join('\n')}
 function render(){document.querySelectorAll('.seg').forEach(g=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',ST[g.dataset.k]===b.dataset.v)));
  $('c_is').style.display=ST.ev==='is'?'':'none';$('c_ich').style.display=ST.ev==='ich'?'':'none';$('c_cvt').style.display=ST.ev==='cvt'?'':'none';$('c_heart').style.display=ST.ev==='cvt'?'none':'';$('l_tlt').style.display=ST.ev==='is'?'':'none';
@@ -289,6 +294,7 @@ function render(){document.querySelectorAll('.seg').forEach(g=>g.querySelectorAl
 const sT=startTxt(),sB=sT?box(sT.c,sT.h,sT.b):'';
  if(ST.ev==='cvt'){const c=cvtPlan();$('drug').innerHTML=box('ok','Лечение тромбоза церебральных вен',c.start+'<br><b>Острый период:</b> '+c.acute+'<br>'+c.oral+'<br>'+c.dur)}else{const p=pick();$('drug').innerHTML=sB+box(p.drug==='Варфарин'?'warn':'ok',p.drug+': '+p.dose,p.why+(p.alt?'<br>'+p.alt:'')+(p.notes&&p.notes.length?'<ul>'+p.notes.map(x=>'<li>'+x+'</li>').join('')+'</ul>':''))}
  $('opout').innerHTML=ST.op==='0'?'':box('info','Отмена и возобновление',opText());
+ if(ST.ev!=='cvt'&&!hasInd()){$('drug').innerHTML=box('warn','Показание к антикоагуляции не отмечено',NOIND+'<br>Отметьте показание на вкладке «Ситуация».');$('timing').innerHTML=box('warn','Антикоагулянт не показан',NOIND);$('opout').innerHTML='';$('sum').textContent=summary();return}
  const ti=timing();$('timing').innerHTML=box(ti.t?'info':'warn','Когда начинать',ti.txt+(ti.t?'<br><span class="big">'+when(ti.t[0],ti.t[1])+'</span>':''))+(ST.ondoac?box('bad','Инсульт на фоне антикоагулянта','Проверить приём и дозу, исключить другую причину, сосудистая визуализация.'):'');
  $('sum').textContent=summary()}
 document.querySelectorAll('.seg').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;ST[g.dataset.k]=b.dataset.v;save();render()});
