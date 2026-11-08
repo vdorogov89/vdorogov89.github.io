@@ -1,4 +1,4 @@
-const CACHE='oac-m3v8kp-v4';
+const CACHE='oac-m3v8kp-v5';
 const CORE=['/oac-m3v8kp.html','/oac-m3v8kp.webmanifest','/oac-icon-192.png','/oac-icon-512.png','/oac-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('oac-m3v8kp-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
