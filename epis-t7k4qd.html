@@ -204,14 +204,44 @@ function doses(){const w=parseFloat(String(ST.wt).replace(',','.')),c=ST.c,ok=w>
  line('Кетамин',`болюс ${rg(0.5,4,'мг')}, затем ${rg(0.3,5,'мг/ч')}`,'не угнетает дыхание, но тахикардия, повышение давления; обычно в сочетании с другим анестетиком.');
  r.push('<h3>Сразу</h3>');line('Тиамин внутривенно','250–500 мг',c.alc?'<b>Алкоголь или истощение — ввести до глюкозы.</b>':'при алкоголе, истощении, рвоте — до глюкозы.');line('Глюкоза 40%','40–60 мл внутривенно','только при гипогликемии; цель — 3–10 ммоль/л.');
  return (ok?'':'<p class="muted">Введите массу тела — дозы пересчитаются в миллиграммы и миллилитры.</p>')+r.join('')}
+function recs(){const e=ST.ev,c=ST.c,w=parseFloat(String(ST.wt).replace(',','.')),W=w>=20&&w<=250?w:null,R=[];
+ const kg=(lo,hi,cap,u)=>W?`${Math.round(Math.min(cap,lo*W))}–${Math.round(Math.min(cap,hi*W))} ${u}`:`${lo}–${hi} ${u}/кг (не более ${cap} ${u})`;
+ const vpaOK=!(c.liv||c.mit),levOK=!c.ren,lcmOK=!c.av,s2=sec2(),given=['lev','vpa','lcm'].filter(k=>e[k]!=null);
+ const L2={lev:`леветирацетам ${kg(40,60,4500,'мг')} внутривенно за 15 минут, развести не менее чем в 100 мл`,vpa:`вальпроевая кислота ${kg(20,40,3000,'мг')} внутривенно, не быстрее 6 мг/кг/мин`,lcm:'лакосамид 200–400 мг внутривенно за 15 минут, под контролем ЭКГ'};
+ const pref=(c.fem||!vpaOK)?['lev','lcm','vpa']:(!levOK?['vpa','lcm','lev']:['lev','vpa','lcm']);
+ const ok2=k=>({lev:levOK,vpa:vpaOK,lcm:lcmOK})[k];
+ const opts=pref.filter(k=>ok2(k)&&!given.includes(k));
+ R.push('Общие меры: положение на боку, проходимость дыхательных путей, кислород (цель SpO2 — насыщение крови кислородом — 95–99%), мониторинг давления, пульса, ЭКГ; головной конец приподнят на 30°; глюкоза 3–10 ммоль/л (при гипогликемии — тиамин 250–500 мг, затем 40% глюкоза); нормотермия.');
+ if(!e.stop){
+  if(!e.bz1)R.push(ST.iv==='n'?'Первая очередь сейчас: мидазолам '+(W&&W<=40?'5':'10')+' мг внутримышечно однократно.':`Первая очередь сейчас: диазепам ${W?(0.15*W>=10?'10':fmt(0.15*W)+'–'+fmt(Math.min(10,0.2*W))):'0,15–0,2 мг/кг, не более 10'} мг внутривенно (на 10 мл 0,9% натрия хлорида, не быстрее чем за 5 минут); если через 10 минут судороги продолжаются — повторить однократно.`);
+  else if(!e.bz2&&!s2)R.push('Если через 10 минут после первой дозы бензодиазепина судороги продолжаются — повторить его однократно в той же дозе. Третью дозу не вводить.');
+  if(!s2)R.push('Вторая очередь (не позднее 20-й минуты, сразу после второй дозы бензодиазепина): '+(opts.length?opts.map(k=>L2[k]).join('; или ')+'.':'все препараты второй очереди противопоказаны по отмеченным состояниям — решение с реаниматологом.')+(c.fem?' Женщина детородного возраста или беременность — вальпроевую кислоту по возможности не использовать.':''));
+  else{const rest=opts;R.push('Если через 15 минут после препарата второй очереди статус не купирован: перевод в отделение реанимации, интубация и искусственная вентиляция лёгких, третья очередь под непрерывным ЭЭГ-мониторингом — '+`мидазолам болюс ${W?fmt(0.1*W)+'–'+fmt(0.3*W)+' мг':'0,1–0,3 мг/кг'}, затем ${W?fmt(0.2*W)+'–'+fmt(0.6*W)+' мг/ч':'0,2–0,6 мг/кг/ч'}; или пропофол болюс ${W?Math.round(W)+'–'+Math.round(2*W)+' мг':'1–2 мг/кг'}, затем ${W?Math.round(2*W)+'–'+Math.round(12*W)+' мг/ч':'2–12 мг/кг/ч'}; или тиопентал натрия болюс ${W?Math.round(W)+'–'+Math.round(3*W)+' мг':'1–3 мг/кг'}, затем ${W?Math.round(3*W)+'–'+Math.round(5*W)+' мг/ч':'3–5 мг/кг/ч'}; кетамин — в сочетании с другим анестетиком. Цель — прекращение приступов на ЭЭГ или паттерн «вспышка — подавление».`+(rest.length?' При фокальном статусе до наркоза допустимо повторить вторую очередь другим препаратом: '+L2[rest[0]]+'.':''))}
+ }else{
+  R.push('Приступ купирован. Наблюдение: уровень сознания по шкале комы Глазго каждый час в первые 6 часов, дыхание, сатурация, давление.');
+  R.push('Если сознание не восстанавливается в течение 30–60 минут или колеблется, есть мелкие подёргивания век, рта, пальцев — срочная ЭЭГ: исключить бессудорожный статус.');
+ }
+ const M=[];if(e.lev!=null)M.push('леветирацетам 1000–1500 мг 2 раза в сутки внутривенно или через зонд'+(c.ren?' (при почечной недостаточности — дозу снизить)':''));
+ if(e.vpa!=null)M.push(`вальпроевая кислота — инфузия ${W?fmt(W)+' мг/ч':'1 мг/кг/ч'} или ${W?Math.round(20*W)+' мг':'20 мг/кг'} в сутки (не более ${W?Math.round(Math.min(3000,40*W))+' мг':'40 мг/кг'}), контроль печёночных проб, аммиака, тромбоцитов`);
+ if(e.lcm!=null)M.push('лакосамид 100–200 мг 2 раза в сутки (не более 600 мг в сутки), ЭКГ');
+ R.push('Поддерживающая терапия: '+(M.length?M.join('; '):'начать противоэпилептический препарат, которым купирован статус, в поддерживающей дозе')+(ST.cz.some(x=>x.startsWith('отмена или пропуск'))?'. Статус на фоне пропуска препаратов — прежнюю схему продолжить (при необходимости через назогастральный зонд), внутривенные препараты — дополнительно':'')+'.');
+ const D=['общий анализ крови с тромбоцитами, глюкоза, электролиты, кальций, магний, мочевина, креатинин, печёночные пробы, МНО (международное нормализованное отношение), АЧТВ (активированное частичное тромбопластиновое время), общий анализ мочи, концентрация противоэпилептических препаратов, токсикология'];
+ if(!e.ct)D.push('КТ (компьютерная томография) головного мозга после стабилизации, затем МРТ (магнитно-резонансная томография) по показаниям');
+ D.push('при лихорадке или менингеальных знаках — люмбальная пункция после КТ; ацикловир и антибиотик эмпирически, не дожидаясь пункции');
+ R.push('Обследование: '+D.join('; ')+'.');
+ const C={'алкоголь':'тиамин 250–500 мг внутривенно до глюкозы, профилактика алкогольного делирия','эклампс':'магния сульфат, срочно акушер-гинеколог','впервые возникший':'антинейрональные антитела в крови и ликворе, обсудить раннюю иммунотерапию','лекарства':'отменить провоцирующий препарат; при отравлении изониазидом — пиридоксин','метабол':'коррекция; натрий при хронической гипонатриемии поднимать не быстрее 10 ммоль/л за сутки'};
+ const cx=[];ST.cz.forEach(z=>Object.keys(C).forEach(k=>{if(z.includes(k))cx.push(C[k])}));if(cx.length)R.push('По причине: '+cx.join('; ')+'.');
+ if(ST.fnd)R.push('Подозрение на функциональный статус: ЭЭГ до наркоза; при отсутствии эпилептиформной активности — не наращивать противоэпилептическую терапию.');
+ R.push('При переводе между отделениями — передать время и дозы всех введённых препаратов и схему поддерживающей терапии.');
+ return 'Рекомендации:\n'+R.map((x,i)=>(i+1)+'. '+x).join('\n')}
 function summary(){const e=ST.ev,L=[];const t=ST.t0?new Date(ST.t0):null;
  L.push('Эпилептический статус (судорожный).'+(t?' Отсчёт от начала приступа: '+t.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})+'.':''));
  if(ST.wt)L.push('Масса тела: '+ST.wt+' кг.');
  const ev=EV.filter(([k])=>e[k]!=null).sort((a,b)=>e[a[0]]-e[b[0]]);if(ev.length)L.push('Ход помощи (минуты от начала):\n'+ev.map(([k,l])=>'— '+mm(e[k])+' — '+l[0].toLowerCase()+l.slice(1)).join('\n'));
  if(e.stop)L.push('Приступ купирован через '+Math.round(e.stop/60)+' мин.');else if(ST.t0)L.push('На момент записи приступ продолжается ('+Math.round(el()/60)+' мин).');
  const cz=ST.cz;if(cz.length)L.push('Возможные причины: '+cz.join('; ')+'.');
- const P=['контроль сознания и витальных функций'];if(e.stop&&!e.eeg)P.push('ЭЭГ при невосстановлении сознания в течение 30–60 минут — исключить бессудорожный статус');if(ST.ncse)P.push('срочная ЭЭГ: подозрение на бессудорожный статус');if(ST.fnd)P.push('ЭЭГ до наркоза: подозрение на функциональный статус');if(!e.ct)P.push('КТ головного мозга после стабилизации');P.push('поддерживающая противоэпилептическая терапия');P.push('лабораторные исследования: электролиты, кальций, магний, мочевина, креатинин, печёночные пробы, общий анализ крови с тромбоцитами, МНО (международное нормализованное отношение), АЧТВ (активированное частичное тромбопластиновое время), общий анализ мочи, концентрация противоэпилептических препаратов, токсикология');
- L.push('План: '+P.join('; ')+'.');return L.join('\n')}
+if(ST.ncse)L.push('Подозрение на бессудорожный статус — показана срочная ЭЭГ.');
+ return L.concat([recs()]).join('\n')}
 function render(){const m=el()/60,[p,t]=phase(m);$('clk').textContent=mm(el());$('ph').textContent=t;$('tbox').className='card timer p'+p;$('start').textContent=ST.t0?'Сбросить таймер':'Старт';$('adj').style.display=ST.t0?'flex':'none';
  $('now').innerHTML=nowAdvice();$('ev').innerHTML=EV.map(([k,l])=>`<button data-e="${k}" class="${ST.ev[k]!=null?'done':''}">${l}${ST.ev[k]!=null?'<small>'+mm(ST.ev[k])+'</small>':''}</button>`).join('')}
 function renderAll(){render();$('doses').innerHTML=doses();$('sum').textContent=summary()}
@@ -219,7 +249,7 @@ $('start').onclick=()=>{if(ST.t0){if(!confirmReset())return;ST.t0=null;ST.ev={}}
 function confirmReset(){const b=$('start');if(b.dataset.c==='1'){b.dataset.c='';return true}b.dataset.c='1';b.textContent='Точно сбросить? Нажмите ещё раз';setTimeout(()=>{b.dataset.c='';render()},2500);return false}
 $('adj').onclick=e=>{const b=e.target.closest('button');if(!b)return;const a=+b.dataset.a;ST.t0-=a*60000;Object.keys(ST.ev).forEach(k=>ST.ev[k]+=a*60);save();renderAll()};
 $('ev').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.e;if(!ST.t0)ST.t0=Date.now();if(ST.ev[k]!=null)delete ST.ev[k];else ST.ev[k]=Math.round(el());save();renderAll()};
-$('wt').value=ST.wt;$('iv').value=ST.iv;$('tag').value=ST.tag;$('mail').value=ST.mail;$('ncse').checked=ST.ncse;$('fnd').checked=ST.fnd;
+$('wt').value=ST.wt;$('iv').value=ST.iv;$('tag').value=ST.tag;$('mail').value=ST.mail||'dorogovvn2@zdrav.mos.ru';if(!ST.mail){ST.mail='dorogovvn2@zdrav.mos.ru';save()}$('ncse').checked=ST.ncse;$('fnd').checked=ST.fnd;
 ['liv','ich','fem','mit','av','ren','alc'].forEach(k=>{const x=$('c_'+k);x.checked=!!ST.c[k];x.onchange=()=>{ST.c[k]=x.checked;save();renderAll()}});
 document.querySelectorAll('.cz').forEach(x=>{x.checked=ST.cz.includes(x.dataset.l);x.onchange=()=>{ST.cz=[...document.querySelectorAll('.cz')].filter(y=>y.checked).map(y=>y.dataset.l);save();renderAll()}});
 $('wt').oninput=()=>{ST.wt=$('wt').value;save();renderAll()};$('iv').onchange=()=>{ST.iv=$('iv').value;save();renderAll()};
@@ -229,7 +259,7 @@ function go(s){document.querySelectorAll('section').forEach(x=>x.classList.toggl
 document.querySelector('nav.tabs').onclick=e=>{const b=e.target.closest('button');if(b)go(b.dataset.s)};
 const order=['s1','s2','s3'];document.querySelectorAll('.stepnav').forEach(n=>{const s=n.closest('section').id,i=order.indexOf(s);const p=n.querySelector('.prev'),x=n.querySelector('.next');if(p)p.onclick=()=>go(order[i-1]);if(x)x.onclick=()=>go(order[(i+1)%3])});
 $('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('sum').textContent);$('copy').textContent='Скопировано'}catch(e){$('copy').textContent='Не удалось — выделите текст'}setTimeout(()=>$('copy').textContent='Скопировать',1800)};
-$('reset').onclick=()=>{const b=$('reset');if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Стереть всё? Нажмите ещё раз';setTimeout(()=>{b.dataset.c='';b.textContent='Новый пациент'},2500);return}const mail=ST.mail;ST={t0:null,ev:{},wt:'',iv:'y',c:{},cz:[],ncse:false,fnd:false,tag:'',mail};save();location.reload()};
+$('reset').onclick=()=>{const b=$('reset');if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Стереть всё? Нажмите ещё раз';setTimeout(()=>{b.dataset.c='';b.textContent='Новый пациент'},2500);return}const mail=ST.mail||'dorogovvn2@zdrav.mos.ru';ST={t0:null,ev:{},wt:'',iv:'y',c:{},cz:[],ncse:false,fnd:false,tag:'',mail};save();location.reload()};
 $('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}const t=ST.tag,sub='Эпилептический статус'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
  location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent($('sum').textContent.replace(/\n/g,'\r\n'))};
 renderAll();setInterval(()=>{if(ST.t0&&document.querySelector('#s1.on'))render()},1000);
