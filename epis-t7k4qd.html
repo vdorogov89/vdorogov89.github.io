@@ -187,7 +187,7 @@ function nowAdvice(){const m=el()/60,e=ST.ev,A=[];if(!ST.t0)return '';if(e.stop)
 const sec2=()=>ST.ev.lev||ST.ev.vpa||ST.ev.lcm;
 function doses(){const w=parseFloat(String(ST.wt).replace(',','.')),c=ST.c,ok=w>=20&&w<=250;const W=ok?w:null;
  const r=[];const line=(b,d,n)=>r.push(`<div class="drug"><b>${b}</b><br><span class="d">${d}</span>${n?'<br><span class="muted">'+n+'</span>':''}</div>`);
- const mg=(lo,hi,cap,conc)=>{const L=Math.min(cap,lo*W),H=Math.min(cap,hi*W);return `${Math.round(L)}–${Math.round(H)} мг = ${fmt(L/conc)}–${fmt(H/conc)} мл (${conc} мг/мл)`};
+ const mg=(lo,hi,cap,conc)=>{const L=Math.min(cap,lo*W),H=Math.min(cap,hi*W);return L>=cap?`${cap} мг = ${fmt(cap/conc)} мл (${conc} мг/мл) — максимальная доза`:`${Math.round(L)}–${Math.round(H)} мг = ${fmt(L/conc)}–${fmt(H/conc)} мл (${conc} мг/мл)`+(H>=cap?' (верхняя граница — максимальная доза)':'')};
  r.push('<h3>Первая очередь</h3>');
  if(ST.iv!=='n')line('Диазепам внутривенно',W?(0.15*W>=10?'10 мг = 2 мл (5 мг/мл)':`${fmt(0.15*W)}–${fmt(Math.min(10,0.2*W))} мг = ${fmt(0.15*W/5)}–${fmt(Math.min(10,0.2*W)/5)} мл (5 мг/мл)`):'0,15–0,2 мг/кг, не более 10 мг = 2 мл (5 мг/мл)','2 мл на 10 мл изотонического раствора натрия хлорида, не быстрее чем за 5 минут — иначе остановка дыхания и падение давления. Повтор один раз через 10 минут.');
  line('Мидазолам'+(ST.iv==='n'?' внутримышечно — вены нет':' внутримышечно или внутривенно'),W&&W<=40?'5 мг = 1 мл (5 мг/мл)':'10 мг = 2 мл (5 мг/мл)','однократно; вне инструкции (#). Внутримышечно — при массе более 40 кг 10 мг, 13–40 кг — 5 мг. Препарат предметно-количественного учёта.');
@@ -205,7 +205,7 @@ function doses(){const w=parseFloat(String(ST.wt).replace(',','.')),c=ST.c,ok=w>
  r.push('<h3>Сразу</h3>');line('Тиамин внутривенно','250–500 мг',c.alc?'<b>Алкоголь или истощение — ввести до глюкозы.</b>':'при алкоголе, истощении, рвоте — до глюкозы.');line('Глюкоза 40%','40–60 мл внутривенно','только при гипогликемии; цель — 3–10 ммоль/л.');
  return (ok?'':'<p class="muted">Введите массу тела — дозы пересчитаются в миллиграммы и миллилитры.</p>')+r.join('')}
 function recs(){const e=ST.ev,c=ST.c,w=parseFloat(String(ST.wt).replace(',','.')),W=w>=20&&w<=250?w:null,R=[];
- const kg=(lo,hi,cap,u)=>W?`${Math.round(Math.min(cap,lo*W))}–${Math.round(Math.min(cap,hi*W))} ${u}`:`${lo}–${hi} ${u}/кг (не более ${cap} ${u})`;
+ const kg=(lo,hi,cap,u)=>{if(!W)return `${lo}–${hi} ${u}/кг (не более ${cap} ${u})`;const L=Math.round(Math.min(cap,lo*W)),H=Math.round(Math.min(cap,hi*W));return L>=cap?`${cap} ${u} (максимальная доза)`:`${L}–${H} ${u}`};
  const vpaOK=!(c.liv||c.mit),levOK=!c.ren,lcmOK=!c.av,s2=sec2(),given=['lev','vpa','lcm'].filter(k=>e[k]!=null);
  const L2={lev:`леветирацетам ${kg(40,60,4500,'мг')} внутривенно за 15 минут, развести не менее чем в 100 мл`,vpa:`вальпроевая кислота ${kg(20,40,3000,'мг')} внутривенно, не быстрее 6 мг/кг/мин`,lcm:'лакосамид 200–400 мг внутривенно за 15 минут, под контролем ЭКГ'};
  const pref=(c.fem||!vpaOK)?['lev','lcm','vpa']:(!levOK?['vpa','lcm','lev']:['lev','vpa','lcm']);
