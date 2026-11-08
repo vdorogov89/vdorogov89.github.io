@@ -85,8 +85,9 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
 <section id="s1" class="on">
   <div class="card">
     <h2>Событие</h2>
-    <div class="seg" data-k="ev"><button data-v="tia">ТИА</button><button data-v="is">Ишемический инсульт</button><button data-v="ich">Внутримозговое кровоизлияние</button></div>
+    <div class="seg" data-k="ev"><button data-v="tia">ТИА</button><button data-v="is">Ишемический инсульт</button><button data-v="ich">Внутримозговое кровоизлияние</button><button data-v="cvt">Тромбоз церебральных вен и синусов</button></div>
     <label class="f" style="margin-top:10px">Дата начала симптомов<input type="date" id="d0"></label>
+    <label class="chk" id="l_tlt"><input type="checkbox" id="tlt"><span>Проведён внутривенный тромболизис</span></label>
     <label class="chk"><input type="checkbox" id="ondoac"><span>Инсульт развился на фоне приёма антикоагулянта</span></label>
   </div>
 
@@ -107,7 +108,15 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
     <label class="chk"><input type="checkbox" id="bp"><span>Давление под контролем — меньше 130/80 мм рт. ст.</span></label>
   </div>
 
-  <div class="card">
+  <div class="card" id="c_cvt">
+    <h2>Тромбоз церебральных вен и синусов</h2>
+    <p class="muted">В клинических рекомендациях РФ 2020 года лечения тромбоза церебральных вен нет — блок по рекомендациям Европейской организации по инсульту (2017) и Американской ассоциации сердца (2024).</p>
+    <div class="lbl">Причина — от неё зависит длительность</div>
+    <div class="seg" data-k="cvc"><button data-v="tr">преходящая: контрацептивы, беременность, послеродовый период, инфекция</button><button data-v="un">не установлена</button><button data-v="th">тяжёлая тромбофилия или повторный тромбоз</button></div>
+    <label class="chk"><input type="checkbox" id="cvh"><span>Есть венозный инфаркт с геморрагическим пропитыванием или кровоизлияние<small>Не противопоказание к гепарину</small></span></label>
+  </div>
+
+  <div class="card" id="c_heart">
     <h2>Сердце</h2>
     <label class="chk"><input type="checkbox" id="mech"><span>Механический протез клапана</span></label>
     <label class="chk"><input type="checkbox" id="ms"><span>Умеренный или тяжёлый митральный стеноз<small>Площадь отверстия 1,5 см² и меньше, обычно ревматический</small></span></label>
@@ -144,6 +153,11 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
   </div>
   <div id="drug"></div>
   <div class="card">
+    <h2>Профилактика тромбоза глубоких вен</h2>
+    <label class="chk"><input type="checkbox" id="imm"><span>Пациент обездвижен — не ходит самостоятельно</span></label>
+    <div id="vte"></div>
+  </div>
+  <div class="card">
     <h2>Предстоит операция</h2>
     <div class="seg" data-k="op"><button data-v="0">нет</button><button data-v="lo">низкий риск кровотечения (например, каротидное стентирование)</button><button data-v="hi">высокий риск (например, каротидная эндартерэктомия)</button></div>
     <div id="opout"></div>
@@ -165,16 +179,16 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
     <label class="f" style="margin-top:8px">Адрес<input type="email" id="mail"></label>
     <div class="mbtns"><button id="send">Отправить</button></div>
   </div>
-  <p class="copy">Помощник для врача, а не замена клиническому решению. Опирается на обзор Кулеш А.А., Дёмин Д.А., Кучеренко С.С. «10 правил назначения пероральных антикоагулянтов после инсульта» (Неврология, нейропсихиатрия, психосоматика, 2024), исследование ELAN (2023), рекомендации Американской ассоциации сердца и инсульта (2021, 2022), Американской коллегии кардиологов (2023) и Европейской ассоциации сердечного ритма по применению прямых оральных антикоагулянтов (2021). Дозы сверять с инструкцией. Данные хранятся только на этом устройстве. © 2026 Василий Дорогов.</p>
+  <p class="copy">Помощник для врача, а не замена клиническому решению. Опирается на обзор Кулеш А.А., Дёмин Д.А., Кучеренко С.С. «10 правил назначения пероральных антикоагулянтов после инсульта» (Неврология, нейропсихиатрия, психосоматика, 2024), исследование ELAN (2023), рекомендации Американской ассоциации сердца и инсульта (2021, 2022), Американской коллегии кардиологов (2023), клинические рекомендации РФ «Ишемический инсульт и транзиторная ишемическая атака у взрослых» (2020), рекомендации Европейской организации по инсульту по тромбозу церебральных вен (2017) и Европейской ассоциации сердечного ритма по применению прямых оральных антикоагулянтов (2021). Дозы сверять с инструкцией. Данные хранятся только на этом устройстве. © 2026 Василий Дорогов.</p>
   <div class="stepnav"><button class="prev">Назад</button><button class="next main">В начало</button></div>
 </section>
 </div>
 <nav class="tabs"><button data-s="s1" class="on">Ситуация</button><button data-s="s2">Препарат</button><button data-s="s3">Сводка</button></nav>
 <script>
 const $=id=>document.getElementById(id);const KEY='oac-st',DEFMAIL='dorogovvn2@zdrav.mos.ru';
-const CB=['ondoac','hte','alt','bp','mech','ms','bio','lvt','dial','cpc','cpb','plt20','plt50','aps','preg','vera','azol','gib','cog'];
+const CB=['tlt','cvh','imm','ondoac','hte','alt','bp','mech','ms','bio','lvt','dial','cpc','cpb','plt20','plt50','aps','preg','vera','azol','gib','cog'];
 const TX=['d0','age','sex','wt','cr','tag','mail'];
-let ST={ev:'is',sz:'s',ht:'0',ichc:'deep',op:'0',mail:DEFMAIL};
+let ST={cvc:'tr',ev:'is',sz:'s',ht:'0',ichc:'deep',op:'0',mail:DEFMAIL};
 try{const x=JSON.parse(localStorage.getItem(KEY));if(x)ST=Object.assign(ST,x)}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 const num=k=>{const v=parseFloat(String(ST[k]||'').replace(',','.'));return isNaN(v)?null:v};
@@ -187,6 +201,7 @@ function noDoac(){const R=[];if(ST.mech)R.push('механический про�
  const k=crcl();if(ST.dial||(k!=null&&k<15))R.push('клиренс креатинина меньше 15 мл/мин или диализ');if(ST.cpc)R.push('печёночная недостаточность класса C');if(ST.plt20)R.push('тромбоциты меньше 20 × 10⁹/л');if(ST.aps)R.push('антифосфолипидный синдром');if(ST.preg)R.push('беременность');if(ST.lvt)R.push('тромб левого желудочка (предпочтителен варфарин)');return R}
 function timing(){const T=[];let t=null,txt='';
  if(ST.ev==='tia'){t=[0,0];txt='ТИА: инфаркта нет — антикоагулянт сразу.'}
+ else if(ST.ev==='cvt'){t=[0,0];txt='Тромбоз церебральных вен: лечебная доза гепарина сразу после подтверждения диагноза'+(ST.cvh?', геморрагический компонент не противопоказание':'')+'.'}
  else if(ST.ev==='is'){const base={s:[1,2],m:[1,2],l:[6,7]}[ST.sz];
   if(ST.ht==='ph2'){t=[14,30];txt='Паренхиматозная гематома 2-го типа: 14–30-е сутки в зависимости от отёка, смещения и динамики на КТ.'}
   else if(ST.ht==='ph1'){t=[base[0]+7,base[1]+7];txt='Паренхиматозная гематома 1-го типа: отсрочка примерно на неделю относительно срока по размеру очага.'}
@@ -200,22 +215,39 @@ function timing(){const T=[];let t=null,txt='';
   else{txt='Амилоидная ангиопатия с корковым поверхностным сидерозом: антикоагулянт нежелателен — окклюзия ушка левого предсердия.'}
   if((ST.mech||ST.ms)&&c!=='css'){t=[7,14];txt+=' Очень высокий тромбоэмболический риск (механический клапан, ревматический порок) — варфарин через 1–2 недели.'}
   if(!ST.bp&&c!=='css')txt+=' Условие — целевое давление меньше 130/80 мм рт. ст.'}
+ if(ST.ev==='is'&&ST.tlt)txt+=' После тромболизиса — любой антикоагулянт не раньше чем через 24 часа (клинические рекомендации РФ 2020).';
+ if(ST.ev==='is'||ST.ev==='tia')txt+=' В клинических рекомендациях РФ 2020 года сроков нет — ориентир по исследованию ELAN и обзору Кулеша и соавторов.';
  return{t,txt}}
 function pick(){const no=noDoac(),k=crcl(),a=num('age'),w=num('wt'),c=num('cr');
  if(no.length){const mech=ST.mech;return{drug:'Варфарин',dose:'по МНО (международному нормализованному отношению): целевое '+(mech?'2,5–3,5 (механический протез; зависит от типа и позиции)':'2,0–3,0'),why:'Прямые оральные антикоагулянты не подходят: '+no.join('; ')+'.',alt:''}}
  const crit=[a>=80,w!=null&&w<=60,c!=null&&c>=133].filter(Boolean).length;
  let apx='5 мг 2 раза в сутки',apxW='';if(k!=null&&k<30){apx='2,5 мг 2 раза в сутки';apxW='клиренс 15–29 мл/мин'}else if(crit>=2){apx='2,5 мг 2 раза в сутки';apxW='2 из 3 критериев: возраст 80 лет и старше, масса 60 кг и меньше, креатинин 133 мкмоль/л и выше'}
  const riv=k==null?'20 мг 1 раз в сутки с едой (15 мг при клиренсе 15–49 мл/мин)':(k<50?'15 мг 1 раз в сутки с едой':'20 мг 1 раз в сутки с едой');
- let dab;if(k!=null&&k<30)dab='противопоказан (клиренс меньше 30 мл/мин)';else if(a>=80||ST.vera)dab='110 мг 2 раза в сутки';else if((a>=75)||(k!=null&&k<50)||ST.gib)dab='150 или 110 мг 2 раза в сутки — рассмотреть снижение';else dab='150 мг 2 раза в сутки';
+ let dab;if(k!=null&&k<30)dab='противопоказан (клиренс меньше 30 мл/мин)';else if(a>=80||ST.vera)dab='110 мг 2 раза в сутки';else if(k!=null&&k<50)dab='110 мг 2 раза в сутки (клинические рекомендации РФ 2020: при клиренсе 30–50 мл/мин)';else if(a>=75||ST.gib)dab='150 или 110 мг 2 раза в сутки — рассмотреть снижение';else dab='150 мг 2 раза в сутки';
  const notes=[];if(ST.plt50)notes.push('тромбоциты 20–50 × 10⁹/л — с осторожностью, рассмотреть половинную дозу');if(ST.cpb)notes.push('печёночная недостаточность класса B — ривароксабан противопоказан');if(ST.azol)notes.push('системные кетоконазол, итраконазол, ритонавир повышают концентрацию прямых антикоагулянтов — избегать сочетания');if(ST.cog)notes.push('когнитивные нарушения — контроль приёма родственниками, таблетница с напоминанием');if(ST.lvt)notes.push('при тромбе левого желудочка предпочтителен варфарин');
  return{drug:'Апиксабан',dose:apx+(apxW?' (сниженная доза: '+apxW+')':' — полная доза; снижать только по критериям'),why:'Прямые оральные антикоагулянты предпочтительнее варфарина; апиксабан в обзоре и наблюдательных данных — с наименьшим риском внутричерепных кровоизлияний.',alt:`Альтернативы: ривароксабан ${ST.cpb?'— противопоказан':riv}; дабигатран ${dab}.`,notes}}
+const r10=x=>Math.round(x/10)*10;
+function enoxTher(){const w=num('wt'),k=crcl();if(ST.dial||(k!=null&&k<15))return'нефракционированный гепарин внутривенно под контролем АЧТВ (активированного частичного тромбопластинового времени) — эноксапарин при клиренсе меньше 15 мл/мин не применяется';
+ const d=w?r10(w)+' мг':'1 мг/кг';return'эноксапарин '+d+' подкожно '+(k!=null&&k<30?'1 раз в сутки (клиренс 15–29 мл/мин)':'2 раза в сутки')+(w?' (1 мг/кг; округлено до 10 мг)':'')}
+function cvtPlan(){const k=crcl(),noDab=(k!=null&&k<30)||ST.aps||ST.preg;const dur={tr:'3–6 месяцев',un:'6–12 месяцев',th:'длительно, возможно пожизненно'}[ST.cvc];
+ return{start:'Сразу после подтверждения диагноза (КТ- или МР-венография)'+(ST.cvh?', несмотря на геморрагический компонент':'')+'.',
+ acute:enoxTher()+'. Низкомолекулярный гепарин предпочтительнее нефракционированного.',
+ oral:'Через 5–15 суток, после стабилизации — переход на пероральный препарат: варфарин с целевым МНО 2,0–3,0 (перекрывать эноксапарином до двух значений МНО в целевом диапазоне)'+(noDab?'':' или дабигатран 150 мг 2 раза в сутки (исследование RE-SPECT CVT; в инструкции РФ это показание не указано)')+'.'+(ST.aps?' Антифосфолипидный синдром — только варфарин.':'')+(ST.preg?' Беременность — продолжать низкомолекулярный гепарин до родов и не менее 6 недель после.':''),
+ dur:'Длительность: '+dur+'.'}}
+function vteText(){if(!ST.imm)return'';const k=crcl();
+ if(ST.ev==='cvt')return'Отдельная профилактика не нужна — пациент получает лечебную дозу.';
+ const d=(ST.dial||(k!=null&&k<15))?'нефракционированный гепарин 5000 единиц подкожно 2–3 раза в сутки (эноксапарин при клиренсе меньше 15 мл/мин не применяется)':'эноксапарин '+(k!=null&&k<30?'20 мг':'40 мг')+' подкожно 1 раз в сутки'+(k!=null&&k<30?' (клиренс 15–29 мл/мин)':'')+'; альтернатива — нефракционированный гепарин 5000 единиц подкожно 2–3 раза в сутки';
+ const st=ST.ev==='ich'?'через 24–48 часов, если на контрольной КТ гематома стабильна':(ST.tlt?'не раньше чем через 24 часа после тромболизиса':'с первых суток');
+ return'Профилактическая доза: '+d+'. Начать '+st+'; вместе с перемежающейся пневматической компрессией. Низкомолекулярный гепарин предпочтительнее нефракционированного (клинические рекомендации РФ 2020). Отменить, когда пациент начнёт ходить или в день старта полной дозы антикоагулянта. Контроль тромбоцитов на 5–10-е сутки — гепарин-индуцированная тромбоцитопения.'}
 function opText(){if(ST.op==='0')return'';const k=crcl();
  if(ST.op==='lo')return'Операция с низким риском кровотечения: можно не отменять или пропустить вечернюю дозу накануне; возобновить в день операции через 6 часов и более при надёжном гемостазе или на следующий день.';
  const p=pick();if(p.drug==='Варфарин')return'Операция с высоким риском кровотечения на варфарине: отмена за 5 дней, контроль МНО, вопрос о «мосте» низкомолекулярным гепарином — решение с кардиологом по тромбоэмболическому риску.';
  let dab='за 2 суток при клиренсе 80 мл/мин и выше'+(k!=null&&k<80?`; при клиренсе ${k} мл/мин — ${k>=50?'за 3 суток':'за 4 суток'}`:'');
  return`Операция с высоким риском кровотечения: апиксабан и ривароксабан отменить за 2 суток (независимо от клиренса), дабигатран — ${dab}; возобновить через 2 суток после операции (по рекомендациям Европейской ассоциации сердечного ритма, 2021).`}
 function summary(){const L=[],ti=timing(),p=pick(),k=crcl();
- const ev={tia:'Транзиторная ишемическая атака',is:'Ишемический инсульт',ich:'Внутримозговое кровоизлияние'}[ST.ev];
+ const ev={tia:'Транзиторная ишемическая атака',is:'Ишемический инсульт',ich:'Внутримозговое кровоизлияние',cvt:'Тромбоз церебральных вен и синусов'}[ST.ev];
+ if(ST.ev==='cvt'){const c=cvtPlan(),v=vteText();const R=[c.start,'Острый период: '+c.acute,c.oral,c.dur,'Контроль тромбоцитов на 5–10-е сутки — гепарин-индуцированная тромбоцитопения.','Поиск причины: тромбофилия (в том числе антифосфолипидный синдром), гормональная контрацепция, инфекция, онкологический процесс.'];
+  return ev+(ST.d0?', начало '+new Date(ST.d0+'T12:00').toLocaleDateString('ru-RU'):'')+'.'+(k!=null?'\nКлиренс креатинина (Кокрофт — Голт): '+k+' мл/мин.':'')+'\nРекомендации:\n'+R.map((x,i)=>(i+1)+'. '+x).join('\n')}
  const ind=[ST.mech&&'механический протез клапана',ST.ms&&'митральный стеноз',ST.bio&&'биопротез клапана',ST.lvt&&'тромб левого желудочка'].filter(Boolean);
  L.push(ev+'; показание к антикоагуляции: '+(ind.length?ind.join(', '):'фибрилляция предсердий')+(ST.d0?', начало '+new Date(ST.d0+'T12:00').toLocaleDateString('ru-RU'):'')+'.');
  if(ST.ev==='is'){L.push('Очаг: '+({s:'малый (до 1,5 см)',m:'средний',l:'большой'})[ST.sz]+'; геморрагическая трансформация: '+({0:'нет',hi1:'геморрагический инфаркт 1-го типа',hi2:'геморрагический инфаркт 2-го типа',ph1:'паренхиматозная гематома 1-го типа',ph2:'паренхиматозная гематома 2-го типа'})[ST.ht]+'.')}
@@ -227,14 +259,17 @@ function summary(){const L=[],ti=timing(),p=pick(),k=crcl();
  if(ST.ev!=='tia'&&!(ST.ev==='ich'))R.push('До начала антикоагулянта — антиагрегантная терапия (ацетилсалициловая кислота'+(ST.alt?' или двойная антитромбоцитарная терапия по основному механизму':'')+'); в день старта антикоагулянта антиагрегант отменить, если нет отдельных показаний.');
  if(!(ST.ev==='ich'&&ST.ichc==='css'))R.push('Препарат: '+p.drug.toLowerCase()+' '+p.dose+'. '+p.why+(p.alt?' '+p.alt:'')+(p.notes&&p.notes.length?' Учесть: '+p.notes.join('; ')+'.':''));
  else R.push('Антикоагулянт нежелателен: направить на консультацию по окклюзии ушка левого предсердия.');
+ R.push('Лечебные дозы гепарина и «мост» гепарином до перорального антикоагулянта при фибрилляции предсердий не показаны: пользы нет, кровоизлияний больше (исследования IST, TAIST, метаанализы)'+(ST.mech?'; при механическом клапане — решение с кардиологом':'')+'.');
+{const v=vteText();if(v)R.push('Профилактика тромбоза глубоких вен. '+v)}
  if(ST.ev==='ich')R.push('МРТ головного мозга с последовательностью SWI до решения о старте; целевое давление меньше 130/80 мм рт. ст.');
  const o=opText();if(o)R.push(o);
  if(p.drug!=='Варфарин')R.push('Полная доза — у большинства пациентов: неоправданно сниженная доза повышает риск инсульта и смерти.');
  return L.join('\n')+'\nРекомендации:\n'+R.map((x,i)=>(i+1)+'. '+x).join('\n')}
 function render(){document.querySelectorAll('.seg').forEach(g=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',ST[g.dataset.k]===b.dataset.v)));
- $('c_is').style.display=ST.ev==='is'?'':'none';$('c_ich').style.display=ST.ev==='ich'?'':'none';
+ $('c_is').style.display=ST.ev==='is'?'':'none';$('c_ich').style.display=ST.ev==='ich'?'':'none';$('c_cvt').style.display=ST.ev==='cvt'?'':'none';$('c_heart').style.display=ST.ev==='cvt'?'none':'';$('l_tlt').style.display=ST.ev==='is'?'':'none';
+ $('vte').innerHTML=ST.imm?box('info','Профилактика',vteText()):'';
  const k=crcl();$('crcl').innerHTML=k==null?'<p class="muted">Заполните возраст, массу и креатинин — посчитается клиренс по Кокрофту — Голту.</p>':box(k<15?'bad':k<30?'warn':k<50?'info':'ok','Клиренс креатинина: '+k+' мл/мин','Формула Кокрофта — Голта.');
- const p=pick();$('drug').innerHTML=box(p.drug==='Варфарин'?'warn':'ok',p.drug+': '+p.dose,p.why+(p.alt?'<br>'+p.alt:'')+(p.notes&&p.notes.length?'<ul>'+p.notes.map(x=>'<li>'+x+'</li>').join('')+'</ul>':''));
+ if(ST.ev==='cvt'){const c=cvtPlan();$('drug').innerHTML=box('ok','Лечение тромбоза церебральных вен',c.start+'<br><b>Острый период:</b> '+c.acute+'<br>'+c.oral+'<br>'+c.dur)}else{const p=pick();$('drug').innerHTML=box(p.drug==='Варфарин'?'warn':'ok',p.drug+': '+p.dose,p.why+(p.alt?'<br>'+p.alt:'')+(p.notes&&p.notes.length?'<ul>'+p.notes.map(x=>'<li>'+x+'</li>').join('')+'</ul>':''))}
  $('opout').innerHTML=ST.op==='0'?'':box('info','Отмена и возобновление',opText());
  const ti=timing();$('timing').innerHTML=box(ti.t?'info':'warn','Когда начинать',ti.txt+(ti.t?'<br><span class="big">'+when(ti.t[0],ti.t[1])+'</span>':''))+(ST.ondoac?box('bad','Инсульт на фоне антикоагулянта','Проверить приём и дозу, исключить другую причину, сосудистая визуализация.'):'');
  $('sum').textContent=summary()}
@@ -246,7 +281,7 @@ function go(s){document.querySelectorAll('section').forEach(x=>x.classList.toggl
 document.querySelector('nav.tabs').onclick=e=>{const b=e.target.closest('button');if(b)go(b.dataset.s)};
 const order=['s1','s2','s3'];document.querySelectorAll('.stepnav').forEach(n=>{const s=n.closest('section').id,i=order.indexOf(s);const p=n.querySelector('.prev'),x=n.querySelector('.next');if(p)p.onclick=()=>go(order[i-1]);if(x)x.onclick=()=>go(order[(i+1)%3])});
 $('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('sum').textContent);$('copy').textContent='Скопировано'}catch(e){$('copy').textContent='Не удалось — выделите текст'}setTimeout(()=>$('copy').textContent='Скопировать',1800)};
-$('reset').onclick=()=>{const b=$('reset');if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Стереть всё? Нажмите ещё раз';setTimeout(()=>{b.dataset.c='';b.textContent='Новый пациент'},2500);return}const mail=ST.mail||DEFMAIL;ST={ev:'is',sz:'s',ht:'0',ichc:'deep',op:'0',mail};save();location.reload()};
+$('reset').onclick=()=>{const b=$('reset');if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Стереть всё? Нажмите ещё раз';setTimeout(()=>{b.dataset.c='';b.textContent='Новый пациент'},2500);return}const mail=ST.mail||DEFMAIL;ST={cvc:'tr',ev:'is',sz:'s',ht:'0',ichc:'deep',op:'0',mail};save();location.reload()};
 $('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}const t=ST.tag||'',sub='Антикоагулянты после инсульта'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
  location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent($('sum').textContent.replace(/\n/g,'\r\n'))};
 render();
