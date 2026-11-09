@@ -83,6 +83,7 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
   <header><h1>Антитромботическая терапия</h1><span>автор — В.&nbsp;Дорогов</span></header>
 
 <section id="s1" class="on">
+  <p class="muted mnote" style="margin:0 0 10px"></p>
   <div class="card">
     <h2>Событие</h2>
     <div class="seg" data-k="ev"><button data-v="tia">ТИА</button><button data-v="is">Ишемический инсульт</button><button data-v="ich">Внутримозговое кровоизлияние</button><button data-v="cvt">Тромбоз церебральных вен и синусов</button></div>
@@ -145,6 +146,7 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
 </section>
 
 <section id="s4">
+  <p class="muted mnote" style="margin:0 0 10px"></p>
   <div class="card">
     <h2>Диссекция артерии</h2>
     <p class="muted">Расслоение стенки сонной или позвоночной артерии. Для инсульта по другим причинам — вкладка «Инсульт».</p>
@@ -170,6 +172,10 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
 </section>
 
 <section id="s2">
+  <div class="card modebar" style="padding:12px 16px">
+    <div class="lbl" style="margin-top:0">Расчёт для</div>
+    <div class="seg" data-k="mode"><button data-v="st">инсульта (вкладка «Инсульт»)</button><button data-v="dis">диссекции (вкладка «Диссекция»)</button></div>
+  </div>
   <div class="card">
     <h2>Пациент</h2>
     <div class="row">
@@ -219,6 +225,10 @@ table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padd
 </section>
 
 <section id="s3">
+  <div class="card modebar" style="padding:12px 16px">
+    <div class="lbl" style="margin-top:0">Расчёт для</div>
+    <div class="seg" data-k="mode"><button data-v="st">инсульта (вкладка «Инсульт»)</button><button data-v="dis">диссекции (вкладка «Диссекция»)</button></div>
+  </div>
   <div id="timing"></div>
   <div class="card">
     <h2>Сводка для истории болезни</h2>
@@ -419,7 +429,7 @@ function summary(){if(DIS())return dissSummary();const L=[],ti=timing(),p=pick()
  const o=opText();if(o)R.push(o);
  if(p.drug!=='Варфарин')R.push('Доза полная, если нет критериев для снижения. Не снижать «на всякий случай»: сниженная доза хуже защищает от повторного инсульта.');
  return L.join('\n')+'\nРекомендации:\n'+R.map((x,i)=>(i+1)+'. '+x).join('\n')}
-function render(){document.querySelectorAll('.seg').forEach(g=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',ST[g.dataset.k]===b.dataset.v)));
+function render(){document.querySelectorAll('.mnote').forEach(n=>{const own=n.closest('section').id==='s4'?'dis':'st';n.innerHTML=ST.mode===own?'':'⚠ Сейчас «Препарат» и «Сводка» считаются для '+(ST.mode==='dis'?'диссекции':'инсульта')+'. Изменение любого поля на этой вкладке переключит расчёт сюда.'});document.querySelectorAll('.seg').forEach(g=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',ST[g.dataset.k]===b.dataset.v)));
  $('c_op').style.display=DIS()?'none':'';
  if(DIS()){$('d_szw').style.display=ST.dpr==='is'?'':'none';$('l_sah').style.display=ST.dloc==='ic'?'':'none';
   const k=crcl();$('crcl').innerHTML=k==null?'<p class="muted">Заполните возраст, массу и креатинин — посчитается клиренс по Кокрофту — Голту.</p>':box(k<15?'bad':k<30?'warn':k<50?'info':'ok','Клиренс креатинина: '+k+' мл/мин','Формула Кокрофта — Голта.');
@@ -439,14 +449,15 @@ const sT=startTxt(),sB=sT?box(sT.c,sT.h,sT.b):'';
  if(ST.ev!=='cvt'&&!hasInd()){$('drug').innerHTML=box('warn','Показание к антикоагуляции не отмечено',(ST.ev==='ich'?NOIND_ICH:NOIND)+'<br>Отметьте показание на вкладке «Ситуация».')+(ST.ev!=='ich'?box('info','Антиагреганты: дозы и сроки','<ol>'+apPlan().map(x=>'<li>'+x+'</li>').join('')+'</ol>'):'');$('timing').innerHTML=box('warn','Антикоагулянт не показан',ST.ev==='ich'?NOIND_ICH:NOIND);$('opout').innerHTML='';$('sum').textContent=summary();return}
  const ti=timing();$('timing').innerHTML=box(ti.t?'info':'warn','Когда начинать',ti.txt+(ti.t?'<br><span class="big">'+when(ti.t[0],ti.t[1])+'</span>':''))+(ST.ondoac?box('bad','Инсульт на фоне антикоагулянта','Проверить приём и дозу, исключить другую причину, сосудистая визуализация.'):'');
  $('sum').textContent=summary()}
-document.querySelectorAll('.seg').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;ST[g.dataset.k]=b.dataset.v;save();render()});
-CB.forEach(k=>{const x=$(k);x.checked=!!ST[k];x.onchange=()=>{ST[k]=x.checked;save();render()}});
-TX.forEach(k=>{const x=$(k);if(ST[k]!=null)x.value=ST[k];x.oninput=x.onchange=()=>{ST[k]=x.value;save();render()}});
+function touch(el){const sec=el.closest('section');if(!sec)return;if(sec.id==='s1')ST.mode='st';if(sec.id==='s4')ST.mode='dis'}
+document.querySelectorAll('.seg').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;ST[g.dataset.k]=b.dataset.v;touch(g);save();render()});
+CB.forEach(k=>{const x=$(k);x.checked=!!ST[k];x.onchange=()=>{ST[k]=x.checked;touch(x);save();render()}});
+TX.forEach(k=>{const x=$(k);if(ST[k]!=null)x.value=ST[k];x.oninput=x.onchange=()=>{ST[k]=x.value;touch(x);save();render()}});
 if(!$('mail').value)$('mail').value=DEFMAIL;
 const order=()=>ST.mode==='dis'?['s4','s2','s3']:['s1','s2','s3'];
-function go(s){if(s==='s1')ST.mode='st';if(s==='s4')ST.mode='dis';save();document.querySelectorAll('section').forEach(x=>x.classList.toggle('on',x.id===s));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));render();scrollTo(0,0)}
+function go(s){document.querySelectorAll('section').forEach(x=>x.classList.toggle('on',x.id===s));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));render();scrollTo(0,0)}
 document.querySelector('nav.tabs').onclick=e=>{const b=e.target.closest('button');if(b)go(b.dataset.s)};
-document.querySelectorAll('.stepnav').forEach(n=>{const s=n.closest('section').id;const p=n.querySelector('.prev'),x=n.querySelector('.next');if(p)p.onclick=()=>{const o=order();go(o[o.indexOf(s)-1])};if(x)x.onclick=()=>{const o=order();go(o[(o.indexOf(s)+1)%3])}});
+document.querySelectorAll('.stepnav').forEach(n=>{const s=n.closest('section').id;const p=n.querySelector('.prev'),x=n.querySelector('.next');if(p)p.onclick=()=>{const o=order();go(o[o.indexOf(s)-1])};if(x)x.onclick=()=>{if(s==='s1'||s==='s4')return go('s2');const o=order();go(o[(o.indexOf(s)+1)%3])}});
 $('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('sum').textContent);$('copy').textContent='Скопировано'}catch(e){$('copy').textContent='Не удалось — выделите текст'}setTimeout(()=>$('copy').textContent='Скопировать',1800)};
 $('reset').onclick=()=>{const b=$('reset');if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Стереть всё? Нажмите ещё раз';setTimeout(()=>{b.dataset.c='';b.textContent='Новый пациент'},2500);return}const mail=ST.mail||DEFMAIL;ST={dvtl:'px',mode:ST.mode||'st',dloc:'ec',dpr:'is',dsz:'s',apm:'minor',cvc:'tr',ev:'is',sz:'s',ht:'0',ichc:'deep',op:'0',mail};save();location.reload()};
 $('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}const t=ST.tag||'',sub='Антитромботическая терапия'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');
