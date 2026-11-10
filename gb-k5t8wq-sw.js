@@ -1,4 +1,4 @@
-const CACHE='gb-k5t8wq-v1';
+const CACHE='gb-k5t8wq-v2';
 const CORE=['/gb-k5t8wq.html','/gb-k5t8wq.webmanifest','/gb-icon-192.png','/gb-icon-512.png','/gb-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('gb-k5t8wq-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
