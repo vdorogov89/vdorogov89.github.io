@@ -1,4 +1,4 @@
-const CACHE='pns-h6q3wd-v1';
+const CACHE='pns-h6q3wd-v2';
 const CORE=['/pns-h6q3wd.html','/pns-h6q3wd.webmanifest','/pns-icon-192.png','/pns-icon-512.png','/pns-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('pns-h6q3wd-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
