@@ -1,0 +1,31 @@
+{
+ "id": "/pns-h6q3wd.html",
+ "name": "Паранеоплазия и иммунотерапия",
+ "short_name": "Паранеоплазия",
+ "lang": "ru",
+ "start_url": "/pns-h6q3wd.html",
+ "scope": "/pns-h6q3wd",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/pns-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/pns-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/pns-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
