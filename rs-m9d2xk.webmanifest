@@ -1,0 +1,31 @@
+{
+ "id": "/rs-m9d2xk.html",
+ "name": "Рассеянный склероз: критерии и ПИТРС",
+ "short_name": "Рассеянный склероз",
+ "lang": "ru",
+ "start_url": "/rs-m9d2xk.html",
+ "scope": "/rs-m9d2xk",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/rs-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/rs-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/rs-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
