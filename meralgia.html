@@ -112,6 +112,15 @@
   .cmp .no{color:var(--warn);} .cmp .yes{color:#6BE3A4;}
   .nerve{margin:8px 0 28px; padding:18px; border-radius:18px; background:var(--glass); border:1px solid var(--line);}
   .nerve svg{display:block; width:100%; max-width:460px; height:auto; margin:0 auto;}
+  .n3d{position:relative; max-width:520px; margin:0 auto; overflow:hidden;}
+  .n3d canvas{display:block; touch-action:pan-y; cursor:grab;}
+  .nlab span{position:absolute; left:0; top:0; font-size:12.5px; font-weight:600; white-space:nowrap; pointer-events:none; padding:2px 7px; border-radius:8px; background:rgba(8,8,13,0.72); }
+  .nlines{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible;}
+  .nhint{position:absolute; left:0; right:0; bottom:8px; text-align:center; font-size:13px; color:var(--muted); transition:opacity .6s; pointer-events:none;}
+  .nbtn{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:12px 0 4px;}
+  .nbtn button{font:500 14px 'Inter',sans-serif; padding:8px 14px; border-radius:100px; border:1px solid var(--line); background:transparent; color:var(--muted); cursor:pointer;}
+  .nbtn button.on{border-color:rgba(79,224,255,0.5); background:rgba(79,224,255,0.12); color:var(--ink);}
+  .nbtn button.tg.on{border-color:rgba(255,197,107,0.55); background:rgba(255,197,107,0.12);}
   .nerve figcaption{font-size:13.5px; color:var(--muted); margin-top:10px; text-align:center;}
   .figcap{font-size:13.5px; color:var(--muted); margin:-12px 0 24px;}
   @media (max-width:760px){ .cmp{grid-template-columns:1fr;} .cmp .c{display:grid; grid-template-columns:96px 1fr; gap:14px; text-align:left; align-items:start;} .cmp .c h3{margin-top:0;} }
@@ -167,7 +176,16 @@
 
       <h2>Почему это происходит</h2>
       <p>Латеральный кожный нерв бедра отвечает только за чувствительность кожи — мышцами он не управляет. На пути к бедру он проходит под паховой связкой рядом с выступающей косточкой таза спереди. Здесь у нерва мало места, и его легко пережать снаружи.</p>
-      <figure class="nerve">
+      <figure class="nerve" id="nfig">
+        <div class="n3d" id="n3d" hidden>
+          <canvas id="n3c" aria-label="Объёмная модель: ход латерального кожного нерва бедра. Проведите пальцем, чтобы повернуть."></canvas>
+          <div class="nlab" id="nlabs"></div>
+          <div class="nhint" id="nhint">↔ проведите пальцем, чтобы повернуть</div>
+        </div>
+        <div class="nbtn" id="nbtn" hidden>
+          <button data-v="front" class="on">Спереди</button><button data-v="side">Сбоку</button><button data-v="obl">Наискосок</button><button data-v="belt" class="tg on">Ремень</button>
+        </div>
+        <div id="n2d">
 <svg viewBox="0 0 430 440" role="img" aria-label="Схема хода латерального кожного нерва бедра: от поясничного отдела позвоночника через таз под паховую связку рядом с косточкой таза и на боковую поверхность бедра">
   <defs>
     <clipPath id="thigh"><path d="M300 196 C306 260 300 340 290 436 L178 436 C170 380 150 320 128 292 L210 250 Z"/></clipPath>
@@ -220,7 +238,8 @@
     <text x="328" y="333" fill="#4FE0FF">онемения</text>
   </g>
 </svg>
-        <figcaption>Вид спереди, левая половина таза. Нерв проходит под паховой связкой в 1–2 сантиметрах от косточки таза — ровно там, где проходит ремень или пояс.</figcaption>
+        </div>
+        <figcaption><span style="color:#4FE0FF">Голубой</span> — нерв, <span style="color:#F2F2F5">белая линия</span> — паховая связка, <span style="color:#FF8A7A">красное кольцо</span> — место, где нерв сдавливается ремнём или поясом.</figcaption>
       </figure>
       <p>Частые причины:</p>
       <ul>
@@ -325,5 +344,83 @@
   </div>
 </footer>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script>
+window.addEventListener('load',function(){try{
+ if(!window.THREE)return;const T=THREE,box=document.getElementById('n3d'),cv=document.getElementById('n3c');
+ const R=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});R.setPixelRatio(Math.min(2,devicePixelRatio||1));
+ document.getElementById('n2d').hidden=true;box.hidden=false;document.getElementById('nbtn').hidden=false;
+ const scene=new T.Scene(),cam=new T.PerspectiveCamera(32,1,1,500);cam.position.set(0,0,108);
+ scene.add(new T.AmbientLight(0xffffff,.55));const dl=new T.DirectionalLight(0xffffff,.75);dl.position.set(30,40,80);scene.add(dl);const dl2=new T.DirectionalLight(0x8899ff,.3);dl2.position.set(-40,-10,-60);scene.add(dl2);
+ const pivot=new T.Group(),model=new T.Group();scene.add(pivot);pivot.add(model);model.position.set(-4,8,0);
+ const V=(x,y,z)=>new T.Vector3(x,y,z);
+ const bone=new T.MeshStandardMaterial({color:0xd8d2c4,roughness:.85,metalness:0,side:T.DoubleSide});
+ const boneF=new T.MeshStandardMaterial({color:0xd8d2c4,roughness:.85,transparent:true,opacity:.55,side:T.DoubleSide,depthWrite:false});
+ const tube=(pts,r,m)=>new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),64,r,10,false),m);
+ const sph=(p,r,m)=>{const s=new T.Mesh(new T.SphereGeometry(r,20,14),m);s.position.copy(p);return s};
+ // позвоночник и крестец
+ [22,19,16,13,10].forEach(y=>{const c=new T.Mesh(new T.CylinderGeometry(2.2,2.2,2.3,20),bone);c.position.set(0,y,-4);model.add(c)});
+ {const b=new T.Mesh(new T.BoxGeometry(7,8,2.6),bone);b.position.set(0,4.5,-5);b.rotation.x=-.35;model.add(b)}
+ // крыло подвздошной кости (обе стороны)
+ function wing(s){const N=24,M=10,pos=[],idx=[];const bz=(t,a,b,c,d)=>{const u=1-t;return a*u*u*u+3*b*u*u*t+3*c*u*t*t+d*t*t*t};
+  for(let i=0;i<=N;i++){const u=i/N;const cx=bz(u,3,10,15.5,12.5),cy=bz(u,9,15.5,12.5,5),cz=bz(u,-6,-5.5,1,4);const bx=3.5+u*5.5,by=1.5-u*4,bz2=-4+u*6;
+   for(let j=0;j<=M;j++){const v=j/M,k=Math.sin(v*Math.PI)*1.2;pos.push(s*(cx+(bx-cx)*v-k*.6),cy+(by-cy)*v,cz+(bz2-cz)*v+k*.3)}}
+  for(let i=0;i<N;i++)for(let j=0;j<M;j++){const a=i*(M+1)+j,b=a+M+1;idx.push(a,b,a+1,b,b+1,a+1)}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();return new T.Mesh(g,bone)}
+ [1,-1].forEach(s=>{model.add(wing(s));
+  model.add(tube([V(s*1,-5,5),V(s*5,-4.4,4),V(s*8.5,-3.4,2)],1,bone));
+  model.add(tube([V(s*1,-6.6,5),V(s*3,-9.2,3),V(s*6.2,-10,0),V(s*8.6,-6,.2)],1,bone));
+  model.add(sph(V(s*9.5,-3.5,1.5),2.3,bone));model.add(tube([V(s*9.5,-3.5,1.5),V(s*12.6,-5.4,.6)],1.3,bone));model.add(sph(V(s*13.4,-5.6,0),1.7,bone));
+  model.add(tube([V(s*13,-6,.6),V(s*12,-20,1.4),V(s*10.4,-42,1.6)],1.45,bone));
+  model.add(sph(V(s*12.5,5,4),.95,new T.MeshStandardMaterial({color:0xffffff,roughness:.5})));
+  model.add(tube([V(s*12.5,5,4),V(s*7.5,0,5.2),V(s*2.6,-5,5.6)],.42,new T.MeshStandardMaterial({color:0xf4f4f8,roughness:.4,emissive:0x333344})))});
+ {const c=new T.Mesh(new T.BoxGeometry(1.6,3,2),bone);c.position.set(0,-5.8,5.2);model.add(c)}
+ // кожа
+ const skin=new T.MeshStandardMaterial({color:0x9fb2ff,transparent:true,opacity:.07,side:T.DoubleSide,depthWrite:false,roughness:1});
+ const edge=new T.LineBasicMaterial({color:0x9fb2ff,transparent:true,opacity:.18});
+ const sk=(g,p,sz)=>{const m=new T.Mesh(g,skin);m.position.copy(p);if(sz)m.scale.z=sz;model.add(m);const e=new T.LineSegments(new T.EdgesGeometry(g,40),edge);e.position.copy(p);if(sz)e.scale.z=sz;model.add(e);return m};
+ sk(new T.CylinderGeometry(15,17,32,48,1,true),V(0,10,0),.68);
+ [1,-1].forEach(s=>sk(new T.CylinderGeometry(7.6,5.6,36,40,1,true),V(s*9.5,-24,1.5)));
+ // зона онемения
+ {const g=new T.CylinderGeometry(7.42,6.3,21,40,1,true,.05,1.65);const m=new T.Mesh(g,new T.MeshStandardMaterial({color:0x4fe0ff,transparent:true,opacity:.32,side:T.DoubleSide,depthWrite:false,emissive:0x0b4a5a}));m.position.set(9.5,-19.5,1.5);model.add(m)}
+ // нерв
+ const nm=new T.MeshStandardMaterial({color:0x4fe0ff,emissive:0x1aa6c8,roughness:.35});
+ model.add(tube([V(2.3,18.6,-3.6),V(3.4,16,-3),V(4.6,13.2,-2.4)],.42,nm));
+ model.add(tube([V(2.3,15.6,-3.6),V(3.5,14.2,-3),V(4.6,13.2,-2.4)],.42,nm));
+ model.add(tube([V(4.6,13.2,-2.4),V(7.5,9.6,-.6),V(10,6,2.2),V(11.3,3.3,3.8),V(12.7,1.2,5.4),V(14.7,-5,5.6),V(16,-12,4.2)],.5,nm));
+ model.add(tube([V(16,-12,4.2),V(15.9,-19,4),V(15.6,-27,3.4)],.32,nm));
+ model.add(tube([V(16,-12,4.2),V(15,-17,5.8),V(13.8,-23,6.6)],.28,nm));
+ model.add(tube([V(16,-12,4.2),V(16.8,-16,2.4),V(16.6,-21,.8)],.28,nm));
+ // место сдавления
+ const ringM=new T.MeshBasicMaterial({color:0xff8a7a,transparent:true,opacity:.95});const ring=new T.Mesh(new T.TorusGeometry(1.9,.22,10,40),ringM);ring.position.set(11.6,3.5,4.6);ring.rotation.y=.5;model.add(ring);
+ // ремень
+ const belt=new T.Mesh(new T.CylinderGeometry(16.9,16.9,3.2,64,1,true),new T.MeshStandardMaterial({color:0xffc56b,transparent:true,opacity:.28,side:T.DoubleSide,depthWrite:false}));belt.position.set(0,4.4,0);belt.scale.z=.7;model.add(belt);
+ // подписи
+ const LB=[['Позвоночник, L2–L3',V(0,17,-4),'#C9C9D3',-14],['Косточка таза',V(12.5,5,4),'#F2F2F5',-40],['Здесь сдавливается',V(11.6,3.5,4.6),'#FF8A7A',12],['Зона онемения',V(16.6,-24,3),'#4FE0FF',-12]];
+ const lbox=document.getElementById('nlabs'),NS='http://www.w3.org/2000/svg',lsv=document.createElementNS(NS,'svg');lsv.setAttribute('class','nlines');lbox.appendChild(lsv);LB.forEach(l=>{const d=document.createElement('span');d.textContent=l[0];d.style.color=l[2];lbox.appendChild(d);l.el=d;const ln=document.createElementNS(NS,'line');ln.setAttribute('stroke',l[2]);ln.setAttribute('stroke-width','1.2');ln.setAttribute('opacity','.75');const c=document.createElementNS(NS,'circle');c.setAttribute('r','3');c.setAttribute('fill',l[2]);lsv.appendChild(ln);lsv.appendChild(c);l.ln=ln;l.c=c});
+ // управление
+ let yaw=0,pitch=.08,ty=0,tp=.08,auto=true,drag=null,t0=performance.now(),dirty=true;
+ const P={front:[0,.08],side:[-1.45,.05],obl:[-.7,.22]};
+ document.getElementById('nbtn').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const v=b.dataset.v;
+  if(v==='belt'){belt.visible=!belt.visible;b.classList.toggle('on',belt.visible);dirty=true;return}
+  auto=false;[ty,tp]=P[v];document.querySelectorAll('#nbtn button:not(.tg)').forEach(x=>x.classList.toggle('on',x===b));hideHint()});
+ function hideHint(){const h=document.getElementById('nhint');if(h)h.style.opacity=0}
+ cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw:ty,p:tp,type:e.pointerType};auto=false;hideHint();cv.setPointerCapture(e.pointerId);document.querySelectorAll('#nbtn button:not(.tg)').forEach(x=>x.classList.remove('on'))});
+ cv.addEventListener('pointermove',e=>{if(!drag)return;ty=drag.yaw+(e.clientX-drag.x)*.012;if(drag.type==='mouse')tp=Math.max(-.6,Math.min(.9,drag.p+(e.clientY-drag.y)*.008))});
+ const up=()=>{drag=null};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+ function size(){const w=box.clientWidth,h=Math.round(w*1.15);R.setSize(w,h,false);cv.style.width=w+'px';cv.style.height=h+'px';cam.aspect=w/h;cam.updateProjectionMatrix();dirty=true}
+ window.addEventListener('resize',size);size();
+ let vis=true;if('IntersectionObserver'in window)new IntersectionObserver(es=>{vis=es[0].isIntersecting},{rootMargin:'100px'}).observe(box);
+ const tmp=new T.Vector3();
+ (function loop(now){requestAnimationFrame(loop);if(!vis)return;
+  if(auto){const t=(now-t0)/1000;ty=-.55+Math.sin(t*.45)*.75;tp=.1+Math.sin(t*.3)*.08}
+  yaw+=(ty-yaw)*.15;pitch+=(tp-pitch)*.15;pivot.rotation.set(pitch,yaw,0);
+  ring.scale.setScalar(1+.12*Math.sin(now/260));
+  R.render(scene,cam);
+  const w=cv.clientWidth,h=cv.clientHeight;
+  LB.forEach(l=>{tmp.copy(l[1]);model.localToWorld(tmp);tmp.project(cam);const x=(tmp.x*.5+.5)*w,y=(-tmp.y*.5+.5)*h,ow=l.el.offsetWidth;let L=x>w*.5?x-ow-12:x+12;L=Math.max(4,Math.min(w-ow-4,L));const Y=y+l[3],oh=l.el.offsetHeight;l.el.style.transform=`translate(${Math.round(L)}px,${Math.round(Y)}px)`;const ex=L+ow/2<x?L+ow:L,ey=Y+oh/2;l.ln.setAttribute('x1',x);l.ln.setAttribute('y1',y);l.ln.setAttribute('x2',ex);l.ln.setAttribute('y2',ey);l.c.setAttribute('cx',x);l.c.setAttribute('cy',y)});
+ })(performance.now());
+}catch(err){document.getElementById('n2d').hidden=false;const b=document.getElementById('n3d');if(b)b.hidden=true;const n=document.getElementById('nbtn');if(n)n.hidden=true}});
+</script>
 </body>
 </html>
