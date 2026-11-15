@@ -1,4 +1,4 @@
-const CACHE='vert-h5n2tb-v3';
+const CACHE='vert-h5n2tb-v4';
 const CORE=['/vert-h5n2tb.html','/vert-h5n2tb.webmanifest','/vert-icon-192.png','/vert-icon-512.png','/vert-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('vert-h5n2tb-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
