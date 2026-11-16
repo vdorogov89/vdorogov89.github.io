@@ -909,6 +909,8 @@ gen(o,c){const h=k=>o.sg.includes(k),v=ssv(o);
  c.a('other',cap(ot.join('; '))+'.');
  if(v.icu.length)c.a('other','Показан перевод в отделение реанимации: '+v.icu.join('; ')+'.');
  c.sy(v.sy);
+ const st=v.stop.startsWith('— наоборот, ')?v.stop.slice(12):'отменить '+v.stop.replace('; — наоборот, ','; ');
+ c.rc(st.replace('прометазин); литий','прометазин) и литий'));c.rc(v.rx);if(!v.icu.length)c.rc(v.obs.replace('отмена препарата и ',''));
 }},
 {id:'fnd',g:'other',n:'Функциональное (диссоциативное) неврологическое расстройство',s:'функциональное диссоциативное конверсионное психогенное гувер неэпилептические приступы фнр',
 info:'Диагноз ставится по положительным признакам, а не «по исключению». Найдено 2 и более — диагноз можно ставить; признаки органического поражения ищут параллельно (сочетание с эпилепсией, рассеянным склерозом, болезнью Паркинсона нередко). В скобках у признаков — чувствительность / специфичность по систематическому обзору Daum и соавторов (2014); исследования небольшие, в основном не слепые.',
@@ -1047,16 +1049,16 @@ function addMod(id){ST.mods.forEach(x=>x.open=false);const m=MI[id];const it=new
  save();renderMods();recompute();setTimeout(()=>{const e=document.querySelector(`[data-card="${it.u}"]`);e&&e.scrollIntoView({behavior:'smooth',block:'start'})},50)}
 
 // ===== сборка =====
-let GEN={},SYN=[];
+let GEN={},SYN=[],REC=[];
 function build(){
- const C={},P={ra:[],la:[],rl:[],ll:[]},PN=[],RF={},PT={},SY=[];
+ const C={},P={ra:[],la:[],rl:[],ll:[]},PN=[],RF={},PT={},SY=[],RC=[];
  const add=(s,t,m)=>{if(t==null)return;(C[s]=C[s]||[]).push({t,m})};
  const R5=['bic','tri','car','kn','ach'],GR={all:R5,arms:['bic','tri','car'],legs:['kn','ach']};
  const c={r:(s,t)=>add(s,t,'r'),n:(s,t)=>add(s,t,'n'),a:(s,t)=>add(s,t,'a'),L:(s,t)=>add(s,t,'L'),
   p:(l,v,ty,q)=>P[l].push({v:+v,ty,q}),pn:t=>PN.push(t),
   rf:(r,sd,v,w)=>{(GR[r]||[r]).forEach(rr=>sides(sd).forEach(s=>{RF[rr]=RF[rr]||{};const cu=RF[rr][s];if(!cu||w>cu.w||(w===cu.w&&Math.abs(v-2)>Math.abs(cu.v-2)))RF[rr][s]={v,w}}))},
   pt:(n,sd)=>{PT[n]=PT[n]||{};sides(sd).forEach(s=>PT[n][s]=true)},
-  sc:t=>add('scale',t,'a'),sy:t=>SY.push(t)};
+  sc:t=>add('scale',t,'a'),sy:t=>SY.push(t),rc:t=>RC.push(t)};
  ST.mods.forEach(m=>{try{MI[m.id].gen(m.o,c)}catch(e){console.error(m.id,e)}});
  const uniq=a=>[...new Set(a.filter(x=>x&&x.trim()))];
  const model={pow:renderPow(P,PN),dtr:renderRefl(RF),path:renderPath(PT)};
@@ -1066,7 +1068,7 @@ function build(){
   const base=r.length?r.map(x=>x.t):[model[s]||normS(s)];
   return uniq(base.concat(a.map(x=>x.t))).join(j)};
  const out={};FL.forEach(f=>{out[f.k]=f.s.map(slot).filter(Boolean).join(f.k==='scale'?'\n':' ')});
- return{out,syn:[...new Set(SY)]}}
+ return{out,syn:[...new Set(SY)],rec:[...new Set(RC)]}}
 const LN={ra:['правой руке','правой руки'],la:['левой руке','левой руки'],rl:['правой ноге','правой ноги'],ll:['левой ноге','левой ноги']};
 const TYW={central:['центральный','центральная'],periph:['периферический','периферическая'],myo:['миопатический','миопатическая'],mixed:['смешанный','смешанная'],plain:['','']};
 const QW={dist:'преимущественно в дистальных отделах',prox:'преимущественно в проксимальных отделах'};
@@ -1101,7 +1103,7 @@ function renderRefl(RF){if(!Object.keys(RF).length)return null;const g=(r,s)=>RF
  return 'Сухожильные рефлексы: '+p.join('; ')+'.'}
 function renderPath(PT){const k=Object.keys(PT);if(!k.length)return null;
  return cap(k.map(n=>'симптом '+n+' '+(PT[n].r&&PT[n].l?'с двух сторон':PT[n].r?'справа':'слева')).join(', '))+'.'}
-function recompute(){const b=build();GEN=b.out;SYN=b.syn;const p=document.getElementById('prev');if(p)p.textContent=summary();save()}
+function recompute(){const b=build();GEN=b.out;SYN=b.syn;REC=b.rec;const p=document.getElementById('prev');if(p)p.textContent=summary();save()}
 const FEM={'ориентирован':'ориентирована','дезориентирован':'дезориентирована','устойчив':'устойчива','неустойчив':'неустойчива','сонлив':'сонлива','заторможен':'заторможена','возбуждён':'возбуждена','возбужден':'возбуждена','вял':'вяла','недоступен':'недоступна','доступен':'доступна','беспокоен':'беспокойна','контактен':'контактна','адекватен':'адекватна','критичен':'критична','оглушён':'оглушена','обездвижен':'обездвижена','истощаем':'истощаема','эйфоричен':'эйфорична','апатичен':'апатична','растерян':'растеряна','напряжён':'напряжена'};
 const FEMRE=new RegExp('(^|[^А-Яа-яЁё])('+Object.keys(FEM).join('|')+')(?![А-Яа-яЁё])','gi');
 const fem=t=>ST.sex!=='f'?t:t.replace(FEMRE,(m,a,w)=>{const f=FEM[w.toLowerCase()];return a+(w[0]===w[0].toUpperCase()?f[0].toUpperCase()+f.slice(1):f)});
@@ -1147,7 +1149,7 @@ function rehText(){if(ST.rh===false&&!ST.ptx)return'';const L=[],seen=new Set();
  if(!L.length)return'';
  return L.length===1?'Реабилитация: '+L[0].t:'Реабилитация:\n'+L.map(x=>'— '+x.n+': '+x.t[0].toLowerCase()+x.t.slice(1)).join('\n')}
 function summary(){const an=typeof anText==='function'?anText():'';let s=(an?an+'\n\n':'')+'Неврологический статус.\n'+FL.map(f=>fieldText(f.k).trim()).filter(Boolean).join('\n');
- if(ST.syn&&SYN.length)s+='\nСиндромально: '+SYN.map((x,i)=>i&&/^[А-ЯЁ][а-яё]/.test(x)?x[0].toLowerCase()+x.slice(1):x).join('; ')+'.';const rh=rehText();if(rh)s+='\n'+rh;return s}
+ if(ST.syn&&SYN.length)s+='\nСиндромально: '+SYN.map((x,i)=>i&&/^[А-ЯЁ][а-яё]/.test(x)?x[0].toLowerCase()+x.slice(1):x).join('; ')+'.';if(REC.length)s+='\nРекомендовано: '+REC.join('; ')+'.';const rh=rehText();if(rh)s+='\n'+rh;return s}
 
 // ===== интерфейс конструктора =====
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
