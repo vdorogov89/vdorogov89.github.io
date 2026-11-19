@@ -1,4 +1,4 @@
-const CACHE='dem-q4h7tz-v1';
+const CACHE='dem-q4h7tz-v2';
 const CORE=['/dem-q4h7tz.html','/dem-q4h7tz.webmanifest','/dem-icon-192.png','/dem-icon-512.png','/dem-apple-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('dem-q4h7tz-')&&x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
