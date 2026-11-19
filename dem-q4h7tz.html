@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Деменция: диагностический алгоритм</title>
+<meta name="theme-color" content="#08080D">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="dem-q4h7tz.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="dem-icon-192.png">
+<link rel="apple-touch-icon" href="dem-apple-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Деменция">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="author" content="Василий Дорогов">
+<meta name="copyright" content="© 2026 Василий Дорогов">
+<style>
+:root{--bg:#08080D; --ink:#F2F2F5; --body:#C9C9D3; --muted:#8B8B98; --line:rgba(255,255,255,0.09); --glass:rgba(255,255,255,0.045); --acc:#4FE0FF; --acc2:#8A5CFF; --warn:#FF8A7A; --amber:#FFC56B; --ok:#6BE3A4;}
+*{box-sizing:border-box;}
+html,body{margin:0; background:var(--bg); color:var(--body); font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif; -webkit-font-smoothing:antialiased;}
+button{font:inherit; color:inherit; cursor:pointer;}
+.app{max-width:560px; margin:0 auto; padding:0 16px calc(84px + env(safe-area-inset-bottom));}
+header{padding:calc(16px + env(safe-area-inset-top)) 0 10px; display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+header h1{margin:0; font-size:20px; color:var(--ink); letter-spacing:-0.01em;}
+header span{font-size:12.5px; color:var(--muted); white-space:nowrap;}
+nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center; gap:4px; padding:10px 8px calc(10px + env(safe-area-inset-bottom)); background:rgba(10,10,16,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--line);}
+nav.tabs button{flex:1; max-width:120px; padding:9px 2px; border-radius:12px; border:0; background:transparent; color:var(--muted); font-size:12.5px;}
+nav.tabs button.on{background:rgba(79,224,255,0.12); color:var(--ink);}
+section{display:none;} section.on{display:block;}
+.card{background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:16px; margin:12px 0;}
+h2{font-size:17px; color:var(--ink); margin:4px 0 8px;}
+h3{font-size:15px; color:var(--ink); margin:14px 0 6px;}
+p{margin:6px 0;}
+.muted{color:var(--muted); font-size:13px;}
+.crumbs{display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 4px;}
+.crumbs span{font-size:12px; padding:3px 9px; border-radius:20px; background:rgba(255,255,255,0.06); color:var(--muted);}
+.crumbs span.on{background:rgba(79,224,255,0.14); color:var(--ink);}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+label.f{display:block; font-size:12.5px; color:var(--muted);}
+input[type=number],input[type=date],select{width:100%; min-width:0; max-width:100%; -webkit-appearance:none; appearance:none; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px; display:block;}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%; background-size:5px 5px; background-repeat:no-repeat; padding-right:32px;}
+select option{background:#16171f; color:var(--ink);}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.8);}
+input:focus,select:focus{outline:none; border-color:rgba(79,224,255,0.6);}
+.chk{display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); color:var(--ink);}
+.chk:first-of-type{border-top:0;}
+.chk input{-webkit-appearance:none; appearance:none; width:22px; height:22px; flex:0 0 22px; margin:1px 0 0; border-radius:7px; border:1.5px solid rgba(255,255,255,0.25); background:transparent; display:grid; place-content:center;}
+.chk input:checked{background:linear-gradient(120deg,var(--acc),var(--acc2)); border-color:transparent;}
+.chk input:checked::after{content:''; width:10px; height:6px; border:2.5px solid #08080D; border-top:0; border-right:0; transform:rotate(-45deg) translate(1px,-1px);}
+.chk small{display:block; color:var(--muted); font-size:12.5px;}
+.out{border-radius:16px; padding:12px 14px; margin:10px 0; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--body);}
+.out b.t{display:block; margin-bottom:4px; color:var(--ink); font-size:15px;}
+.out.ok{border-color:rgba(107,227,164,0.35); background:rgba(107,227,164,0.06);} .out.ok b.t{color:var(--ok);}
+.out.warn{border-color:rgba(255,197,107,0.4); background:rgba(255,197,107,0.06);} .out.warn b.t{color:var(--amber);}
+.out.bad{border-color:rgba(255,138,122,0.4); background:rgba(255,138,122,0.06);} .out.bad b.t{color:var(--warn);}
+.out.info{border-color:rgba(79,224,255,0.25); background:rgba(79,224,255,0.04);} .out.info b.t{color:var(--acc);}
+.out ul{margin:6px 0 0; padding-left:20px;} li{margin:3px 0;}
+.out b{color:var(--ink);}
+.dose{font-weight:600; color:var(--acc); white-space:nowrap;}
+.stepnav{display:flex; gap:8px; margin:16px 0 4px;}
+.stepnav button{flex:1; padding:11px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,0.04); color:var(--ink);}
+.stepnav button.main{flex:2; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.mbtns button{padding:10px 14px; border-radius:12px; border:0; background:linear-gradient(120deg,var(--acc),var(--acc2)); color:#08080D; font-weight:600;}
+.mbtns button.alt{background:rgba(255,255,255,0.08); color:var(--ink); font-weight:500;}
+pre{white-space:pre-wrap; font:13.5px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; color:var(--ink); background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:14px; padding:12px; margin:8px 0;}
+a{color:var(--acc);}
+.foot{font-size:12px; color:var(--muted); margin:18px 0;}
+.seg3{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 2px;} .seg3 button{padding:8px 12px; border-radius:20px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--muted); font-size:13.5px;} .seg3 button.on{border-color:rgba(79,224,255,0.5); background:rgba(79,224,255,0.12); color:var(--ink);}
+.q{padding:10px 0; border-top:1px solid var(--line);} .q:first-of-type{border-top:0;} .q>b{display:block; color:var(--ink); font-weight:500;} .q small{color:var(--muted); font-size:12.5px;}
+.pts{float:right; font-size:12px; color:var(--muted);}
+input[type=email],input[type=text]{width:100%; font:inherit; font-size:16px; color:var(--ink); background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:4px; min-height:46px;}
+table.oh{width:100%; border-collapse:collapse; font-size:14px;} table.oh td{padding:4px 4px;} table.oh input{margin:0; min-height:40px; padding:8px; text-align:center;}
+.copy{font-size:11.5px; color:var(--muted); line-height:1.45; margin:22px 0 6px; padding-top:12px; border-top:1px solid var(--line);}
+.seg{display:flex; gap:6px; flex-wrap:wrap; margin:8px 0 2px;} .seg button{padding:8px 12px; border-radius:20px; border:1px solid var(--line); background:rgba(255,255,255,0.03); color:var(--muted); font-size:13.5px;} .seg button.on{border-color:rgba(79,224,255,0.5); background:rgba(79,224,255,0.12); color:var(--ink);}
+.lbl{font-size:12.5px; color:var(--muted); margin-top:12px;}
+.big{font-size:22px; font-weight:700; color:var(--ink);}
+.ql{display:block; color:var(--ink); font-size:14.5px;}
+.out li{margin:3px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>Деменция: диагностический алгоритм</h1><span>автор — В.&nbsp;Дорогов</span></header>
+<section id="s1" class="on"><div class="card"><h2>Пациент</h2><div class="row"><label class="f">Возраст, лет<input type="number" id="age" inputmode="numeric"></label><label class="f">Образование, лет<input type="number" id="edu" inputmode="numeric"></label></div><div class="row" style="margin-top:10px"><label class="f">MoCA, баллов из 30<input type="number" id="moca" inputmode="numeric"></label><label class="f">MMSE, баллов из 30<input type="number" id="mmse" inputmode="numeric"></label></div><div class="lbl">Бытовая независимость (со слов близких)</div><div class="seg" data-k="func"><button data-v="full">полностью сохранена</button><button data-v="eff">сохранена, но с трудом</button><button data-v="iadl">нужна помощь в сложных делах</button><button data-v="adl">нужна помощь в самообслуживании</button></div><p class="muted" style="margin-top:6px">Сложные дела: деньги и счета, приём лекарств, транспорт, готовка, телефон.</p><div class="lbl">Темп нарастания</div><div class="seg" data-k="pace"><button data-v="yrs">годы</button><button data-v="mo">месяцы (до 1–2 лет)</button><button data-v="wk">недели</button></div></div><div class="card"><h2>Не делирий и не депрессия?</h2><label class="chk"><input type="checkbox" id="d_acute"><span>Острое начало или колебания в течение дня</span></label><label class="chk"><input type="checkbox" id="d_att"><span>Нарушено внимание<small>Не может назвать месяцы в обратном порядке, отвлекается</small></span></label><label class="chk"><input type="checkbox" id="dp_mood"><span>Сниженное настроение, ангедония</span></label><label class="chk"><input type="checkbox" id="dp_cmp"><span>Жалуется сам и подробно, отвечает «не знаю», не старается на тестах</span></label></div><div id="o1"></div><div class="stepnav"><button class="next main">Обратимые причины</button></div></section>
+<section id="s2"><div class="card"><h2>Анализы</h2><p class="muted">Минимум для всех.</p><div class="mbtns" style="margin:0 0 8px"><button id="laball" class="alt">Отметить всё как норму</button></div><div class="q"><span class="ql">Общий анализ крови</span><div class="seg" data-k="l_cbc"><button data-v="nd">не делали</button><button data-v="ok">норма</button><button data-v="ab">изменения</button></div></div><div class="q"><span class="ql">Натрий, кальций</span><div class="seg" data-k="l_el"><button data-v="nd">не делали</button><button data-v="ok">норма</button><button data-v="ab">изменения</button></div></div><div class="q"><span class="ql">Глюкоза</span><div class="seg" data-k="l_glu"><button data-v="nd">не делали</button><button data-v="ok">норма</button><button data-v="ab">изменения</button></div></div><div class="q"><span class="ql">Креатинин</span><div class="seg" data-k="l_cr"><button data-v="nd">не делали</button><button data-v="ok">норма</button><button data-v="ab">изменения</button></div></div><div class="q"><span class="ql">Печёночные пробы</span><div class="seg" data-k="l_lft"><button data-v="nd">не делали</button><button data-v="ok">норма</button><button data-v="ab">изменения</button></div></div><div class="q"><span class="ql">Тиреотропный гормон</span><div class="seg" data-k="l_tsh"><button data-v="nd">не делали</button><button data-v="ok">норма</button><button data-v="ab">изменения</button></div></div><div class="q"><span class="ql">B12 (при пограничном — гомоцистеин)</span><div class="seg" data-k="l_b12"><button data-v="nd">не делали</button><button data-v="ok">норма</button><button data-v="ab">изменения</button></div></div><div class="q"><span class="ql">Фолиевая кислота</span><div class="seg" data-k="l_fol"><button data-v="nd">не делали</button><button data-v="ok">норма</button><button data-v="ab">изменения</button></div></div><div class="q"><span class="ql">Сифилис (трепонемный тест)</span><div class="seg" data-k="l_syph"><button data-v="nd">не делали</button><button data-v="ok">норма</button><button data-v="ab">изменения</button></div></div><div class="q"><span class="ql">ВИЧ — по риску и до 60 лет</span><div class="seg" data-k="l_hiv"><button data-v="nd">не делали</button><button data-v="ok">норма</button><button data-v="ab">изменения</button></div></div></div><div class="card"><h2>Нейровизуализация</h2><div class="seg" data-k="img"><button data-v="no">не выполнена</button><button data-v="ct">КТ</button><button data-v="mri">МРТ</button></div></div><div class="card"><h2>Лекарства</h2><label class="chk"><input type="checkbox" id="m_ach"><span>Холинолитики<small>амитриптилин, пароксетин, дифенгидрамин, хлоропирамин, гидроксизин, оксибутинин, толтеродин, тригексифенидил</small></span></label><label class="chk"><input type="checkbox" id="m_bzd"><span>Бензодиазепины и «снотворные»<small>феназепам, зопиклон, золпидем</small></span></label><label class="chk"><input type="checkbox" id="m_phb"><span>Корвалол, Валокордин<small>содержат фенобарбитал — спросить отдельно</small></span></label><label class="chk"><input type="checkbox" id="m_op"><span>Опиоиды, прегабалин, габапентин</span></label><label class="chk"><input type="checkbox" id="m_aed"><span>Топирамат, фенобарбитал, вальпроат</span></label><label class="chk"><input type="checkbox" id="m_nl"><span>Нейролептики</span></label></div><div class="card"><h2>Что ещё</h2><label class="chk"><input type="checkbox" id="o_dep"><span>Депрессия</span></label><label class="chk"><input type="checkbox" id="o_alc"><span>Злоупотребление алкоголем</span></label><label class="chk"><input type="checkbox" id="o_osa"><span>Храп и остановки дыхания во сне</span></label><label class="chk"><input type="checkbox" id="o_sens"><span>Снижение слуха или зрения без коррекции</span></label><label class="chk"><input type="checkbox" id="o_fall"><span>Падения на антитромботической терапии</span></label><label class="chk"><input type="checkbox" id="o_epi"><span>Эпизоды «замирания» или транзиторной амнезии</span></label></div><div id="o2"></div><div class="stepnav"><button class="prev">Назад</button><button class="next main">Фенотип</button></div></section>
+<section id="s3"><div class="card"><h2>Что нарушилось первым</h2><p class="muted">Спросите близких о первом годе болезни.</p><div class="seg" data-k="first"><button data-v="mem">память на недавнее</button><button data-v="lang">речь</button><button data-v="vis">зрение и пространство</button><button data-v="beh">поведение и личность</button><button data-v="exe">замедленность, планирование</button><button data-v="gait">ходьба</button><button data-v="mot">движения (паркинсонизм)</button></div><label class="chk"><input type="checkbox" id="am_cue"><span>Подсказка не помогает вспомнить слова на тесте<small>гиппокампальный тип амнезии</small></span></label></div><div class="card"><h2>Тельца Леви и болезнь Паркинсона</h2><p class="muted">Основные признаки (McKeith 2017)</p><label class="chk"><input type="checkbox" id="lb_fl"><span>Колебания внимания и бодрствования</span></label><label class="chk"><input type="checkbox" id="lb_vh"><span>Повторяющиеся зрительные галлюцинации</span></label><label class="chk"><input type="checkbox" id="lb_rbd"><span>Разыгрывает сны: кричит, машет руками во сне</span></label><label class="chk"><input type="checkbox" id="lb_pk"><span>Паркинсонизм: брадикинезия с тремором покоя или ригидностью</span></label><div class="lbl">Болезнь Паркинсона</div><div class="seg" data-k="pd"><button data-v="no">нет</button><button data-v="pd1">двигательные симптомы больше чем за год до деменции</button><button data-v="sim">одновременно или в пределах года</button></div><label class="chk"><input type="checkbox" id="lb_ns"><span>Тяжёлая реакция на нейролептики</span></label><label class="chk"><input type="checkbox" id="lb_aut"><span>Ортостатическая гипотензия, запоры, падения</span></label></div><div class="card"><h2>Поведение (лобно-височная деменция)</h2><p class="muted">Критерии Rascovsky 2011, ранние признаки — в первые 3 года</p><label class="chk"><input type="checkbox" id="ft_dis"><span>Расторможенность<small>бестактность, импульсивность, нарушение норм</small></span></label><label class="chk"><input type="checkbox" id="ft_apa"><span>Апатия, инертность</span></label><label class="chk"><input type="checkbox" id="ft_emp"><span>Утрата сочувствия и сопереживания</span></label><label class="chk"><input type="checkbox" id="ft_per"><span>Стереотипии, ритуалы, навязчивое поведение</span></label><label class="chk"><input type="checkbox" id="ft_hyp"><span>Гипероральность, изменение пищевых пристрастий</span></label><label class="chk"><input type="checkbox" id="ft_exe"><span>Нарушены регуляторные функции при относительно сохранной памяти и пространственных функциях</span></label></div><div class="card"><h2>Речь</h2><p class="muted">Если речь нарушилась первой</p><label class="chk"><input type="checkbox" id="pa_ag"><span>Аграмматизм, запинки, искажение звуков<small>небеглый вариант</small></span></label><label class="chk"><input type="checkbox" id="pa_sem"><span>Не понимает значения отдельных слов, не может назвать предмет<small>семантический вариант</small></span></label><label class="chk"><input type="checkbox" id="pa_rep"><span>Паузы в поиске слов, не повторяет длинные фразы<small>логопенический вариант</small></span></label></div><div class="card"><h2>Сосуды, ходьба, движения</h2><label class="chk"><input type="checkbox" id="v_str"><span>Инсульт с ухудшением когнитивных функций после него</span></label><label class="chk"><input type="checkbox" id="v_step"><span>Ступенчатое течение</span></label><label class="chk"><input type="checkbox" id="v_rf"><span>Сосудистые факторы риска<small>гипертензия, диабет, курение, фибрилляция предсердий</small></span></label><label class="chk"><input type="checkbox" id="n_gait"><span>Ходьба мелкими шагами, «прилипание» к полу, нарушилась рано</span></label><label class="chk"><input type="checkbox" id="n_inc"><span>Императивные позывы, недержание мочи</span></label><label class="chk"><input type="checkbox" id="ps_vg"><span>Парез вертикального взора, особенно вниз</span></label><label class="chk"><input type="checkbox" id="ps_fall"><span>Падения назад в первый год</span></label><label class="chk"><input type="checkbox" id="cb_asym"><span>Асимметричная ригидность, апраксия, «чужая рука»</span></label><label class="chk"><input type="checkbox" id="cj_myo"><span>Миоклонус, мозжечковая атаксия, корковая слепота</span></label></div><div id="o3"></div><div class="stepnav"><button class="prev">Назад</button><button class="next main">МРТ и биомаркеры</button></div></section>
+<section id="s4"><div class="card"><h2>МРТ: шкалы</h2><div class="row"><label class="f">MTA справа (0–4)<input type="number" id="mta_r" inputmode="numeric"></label><label class="f">MTA слева (0–4)<input type="number" id="mta_l" inputmode="numeric"></label></div><div class="lbl">Фазекас</div><div class="seg" data-k="faz"><button data-v="0">0</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div><div class="lbl">Теменная атрофия, Кудам</div><div class="seg" data-k="koe"><button data-v="0">0</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div></div><div class="card"><h2>МРТ: находки</h2><label class="chk"><input type="checkbox" id="mr_sdh"><span>Субдуральная гематома</span></label><label class="chk"><input type="checkbox" id="mr_tum"><span>Объёмное образование</span></label><label class="chk"><input type="checkbox" id="mr_inf"><span>Инфаркты, в том числе в стратегических зонах<small>таламус, хвостатое ядро, угловая извилина</small></span></label><label class="chk"><input type="checkbox" id="mr_lob"><span>Долевые микрокровоизлияния или поверхностный сидероз</span></label><label class="chk"><input type="checkbox" id="mr_nph"><span>Индекс Эванса больше 0,3, DESH, острый мозолистый угол</span></label><label class="chk"><input type="checkbox" id="mr_ftd"><span>Асимметричная лобная или передняя височная атрофия</span></label><label class="chk"><input type="checkbox" id="mr_mid"><span>Атрофия среднего мозга («колибри»)</span></label><label class="chk"><input type="checkbox" id="mr_dwi"><span>Ограничение диффузии в коре или базальных ганглиях</span></label></div><div class="card"><h2>Биомаркеры</h2><div class="lbl">Ликвор: Aβ42/40 и p-tau</div><div class="seg" data-k="csf"><button data-v="nd">не делали</button><button data-v="ad">профиль Альцгеймера</button><button data-v="neg">норма</button><button data-v="tt">очень высокий общий tau</button></div><div class="lbl">p-tau217 в плазме</div><div class="seg" data-k="ptau"><button data-v="nd">не делали</button><button data-v="pos">положительный</button><button data-v="grey">серая зона</button><button data-v="neg">отрицательный</button></div><div class="lbl">ОФЭКТ с ДАТ</div><div class="seg" data-k="dat"><button data-v="nd">не делали</button><button data-v="low">снижен захват</button><button data-v="norm">норма</button></div><div class="lbl">ПЭТ с ФДГ</div><div class="seg" data-k="fdg"><button data-v="nd">не делали</button><button data-v="tp">теменно-височный</button><button data-v="fr">лобный</button><button data-v="occ">затылочный</button><button data-v="norm">норма</button></div><div class="lbl">ЭЭГ</div><div class="seg" data-k="eeg"><button data-v="nd">не делали</button><button data-v="per">периодические комплексы</button><button data-v="psl">заднее замедление</button><button data-v="epi">эпилептиформная активность</button><button data-v="norm">норма</button></div><div class="lbl">Полисомнография</div><div class="seg" data-k="psg"><button data-v="nd">не делали</button><button data-v="rsw">сон без атонии</button><button data-v="osa">апноэ</button><button data-v="norm">норма</button></div></div><div id="o4"></div><div class="stepnav"><button class="prev">Назад</button><button class="next main">Сводка</button></div></section>
+<section id="s5"><div class="card"><h2>Сводка для истории болезни</h2><p class="muted">Собирается из отметок. Проверьте перед вставкой.</p><pre id="sum"></pre><div class="mbtns"><button id="copy">Скопировать</button><button id="reset" class="alt">Новый пациент</button></div></div><div class="card"><h2>Отправить на почту</h2><label class="f">Метка (без ФИО), например «неврология, палата 5»<input type="text" id="tag" autocomplete="off"></label><label class="f" style="margin-top:8px">Адрес<input type="email" id="mail"></label><div class="mbtns"><button id="send">Отправить</button></div></div><p class="copy">Помощник для врача, а не замена клиническому решению. Критерии: NIA-AA 2011 и 2024 (болезнь Альцгеймера), McKeith 2017 (деменция с тельцами Леви), Rascovsky 2011 (поведенческий вариант лобно-височной деменции), Gorno-Tempini 2011 (первичные прогрессирующие афазии). Дозы — по инструкциям; сверяйте с действующими клиническими рекомендациями. Подробно — карточка «Деменция: от жалобы на память до диагноза».</p><div class="stepnav"><button class="prev">Назад</button><button class="next main">В начало</button></div></section>
+</div>
+<nav class="tabs"><button data-s="s1" class="on">Пациент</button><button data-s="s2">Причины</button><button data-s="s3">Фенотип</button><button data-s="s4">МРТ</button><button data-s="s5">Сводка</button></nav>
+<script>
+const $=id=>document.getElementById(id);const KEY='dem-st',DEFMAIL='dorogovvn2@zdrav.mos.ru';
+const CB=[...document.querySelectorAll('input[type=checkbox]')].map(x=>x.id);
+const TX=['age','edu','moca','mmse','mta_r','mta_l','tag','mail'];
+const LAB={l_cbc:'общий анализ крови',l_el:'натрий и кальций',l_glu:'глюкоза',l_cr:'креатинин',l_lft:'печёночные пробы',l_tsh:'тиреотропный гормон',l_b12:'B12',l_fol:'фолиевая кислота',l_syph:'сифилис',l_hiv:'ВИЧ'};
+const DEF={mail:DEFMAIL};
+let ST=JSON.parse(JSON.stringify(DEF));
+try{const x=JSON.parse(localStorage.getItem(KEY));if(x)ST=Object.assign(ST,x)}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
+const num=k=>{const s=String(ST[k]??'').replace(',','.').trim();if(s==='')return null;const v=parseFloat(s);return isNaN(v)?null:v};
+const box=(c,h,b)=>`<div class="out ${c}"><b class="t">${h}</b>${b}</div>`;
+const ul=a=>'<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const h=k=>!!ST[k];const nd=k=>!ST[k]||ST[k]==='nd';
+const cnt=a=>a.filter(h).length;
+
+/* шаг 1: когнитивный статус */
+function cog(){const age=num('age'),edu=num('edu'),mo=num('moca'),mm=num('mmse'),f=ST.func;
+ const moA=mo!==null?Math.min(30,mo+(edu!==null&&edu<=12?1:0)):null;
+ const abn=(moA!==null&&moA<26)||(mm!==null&&mm<=24);
+ const tested=moA!==null||mm!==null;
+ let st='',sev='';
+ if(f==='iadl'||f==='adl'){st='dem';
+  if(mm!==null)sev=mm>=20?'лёгкая':mm>=10?'умеренная':'тяжёлая';
+  else if(moA!==null)sev=moA>=18?'лёгкая':moA>=10?'умеренная':'тяжёлая';
+  if(f==='adl'&&sev==='лёгкая')sev='умеренная';if(!sev)sev=f==='adl'?'умеренная или тяжёлая':'лёгкая'}
+ else if(f==='full'||f==='eff')st=tested?(abn?'mci':'scd'):'mci?';
+ const del=h('d_acute')&&h('d_att'),dep=h('dp_mood')&&h('dp_cmp');
+ return{age,edu,mo,moA,mm,abn,tested,st,sev,del,dep,rpd:ST.pace==='mo'||ST.pace==='wk',fast:ST.pace==='wk'}}
+const STN={dem:'деменция',mci:'умеренное когнитивное расстройство',scd:'субъективное когнитивное снижение','mci?':'умеренное когнитивное расстройство или субъективное снижение — нужен тест'};
+
+/* шаг 2: обратимые причины */
+const MED={m_ach:'холинолитики — по возможности отменить или заменить (амитриптилин → сертралин, оксибутинин → мирабегрон)',m_bzd:'бензодиазепины и «снотворные» — постепенная отмена',m_phb:'Корвалол или Валокордин (фенобарбитал) — постепенная отмена',m_op:'опиоиды, прегабалин, габапентин — пересмотреть дозу и показания',m_aed:'топирамат, фенобарбитал, вальпроат — пересмотреть; на вальпроате проверить аммиак',m_nl:'нейролептики — оценить необходимость; при деменции с тельцами Леви опасны'};
+const OTH={o_dep:'депрессия — лечить и перетестировать через 3 месяца',o_alc:'алкоголь — тиамин, оценить алкогольную энцефалопатию',o_osa:'подозрение на апноэ сна — полисомнография или кардиореспираторный мониторинг',o_sens:'слух и зрение — коррекция (слуховой аппарат, очки)',o_fall:'падения на антитромботиках — исключить субдуральную гематому (КТ или МРТ)',o_epi:'эпизоды «замирания» или амнезии — ЭЭГ, исключить эпилепсию пожилых'};
+function rev(){const nd=Object.keys(LAB).filter(k=>!ST[k]||ST[k]==='nd'),ab=Object.keys(LAB).filter(k=>ST[k]==='ab'),ok=Object.keys(LAB).filter(k=>ST[k]==='ok');
+ return{nd,ab,ok,med:Object.keys(MED).filter(h),oth:Object.keys(OTH).filter(h),img:ST.img||''}}
+
+/* шаг 3–4: фенотипы */
+function pheno(C){const P=[],first=ST.first,age=C.age;
+ const mta=Math.max(num('mta_r')??-1,num('mta_l')??-1),mtaThr=age!==null&&age>=75?3:2,mtaAb=mta>=mtaThr,sn=k=>ST[k]===''||ST[k]==null?-1:+ST[k],koe=sn('koe'),faz=sn('faz');
+ const adBio=ST.csf==='ad'||ST.ptau==='pos',adNeg=ST.csf==='neg'||ST.ptau==='neg';
+ const core=['lb_fl','lb_vh','lb_rbd','lb_pk'].filter(h),ib=[ST.dat==='low'&&'сниженный захват на ОФЭКТ с ДАТ',ST.psg==='rsw'&&'сон без атонии на полисомнографии'].filter(Boolean);
+ const ft=['ft_dis','ft_apa','ft_emp','ft_per','ft_hyp','ft_exe'].filter(h);
+ const sup=[];
+ /* ДТЛ / деменция при БП */
+ if(ST.pd==='pd1')P.push({id:'pdd',lvl:'warn',t:'Деменция при болезни Паркинсона',w:['Деменция развилась больше чем через год после двигательных симптомов (критерии MDS 2007)'],dx:'деменция при болезни Паркинсона'});
+ else if(core.length||ib.length){const n=core.length,prob=n>=2||(n>=1&&ib.length),poss=!prob;
+  const lv=prob?'вероятная':'возможная';const why=[];if(n)why.push('основные признаки: '+core.map(k=>({lb_fl:'колебания внимания',lb_vh:'зрительные галлюцинации',lb_rbd:'разыгрывание снов',lb_pk:'паркинсонизм'})[k]).join(', '));if(ib.length)why.push('биомаркеры: '+ib.join(', '));
+  if(h('lb_ns'))why.push('чувствительность к нейролептикам (поддерживающий признак)');
+  if(poss&&!ib.length)why.push('для «вероятной» нужен второй основной признак или биомаркер: ОФЭКТ с ДАТ, полисомнография');
+  P.push({id:'dlb',lvl:prob?'bad':'warn',t:cap(lv)+' деменция с тельцами Леви (McKeith 2017)',w:why,dx:lv+' деменция с тельцами Леви'})}
+ /* bvFTD */
+ if(ft.length>=3){const prob=(ST.func==='iadl'||ST.func==='adl')&&(h('mr_ftd')||ST.fdg==='fr');
+  P.push({id:'ftd',lvl:'bad',t:(prob?'Вероятный':'Возможный')+' поведенческий вариант лобно-височной деменции',w:[ft.length+' из 6 признаков Rascovsky',prob?'есть снижение функций и лобная атрофия или гипометаболизм':'для «вероятного»: снижение бытовых функций + лобная или передняя височная атрофия на МРТ или гипометаболизм на ПЭТ',...(age!==null&&age<65?['начало до 65 лет — типично']:[]),...(adBio?['но биомаркеры Альцгеймера положительны — лобный вариант болезни Альцгеймера?']:[])],dx:(prob?'вероятный':'возможный')+' поведенческий вариант лобно-височной деменции'})}
+ else if(ft.length)sup.push('Признаков лобно-височной деменции '+ft.length+' из 6 — для «возможной» нужно 3.');
+ /* ППА */
+ if(first==='lang'){const v=h('pa_ag')?['nfv','небеглый (аграмматический) вариант первичной прогрессирующей афазии','чаще таупатии лобно-височного спектра']:h('pa_sem')?['svv','семантический вариант первичной прогрессирующей афазии','чаще TDP-43, передняя височная атрофия, слева больше']:h('pa_rep')?['lv','логопенический вариант первичной прогрессирующей афазии','чаще болезнь Альцгеймера — биомаркеры']:null;
+  if(v)P.push({id:'ppa',lvl:'warn',t:cap(v[1]),w:['Речь нарушилась первой и остаётся ведущей (Gorno-Tempini 2011)',v[2],...(v[0]==='lv'&&adBio?['биомаркеры Альцгеймера положительны — подтверждает']:[])],dx:v[1]});
+  else sup.push('Речь нарушилась первой — отметьте тип речевых нарушений.')}
+ /* ЗКА */
+ if(first==='vis')P.push({id:'pca',lvl:'warn',t:'Задняя корковая атрофия',w:['Зрительно-пространственные нарушения первыми при нормальном осмотре офтальмолога','Чаще всего — атипичная болезнь Альцгеймера; реже деменция с тельцами Леви, кортикобазальная дегенерация',koe>=2?'теменная атрофия по Кудаму '+koe+' — подтверждает':'смотреть теменно-затылочную атрофию (шкала Кудама)',...(adBio?['биомаркеры Альцгеймера положительны']:[])],dx:'задняя корковая атрофия'+(adBio?' (атипичная болезнь Альцгеймера)':'')});
+ /* Альцгеймер амнестический */
+ if(first==='mem'&&!P.some(p=>p.id==='dlb'&&p.lvl==='bad')&&ft.length<3){const w=['Ведущее — память на недавние события'+(h('am_cue')?', подсказка не помогает (гиппокампальный тип)':'')];
+  if(mtaAb)w.push('атрофия медиальных височных отделов MTA '+mta+' — поддерживает');else if(mta>=0)w.push('MTA '+mta+' — для возраста не изменена');
+  if(koe>=2)w.push('теменная атрофия по Кудаму '+koe);
+  if(faz>=2)w.push('выраженная болезнь малых сосудов (Фазекас '+faz+') — возможна смешанная деменция');
+  if(ST.fdg==='tp')w.push('теменно-височный гипометаболизм на ПЭТ');
+  if(adBio)w.push('биомаркеры Альцгеймера положительны');if(adNeg)w.push('<b>биомаркеры отрицательны — болезнь Альцгеймера маловероятна</b>: думать о LATE, гиппокампальном склерозе, депрессии');
+  if(ST.pace!=='yrs'&&ST.pace)w.push('темп быстрее типичного — пройти маршрут быстро прогрессирующей деменции');
+  const lvl=adNeg?'info':adBio?'bad':'warn',lv=adBio?'болезнь Альцгеймера, подтверждённая биомаркерами':'вероятная болезнь Альцгеймера (клинически)';
+  P.push({id:'ad',lvl,t:adNeg?'Амнестический фенотип без амилоида':cap(lv),w,dx:adNeg?'амнестический синдром, биомаркеры Альцгеймера отрицательны':lv})}
+ /* сосудистая */
+ const vasc=(h('v_str')||h('v_step')||first==='exe')&&(h('mr_inf')||faz>=2);
+ if(vasc){const mix=P.some(p=>p.id==='ad'&&p.lvl!=='info')||mtaAb||adBio;
+  P.push({id:'vasc',lvl:'warn',t:mix?'Смешанная деменция: Альцгеймер + сосудистое поражение':'Сосудистое когнитивное расстройство',w:[h('v_str')?'связь с инсультом по времени':h('v_step')?'ступенчатое течение':'замедленность и регуляторные нарушения первыми',h('mr_inf')?'инфаркты на МРТ':'изменения белого вещества Фазекас '+faz,...(mix?['атрофия гиппокампов или биомаркеры Альцгеймера — сосудистое поражение не единственная причина']:[])],dx:mix?'смешанная деменция (болезнь Альцгеймера и сосудистое поражение)':'сосудистое когнитивное расстройство'})}
+ else if(h('v_str')||h('v_step'))sup.push('Для сосудистого генеза нужна МРТ: инфаркты или изменения белого вещества Фазекас 2–3.');
+ /* НТГ */
+ if(h('n_gait')&&(first==='gait'||h('n_inc'))){P.push({id:'nph',lvl:h('mr_nph')?'bad':'warn',t:(h('mr_nph')?'Вероятная':'Возможная')+' нормотензивная гидроцефалия',w:['Ходьба нарушилась рано'+(h('n_inc')?', недержание':''),h('mr_nph')?'МРТ: индекс Эванса больше 0,3, DESH':'нужна МРТ: индекс Эванса, DESH, мозолистый угол','тап-тест 30–50 мл с оценкой ходьбы до и после, нейрохирург'],dx:(h('mr_nph')?'вероятная':'возможная')+' нормотензивная гидроцефалия'})}
+ /* ПНП, КБС */
+ if(h('ps_vg')&&h('ps_fall'))P.push({id:'psp',lvl:'warn',t:'Прогрессирующий надъядерный паралич',w:['Парез вертикального взора и падения назад в первый год (MDS 2017)',h('mr_mid')?'атрофия среднего мозга на МРТ — поддерживает':'смотреть атрофию среднего мозга на МРТ'],dx:'прогрессирующий надъядерный паралич'});
+ if(h('cb_asym'))P.push({id:'cbs',lvl:'warn',t:'Кортикобазальный синдром',w:['Асимметричная ригидность, апраксия, «чужая рука» (Armstrong 2013)','Причина: кортикобазальная дегенерация, ПНП или болезнь Альцгеймера — биомаркеры'],dx:'кортикобазальный синдром'});
+ /* Крейцфельдт — Якоб */
+ const cj=[h('cj_myo')&&'миоклонус или атаксия',h('mr_dwi')&&'ограничение диффузии в коре или базальных ганглиях',ST.eeg==='per'&&'периодические комплексы на ЭЭГ',ST.csf==='tt'&&'очень высокий общий tau'].filter(Boolean);
+ if(C.rpd&&cj.length)P.push({id:'cjd',lvl:'bad',t:'Подозрение на болезнь Крейцфельдта — Якоба',w:['Быстрое прогрессирование + '+cj.join(', '),'ликвор: RT-QuIC и белок 14-3-3; меры инфекционного контроля при пункции и операциях','см. карточку «Прионные заболевания»'],dx:'подозрение на болезнь Крейцфельдта — Якоба'});
+ else if(h('mr_dwi'))sup.push('Ограничение диффузии в коре — исключить болезнь Крейцфельдта — Якоба (RT-QuIC), постиктальные изменения, гипогликемию.');
+ if(h('mr_lob'))sup.push('Долевые микрокровоизлияния или сидероз — церебральная амилоидная ангиопатия (Бостонские критерии 2.0): осторожно с антитромботиками и антикоагулянтами, противопоказание к антиамилоидным антителам.');
+ return{P,sup,mta,mtaAb,mtaThr,koe,faz,adBio,adNeg,core,ib,ft}}
+
+function plan(C,R,F){const T=[],X=[];const P=F.P,has=id=>P.some(p=>p.id===id);
+ if(C.del)X.push('Подозрение на делирий: 4AT, поиск причины (инфекция, лекарства, электролиты, задержка мочи); диагноз деменции — не раньше чем через 1–3 месяца после разрешения делирия');
+ if(C.dep)X.push('Признаки депрессии: шкала PHQ-9 или гериатрическая шкала депрессии; лечение и повторное тестирование через 3 месяца');
+ if(C.rpd)X.push('Быстро прогрессирующая деменция: госпитализация; МРТ с DWI, SWI и контрастом; ЭЭГ; ликвор (клетки, белок, олигоклональные полосы, ПЦР, цитология, антитела к нейрональным антигенам, RT-QuIC и белок 14-3-3); кровь: электролиты, ТТГ и антитела к тиреопероксидазе, B1, B12, сифилис, ВИЧ, онконевральные антитела; при подозрении на паранеоплазию — КТ грудной клетки, брюшной полости и малого таза');
+ if(R.nd.length&&!C.rpd)X.push('Анализы: '+R.nd.map(k=>LAB[k]).join(', '));
+ if(R.ab.length)X.push('Изменены: '+R.ab.map(k=>LAB[k]).join(', ')+' — скорректировать и переоценить когнитивные функции');
+ if(R.img==='no'||!R.img)X.push('МРТ головного мозга: T1 в корональной проекции (гиппокампы), FLAIR, DWI, SWI; если МРТ нельзя — КТ');
+ else if(R.img==='ct')X.push('По возможности МРТ вместо КТ: атрофия гиппокампов, микрокровоизлияния, DWI');
+ if(has('cjd'))X.push('Подозрение на прионную болезнь: меры инфекционного контроля при люмбальной пункции и операциях, уведомление по правилам учреждения; см. карточку «Прионные заболевания»');
+ if(h('mr_sdh'))X.push('Субдуральная гематома — нейрохирург; решение по антитромботикам');
+ if(h('mr_tum'))X.push('Объёмное образование — нейрохирург, онколог');
+ R.med.forEach(k=>T.push(cap(MED[k])));R.oth.forEach(k=>X.push(cap(OTH[k])));
+ if(has('dlb')&&nd('dat')&&F.core.length<2)X.push('ОФЭКТ с лигандом дофаминового транспортёра или полисомнография — для «вероятной» деменции с тельцами Леви');
+ const early=C.age!==null&&C.age<65,atyp=has('pca')||has('ppa')||has('ftd')||(has('ad')&&F.adNeg===false&&!F.adBio&&(early||!F.mtaAb));
+ if(atyp&&nd('csf')&&nd('ptau'))X.push('Биомаркеры болезни Альцгеймера: ликвор (Aβ42/40, p-tau) или p-tau217 в плазме — '+(early?'начало до 65 лет':'атипичная картина'));
+ if(ST.ptau==='grey')X.push('p-tau217 в серой зоне — подтвердить ликвором или ПЭТ');
+ if(has('ftd')||(early&&has('ppa')))X.push('Семейный анамнез; при отягощённости — консультация генетика (C9orf72, GRN, MAPT)');
+ if(C.st==='mci'||C.st==='mci?')X.push('Нейропсихологическое обследование; повторная оценка через 6–12 месяцев тем же тестом');
+ /* лечение */
+ const che=C.st==='dem'&&(has('ad')&&!F.adNeg||has('dlb')||has('pdd')||has('pca')||(has('ppa')&&P.find(p=>p.id==='ppa').t.startsWith('Логопен'))||has('vasc'));
+ if(che){T.push('Ингибитор холинэстеразы: '+(has('pdd')||has('dlb')?'ривастигмин (пластырь 4,6 → 9,5 мг/сут через 4 недели) или донепезил':'донепезил 5 мг вечером, через 4–6 недель 10 мг; альтернатива — ривастигмин пластырь, галантамин')+'. Перед стартом ЭКГ и пульс (брадикардия, AV-блокада, обмороки)');
+  if(C.sev&&C.sev!=='лёгкая')T.push('Мемантин 5 мг с повышением на 5 мг в неделю до 20 мг (при клиренсе креатинина меньше 30 мл/мин — не больше 10 мг)')}
+ if(C.st==='mci')T.push('При умеренном когнитивном расстройстве ингибиторы холинэстеразы не показаны: контроль сосудистых факторов, физическая и когнитивная активность, слух и сон');
+ if(has('ftd'))T.push('Лобно-височная деменция: ингибиторы холинэстеразы не назначать; для поведения — сертралин или циталопрам, тразодон');
+ if(has('dlb')||has('pdd'))T.push('Чувствительность к нейролептикам: галоперидол и типичные не назначать; при психозе — кветиапин в минимальной дозе или клозапин');
+ if(has('vasc'))T.push('Вторичная профилактика: контроль давления, статин, антиагрегант или антикоагулянт по показаниям');
+ if(has('nph'))T.push('Нейрохирург: тап-тест, решение о шунтировании');
+ if(C.st==='dem'){T.push('Вождение автомобиля, финансы и доверенности — обсудить, пока пациент может принимать решения; поддержка близких');T.push('Повторная оценка через 6–12 месяцев; резкое ухудшение — искать делирий и гематому')}
+ return{T,X}}
+
+function render(){const C=cog(),R=rev(),F=pheno(C),Pl=plan(C,R,F);
+ document.querySelectorAll('.seg').forEach(g=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',ST[g.dataset.k]===b.dataset.v)));
+ let o='';
+ if(C.st){const why=[];if(C.moA!==null)why.push('MoCA '+C.mo+(C.moA!==C.mo?' (с поправкой на образование '+C.moA+')':'')+(C.moA<26?' — снижено':' — норма'));if(C.mm!==null)why.push('MMSE '+C.mm+(C.mm<=24?' — снижено':' — норма'));
+  why.push({full:'бытовая независимость полностью сохранена',eff:'независимость сохранена, но с трудом',iadl:'нужна помощь в сложных бытовых делах',adl:'нужна помощь в самообслуживании'}[ST.func]);
+  if(C.st==='scd'&&C.tested)why.push('тесты в норме — повторить через год');
+  if(C.edu!==null&&C.edu<8&&C.moA!==null&&C.moA<26)why.push('при образовании меньше 8 лет MoCA часто занижает — опирайтесь на быт и динамику');
+  o+=box(C.st==='dem'?'warn':'info',cap(STN[C.st])+(C.st==='dem'?', '+C.sev+' степень':''),ul(why))}
+ else o+=box('info','Отметьте бытовую независимость','Она отличает деменцию от умеренного когнитивного расстройства; баллы теста уточняют степень.');
+ if(C.rpd)o+=box('bad','Быстро прогрессирующая деменция',ul(['Неотложный маршрут: госпитализация и расширенное обследование — см. сводку','Сначала лечимые причины: субдуральная гематома, бессудорожный статус, аутоиммунный энцефалит, инфекции, метаболические и токсические, лимфома','Затем — болезнь Крейцфельдта — Якоба']));
+ if(C.del)o+=box('bad','Возможен делирий','Острое начало или колебания + нарушение внимания. Сначала 4AT и поиск причины; диагноз деменции — после разрешения делирия.');
+ if(C.dep)o+=box('warn','Возможна депрессия','Лечить и перетестировать; помните, что депрессия после 60 лет бывает первым проявлением нейродегенерации.');
+ $('o1').innerHTML=o;
+ let o2='';
+ o2+=box(R.nd.length?'warn':'ok','Анализы',R.nd.length?'Не сделаны: '+R.nd.map(k=>LAB[k]).join(', ')+(R.ab.length?'<br>Изменены: '+R.ab.map(k=>LAB[k]).join(', '):''):'Минимум выполнен'+(R.ab.length?'; изменены: '+R.ab.map(k=>LAB[k]).join(', '):'.'));
+ if(!R.img||R.img==='no')o2+=box('warn','Нейровизуализация не выполнена','МРТ нужна всем: гематома, опухоль, гидроцефалия, инфаркты, паттерн атрофии.');
+ if(R.med.length)o2+=box('bad','Лекарства, ухудшающие когнитивные функции',ul(R.med.map(k=>cap(MED[k]))));
+ if(R.oth.length)o2+=box('warn','Сопутствующие факторы',ul(R.oth.map(k=>cap(OTH[k]))));
+ $('o2').innerHTML=o2;
+ let o3='';F.P.forEach(p=>o3+=box(p.lvl,p.t,ul(p.w)));
+ if(!F.P.length)o3+=box('info','Фенотип не определён','Отметьте, что нарушилось первым, и характерные признаки.');
+ F.sup.forEach(s=>o3+=box('info','Учесть',s));
+ $('o3').innerHTML=o3;
+ let o4='';const mi=[];
+ if(F.mta>=0)mi.push('MTA '+F.mta+(F.mtaAb?' — атрофия для возраста (порог '+F.mtaThr+')':' — в пределах возраста'));
+ if(F.faz>=0)mi.push('Фазекас '+F.faz+(F.faz>=2?' — выраженная болезнь малых сосудов':''));
+ if(F.koe>=0)mi.push('Кудам '+F.koe+(F.koe>=2?' — теменная атрофия, характерна для болезни Альцгеймера':''));
+ if(mi.length)o4+=box('info','МРТ',ul(mi));
+ if(F.adBio)o4+=box('ok','Биомаркеры Альцгеймера положительны','Подтверждают альцгеймеровскую патологию; при деменции другого фенотипа — возможна сопутствующая.');
+ if(F.adNeg)o4+=box('info','Биомаркеры Альцгеймера отрицательны','Болезнь Альцгеймера как причина маловероятна.');
+ if(ST.csf==='tt')o4+=box('bad','Очень высокий общий tau','Быстрая гибель нейронов: болезнь Крейцфельдта — Якоба, энцефалит, недавний инсульт или эпистатус.');
+ $('o4').innerHTML=o4;
+ $('sum').textContent=summary(C,R,F,Pl)}
+
+function summary(C,R,F,Pl){const L=[];
+ if(!C.st&&!F.P.length&&!C.rpd)return 'Отметьте бытовую независимость, тест и что нарушилось первым.';
+ const pace={yrs:'медленное, годы',mo:'быстрое, месяцы',wk:'очень быстрое, недели'}[ST.pace];
+ const first={mem:'память на недавние события',lang:'речь',vis:'зрительно-пространственные функции',beh:'поведение и личность',exe:'замедленность и планирование',gait:'ходьба',mot:'движения'}[ST.first];
+ L.push('Когнитивные нарушения'+(C.age!==null?', возраст '+C.age:'')+(C.edu!==null?', образование '+C.edu+' лет':'')+'.'+(pace?' Нарастание: '+pace+'.':'')+(first?' Первыми нарушились: '+first+'.':''));
+ const t=[];if(C.mo!==null)t.push('MoCA '+C.mo+'/30'+(C.moA!==C.mo?' (с поправкой '+C.moA+')':''));if(C.mm!==null)t.push('MMSE '+C.mm+'/30');
+ if(t.length||ST.func)L.push((t.length?t.join(', ')+'. ':'')+(ST.func?'Бытовая независимость: '+{full:'сохранена',eff:'сохранена с трудом',iadl:'нужна помощь в сложных делах',adl:'нужна помощь в самообслуживании'}[ST.func]+'.':''));
+ const fe=[];F.core.forEach(k=>fe.push({lb_fl:'колебания внимания',lb_vh:'зрительные галлюцинации',lb_rbd:'разыгрывание снов',lb_pk:'паркинсонизм'}[k]));
+ F.ft.forEach(k=>fe.push({ft_dis:'расторможенность',ft_apa:'апатия',ft_emp:'утрата сопереживания',ft_per:'стереотипии',ft_hyp:'гипероральность',ft_exe:'регуляторные нарушения'}[k]));
+ [['pa_ag','аграмматизм'],['pa_sem','нарушение понимания слов'],['pa_rep','паузы поиска слов, нарушено повторение'],['v_str','связь с инсультом'],['v_step','ступенчатое течение'],['n_gait','нарушение ходьбы'],['n_inc','недержание мочи'],['ps_vg','парез вертикального взора'],['ps_fall','падения назад'],['cb_asym','асимметричная апраксия и ригидность'],['cj_myo','миоклонус или атаксия']].forEach(([k,l])=>{if(h(k))fe.push(l)});
+ if(fe.length)L.push('Клинически: '+fe.join(', ')+'.');
+ if(C.del)L.push('Признаки делирия: острое начало или колебания, нарушение внимания.');
+ const lab=[];if(R.ok.length)lab.push('в норме: '+R.ok.map(k=>LAB[k]).join(', '));if(R.ab.length)lab.push('изменены: '+R.ab.map(k=>LAB[k]).join(', '));if(lab.length)L.push('Анализы '+lab.join('; ')+'.');
+ const mr=[];if(F.mta>=0)mr.push('MTA '+F.mta);if(F.faz>=0)mr.push('Фазекас '+F.faz);if(F.koe>=0)mr.push('Кудам '+F.koe);
+ [['mr_sdh','субдуральная гематома'],['mr_tum','объёмное образование'],['mr_inf','инфаркты'],['mr_lob','долевые микрокровоизлияния или сидероз'],['mr_nph','признаки нормотензивной гидроцефалии'],['mr_ftd','лобная или передняя височная атрофия'],['mr_mid','атрофия среднего мозга'],['mr_dwi','ограничение диффузии в коре или базальных ганглиях']].forEach(([k,l])=>{if(h(k))mr.push(l)});
+ if(R.img&&R.img!=='no')L.push((R.img==='ct'?'КТ':'МРТ')+(mr.length?': '+mr.join(', '):' без указанных изменений')+'.');
+ const bm=[];if(ST.csf&&ST.csf!=='nd')bm.push('ликвор — '+{ad:'профиль Альцгеймера',neg:'норма',tt:'очень высокий общий tau'}[ST.csf]);if(ST.ptau&&ST.ptau!=='nd')bm.push('p-tau217 — '+{pos:'положительный',grey:'серая зона',neg:'отрицательный'}[ST.ptau]);
+ if(ST.dat&&ST.dat!=='nd')bm.push('ОФЭКТ с ДАТ — '+{low:'снижен захват',norm:'норма'}[ST.dat]);if(ST.fdg&&ST.fdg!=='nd')bm.push('ПЭТ с ФДГ — '+{tp:'теменно-височный гипометаболизм',fr:'лобный гипометаболизм',occ:'затылочный гипометаболизм',norm:'норма'}[ST.fdg]);
+ if(ST.eeg&&ST.eeg!=='nd')bm.push('ЭЭГ — '+{per:'периодические комплексы',psl:'заднее замедление',epi:'эпилептиформная активность',norm:'норма'}[ST.eeg]);if(ST.psg&&ST.psg!=='nd')bm.push('полисомнография — '+{rsw:'сон без атонии',osa:'апноэ',norm:'норма'}[ST.psg]);
+ if(bm.length)L.push('Биомаркеры: '+bm.join('; ')+'.');
+ let z='Заключение: '+(C.st?STN[C.st]+(C.st==='dem'?', '+C.sev+' степень':''):'когнитивные нарушения');
+ if(C.rpd)z+=', быстро прогрессирующее течение';
+ if(F.P.length)z+='; '+F.P.map(p=>p.dx).join('; ');else if(C.st)z+='; этиология не уточнена';
+ L.push(z+'.');
+ const all=[...Pl.X,...Pl.T];
+ if(all.length)L.push('Рекомендовано:\n'+all.map((x,i)=>(i+1)+'. '+x+'.').join('\n'));
+ return L.join('\n')}
+
+document.addEventListener('click',e=>{const b=e.target.closest('.seg button');if(!b)return;const g=b.closest('.seg'),k=g.dataset.k;ST[k]=ST[k]===b.dataset.v?'':b.dataset.v;save();render()});
+CB.forEach(k=>{const x=$(k);if(!x)return;x.checked=!!ST[k];x.onchange=()=>{ST[k]=x.checked;save();render()}});
+TX.forEach(k=>{const x=$(k);if(!x)return;if(ST[k]!=null)x.value=ST[k];x.oninput=x.onchange=()=>{ST[k]=x.value;save();render()}});
+if(!$('mail').value)$('mail').value=DEFMAIL;
+$('laball').onclick=()=>{Object.keys(LAB).forEach(k=>{if(!ST[k]||ST[k]==='nd')ST[k]='ok'});save();render()};
+const order=['s1','s2','s3','s4','s5'];
+function go(s){document.querySelectorAll('section').forEach(x=>x.classList.toggle('on',x.id===s));document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));render();scrollTo(0,0)}
+document.querySelector('nav.tabs').onclick=e=>{const b=e.target.closest('button');if(b)go(b.dataset.s)};
+document.querySelectorAll('.stepnav').forEach(n=>{const i=order.indexOf(n.closest('section').id);const p=n.querySelector('.prev'),x=n.querySelector('.next');if(p)p.onclick=()=>go(order[i-1]);if(x)x.onclick=()=>go(order[(i+1)%order.length])});
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('sum').textContent);$('copy').textContent='Скопировано'}catch(e){$('copy').textContent='Не удалось — выделите текст'}setTimeout(()=>$('copy').textContent='Скопировать',1800)};
+$('reset').onclick=()=>{const b=$('reset');if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Стереть всё? Нажмите ещё раз';setTimeout(()=>{b.dataset.c='';b.textContent='Новый пациент'},2500);return}const mail=ST.mail||DEFMAIL;ST=Object.assign(JSON.parse(JSON.stringify(DEF)),{mail});save();location.reload()};
+$('send').onclick=()=>{const to=$('mail').value.trim();if(!to){$('mail').focus();return}const t=ST.tag||'',sub='Деменция'+(t?' — '+t:'')+' — '+new Date().toLocaleDateString('ru-RU');location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent($('sum').textContent.replace(/\n/g,'\r\n'))};
+render();
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('/dem-q4h7tz-sw.js',{scope:'/dem-q4h7tz'}).catch(()=>{});
+</script>
+</body>
+</html>

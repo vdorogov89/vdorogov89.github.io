@@ -1,0 +1,31 @@
+{
+ "id": "/dem-q4h7tz.html",
+ "name": "Деменция: диагностический алгоритм",
+ "short_name": "Деменция",
+ "lang": "ru",
+ "start_url": "/dem-q4h7tz.html",
+ "scope": "/dem-q4h7tz",
+ "display": "standalone",
+ "background_color": "#08080D",
+ "theme_color": "#08080D",
+ "icons": [
+  {
+   "src": "/dem-icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/dem-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/dem-icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
