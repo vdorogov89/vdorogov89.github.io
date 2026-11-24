@@ -350,6 +350,7 @@ footer{position:relative; z-index:1; padding:30px 0 44px; color:var(--muted); fo
       <button data-p="3">3 месяца</button>
       <button data-p="6">6 месяцев</button>
       <button data-p="12">Год</button>
+      <button data-p="all">Всё время</button>
     </div>
     <div id="summaryOut"></div>
     <div class="actions">
@@ -533,7 +534,7 @@ function wxText(pt,short){
 function wxRange(){
   const t=today(); let start=dPlus(t,-2);
   if(entries.length){const first=entries.reduce((m,e)=>e.date<m?e.date:m,t); start=dPlus(first,-33);}
-  const lim=dPlus(t,-400); if(start<lim) start=lim; return [start,t];
+  const lim=dPlus(t,-1830); if(start<lim) start=lim; return [start,t];
 }
 async function wxFetch(url){const r=await fetch(url); if(!r.ok) throw new Error(r.status); return r.json();}
 function wxMerge(j){const tm=j.hourly&&j.hourly.time, v=j.hourly&&j.hourly.surface_pressure; if(!tm) return;
@@ -1014,7 +1015,8 @@ function delEntry(id){if(!confirm('Удалить эту запись?'))return;
 function monthList(p){
   const now=new Date(); let y=now.getFullYear(), m=now.getMonth();
   if(p==='prev'){m--; if(m<0){m=11;y--;} return [y+'-'+pad(m+1)];}
-  const n=p==='cur'?1:+p, out=[];
+  let n=p==='cur'?1:+p; const out=[];
+  if(p==='all'){const f=entries.length?entries.reduce((m,e)=>e.date<m?e.date:m,'9999-99-99'):today(); n=Math.max(1,(y-+f.slice(0,4))*12+m-(+f.slice(5,7)-1)+1);}
   for(let i=0;i<n;i++){out.unshift(y+'-'+pad(m+1)); m--; if(m<0){m=11;y--;}}
   return out;
 }
@@ -1104,7 +1106,7 @@ function renderSummary0(){
     }
     const cur=per.find(x=>x.k===curK), curNote=cur&&nb?` В текущем месяце пока: ${cur.s.attacks} ${plural(cur.s.attacks,'приступ','приступа','приступов')}, ${cur.s.hDays} ${plural(cur.s.hDays,'день','дня','дней')} с болью.`:'';
     const worst=per.map(x=>medLevel(x.s)).includes('red')?'red':per.map(x=>medLevel(x.s)).includes('amber')?'amber':'';
-    h+=`<h2>Дни с головной болью по месяцам</h2>${chartLegend(avgHD)}<div class="chartbox">${daysChart(per,avgHD)}</div>
+    h+=`<h2>Дни с головной болью по месяцам</h2>${chartLegend(avgHD)}<div class="chartbox tchart">${daysChart(per,avgHD)}</div>
       <div class="cards">
         <div class="card"><div class="num">${fmtNum(avgA)}</div><div class="lbl">приступов в месяц, в среднем</div></div>
         <div class="card ${avgHD>=15?'red':''}"><div class="num">${fmtNum(avgHD)}</div><div class="lbl">дней с головной болью в месяц, в среднем</div></div>
@@ -1190,7 +1192,7 @@ function renderHistory(){
 }
 function renderData(){$('dataInfo').textContent=entries.length?`Сейчас в дневнике ${entries.length} ${plural(entries.length,'запись','записи','записей')}.`:'Дневник пока пуст.';}
 function plural(n,a,b,c){const m10=n%10,m100=n%100; return m10===1&&m100!==11?a:m10>=2&&m10<=4&&(m100<10||m100>=20)?b:c;}
-function pchartEnd(){document.querySelectorAll('.pchart').forEach(b=>{b.scrollLeft=b.scrollWidth;});}
+function pchartEnd(){document.querySelectorAll('.pchart,.tchart').forEach(b=>{b.scrollLeft=b.scrollWidth;});}
 function renderAll(){renderSummary(); renderHistory(); renderData(); wxRiskRender();}
 
 function showTab(t){
