@@ -27,6 +27,7 @@ header span{font-size:12.5px; color:var(--muted); white-space:nowrap;}
 nav.tabs{position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; justify-content:center; gap:4px; padding:10px 8px calc(10px + env(safe-area-inset-bottom)); background:rgba(10,10,16,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-top:1px solid var(--line);}
 nav.tabs button{flex:1; max-width:120px; padding:9px 2px; border-radius:12px; border:0; background:transparent; color:var(--muted); font-size:12.5px;}
 nav.tabs button.on{background:rgba(79,224,255,0.12); color:var(--ink);}
+@media (max-width:720px){nav.tabs{flex-wrap:wrap;} nav.tabs button{flex:1 0 calc(25% - 4px); max-width:none; padding:8px 2px;} .app{padding-bottom:calc(128px + env(safe-area-inset-bottom));}}
 section{display:none;} section.on{display:block;}
 .card{background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:16px; margin:12px 0;}
 h2{font-size:17px; color:var(--ink); margin:4px 0 8px;}
