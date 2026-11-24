@@ -1067,7 +1067,8 @@ function triggersBlock(list){
   const mx=tops[0][1];
   return `<h2>Частые провокаторы</h2><div class="bars">`+tops.map(([t,c])=>`<div class="row"><span>${esc(TRIGL[t]||t)}</span><div class="track"><div class="fill" style="width:${c/mx*100}%"></div></div><span>${c}</span></div>`).join('')+`</div>`;
 }
-function renderSummary(){
+function renderSummary(){renderSummary0(); pchartEnd();}
+function renderSummary0(){
   let months=monthList(period);
   const out=$('summaryOut');
   // для многомесячных периодов не учитываем месяцы до первой записи, чтобы не занижать средние
@@ -1189,11 +1190,13 @@ function renderHistory(){
 }
 function renderData(){$('dataInfo').textContent=entries.length?`Сейчас в дневнике ${entries.length} ${plural(entries.length,'запись','записи','записей')}.`:'Дневник пока пуст.';}
 function plural(n,a,b,c){const m10=n%10,m100=n%100; return m10===1&&m100!==11?a:m10>=2&&m10<=4&&(m100<10||m100>=20)?b:c;}
+function pchartEnd(){document.querySelectorAll('.pchart').forEach(b=>{b.scrollLeft=b.scrollWidth;});}
 function renderAll(){renderSummary(); renderHistory(); renderData(); wxRiskRender();}
 
 function showTab(t){
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
   ['entry','summary','history','data'].forEach(x=>$('tab-'+x).hidden=x!==t);
+  if(t==='summary') pchartEnd();
 }
 
 function printSummary(){
